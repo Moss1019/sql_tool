@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# application files
+parser/*.java
+parser/*.interp
+parser/*.tokens
+
+antlr4.jar
+run.sh
