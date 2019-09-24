@@ -6,9 +6,11 @@ public class Column {
     private String name;
     private ColumnEnums.Type type;
     private List<ColumnEnums.Option> options;
+    private boolean isPrimary;
 
     public Column() {
         options = new ArrayList<>();
+        isPrimary = false;
     }
 
     public Column(String name, ColumnEnums.Type type) {
@@ -35,40 +37,19 @@ public class Column {
 
     public void setOptions(List<ColumnEnums.Option> options) {
         this.options = options;
+        for(ColumnEnums.Option option: options) {
+            if(option == ColumnEnums.Option.primaryKey) {
+                isPrimary = true;
+            }
+        }
     }
 
     public List<ColumnEnums.Option> getOptions() {
         return options;
     }
 
-    public String toSQLString() {
-        StringBuilder b = new StringBuilder();
-        b.append(name).append(" ");
-        switch(type) {
-        case integer:
-            b.append("INTEGER ");
-            break;
-        case charArray:
-            b.append("CHAR(32) ");
-            break;
-        case charUnit:
-            b.append("CHAR(1) ");
-            break;
-        default:
-            break;
-        }
-        for(ColumnEnums.Option option: options) {
-            switch(option) {
-            case primaryKey:
-                b.append("PRIMARY KEY ");
-                break;
-            case autoIncrement:
-                b.append("AUTO_INCREMENT ");
-                break;
-
-            }
-        }
-        return b.toString();
+    public boolean getIsPrimary() {
+        return isPrimary;
     }
 }
 

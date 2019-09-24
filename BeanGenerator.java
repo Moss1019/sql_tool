@@ -13,7 +13,7 @@ public class BeanGenerator {
     }
 
     public String generateEntity(Table table) {
-
+        
         return "";
     }
 }

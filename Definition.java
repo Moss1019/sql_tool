@@ -18,8 +18,13 @@ public class Definition {
             ExtractionVisitor visitor = new ExtractionVisitor();
             Table table = (Table)visitor.visit(tree);
             SqlGenerator gen = new SqlGenerator();
-            String createTableStatement = gen.generateCreateTable(table);
-            System.out.println(createTableStatement);
+            System.out.println(gen.generateCreateTable(table));
+            System.out.println(gen.generateSelectAllProc(table));
+            System.out.println(gen.generateSelectByPKProc(table));
+            System.out.println(gen.generateInsertProc(table));
+            System.out.println(gen.generateUpdateProc(table));
+            System.out.println(gen.generateDeleteProc(table));
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         } finally {

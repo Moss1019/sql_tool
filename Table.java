@@ -30,4 +30,13 @@ class Table {
     public List<Column> getColumns() {
         return columns;
     }
+
+    public Column getPrimaryColumn() {
+        for(Column col: columns) {
+            if(col.getIsPrimary()) {
+                return col;
+            }
+        }
+        return null;
+    }
 }

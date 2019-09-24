@@ -23,8 +23,7 @@ def compile_java():
     chdir('..')
 
 if __name__ == '__main__':
-    # run_antlr()
     if not path.exists('./antlr4.jar'):
         download_antlr_jar()
-    run_antlr()
+    # run_antlr()
     compile_java()
