@@ -4,8 +4,30 @@ import org.antlr.v4.runtime.tree.*;
 
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
 
 public class Definition {
+    public static void writeFile(String fileName, String fileContent) {
+        String filePath = String.format("../output/%s", fileName);
+        FileOutputStream fOut = null;
+        BufferedOutputStream bufOStream = null;
+        try {
+            fOut = new FileOutputStream(filePath);
+            bufOStream = new BufferedOutputStream(fOut);
+            bufOStream.write(fileContent.getBytes());
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                bufOStream.close();
+            } catch (Exception ex) {}
+            try {
+                fOut.close();
+            } catch (Exception ex) {}
+        }
+    }
+
     public static void main(String[] args) {
         InputStream iStream = null;
         try {
@@ -18,13 +40,12 @@ public class Definition {
             ExtractionVisitor visitor = new ExtractionVisitor();
             Table table = (Table)visitor.visit(tree);
             SqlGenerator gen = new SqlGenerator();
-            System.out.println(gen.generateCreateTable(table));
-            System.out.println(gen.generateSelectAllProc(table));
-            System.out.println(gen.generateSelectByPKProc(table));
-            System.out.println(gen.generateInsertProc(table));
-            System.out.println(gen.generateUpdateProc(table));
-            System.out.println(gen.generateDeleteProc(table));
-
+            writeFile("create_table.sql", gen.generateCreateTable(table));
+            writeFile("select_app_proc.sql", gen.generateSelectAllProc(table));
+            writeFile("select_one_proc.sql", gen.generateSelectByPKProc(table));
+            writeFile("insert_proc.sql", gen.generateInsertProc(table));
+            writeFile("update_proc.sql", gen.generateUpdateProc(table));
+            writeFile("delete_proc.sql", gen.generateDeleteProc(table));
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         } finally {

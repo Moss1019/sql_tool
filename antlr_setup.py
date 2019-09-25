@@ -40,6 +40,6 @@ def run_java():
 if __name__ == '__main__':
     if not path.exists('./antlr4.jar'):
         download_antlr_jar()
-    run_antlr()
+    run_antlr('Definition')
     compile_java()
     run_java()
