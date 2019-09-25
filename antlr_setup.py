@@ -1,6 +1,7 @@
 
 from os import system, environ, chdir, getcwd, path
 from urllib.request import urlopen
+from platform import system as platform_os
 
 current_dir = getcwd()
 
@@ -13,11 +14,15 @@ def download_antlr_jar():
     req.close()
 
 def run_antlr():
-    environ['CLASSPATH'] = '.:%s/antlr4.jar:$CLASSPATH' % current_dir
-    system('java -jar %s/antlr4.jar ./parser/Definition.g4 -no-listener -visitor' % current_dir)
+    cp_string = '.;%s/antlr4.jar;%%CLASSPATH%%' if platform_os() == 'Windows' else '.:%s/antlr4.jar:%CLASSPATH%'
+    environ['CLASSPATH'] = cp_string % current_dir
+    print( environ['CLASSPATH'] )
+    chdir('./parser')
+    system('java -jar %s/antlr4.jar ./Definition.g4 -no-listener -visitor' % current_dir)
+    chdir('..')
 
 def compile_java():
-    system('javac -d ./build ./*.java ./parser/*.java')
+    system('javac -d ./build ./parser/*.java ./*.java')
     chdir('./build')
     system('java Definition')
     chdir('..')
@@ -25,5 +30,5 @@ def compile_java():
 if __name__ == '__main__':
     if not path.exists('./antlr4.jar'):
         download_antlr_jar()
-    # run_antlr()
+    run_antlr()
     compile_java()
