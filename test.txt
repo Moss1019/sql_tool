@@ -3,4 +3,5 @@ Person {
    id int primary_key auto_increment;
    first_name string;
    last_name string;
+   is_active bool;
 };

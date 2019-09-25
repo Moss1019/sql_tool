@@ -28,6 +28,20 @@ public class ColumnEnums {
         return "char(16)";
     }
 
+    public static String resolveJavaType(Type type) {
+        switch(type) {
+            case integer:
+                return "Integer";
+            case charArray:
+                return "String";
+            case bit:
+                return "Boolean";
+            case charUnit:
+                return "Character";
+            }
+            return "String";
+    }
+
     public static String resolveOption(Option option) {
         switch(option) {
         case primaryKey:

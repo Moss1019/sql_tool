@@ -29,6 +29,8 @@ public class ExtractionVisitor extends DefinitionBaseVisitor<Object> {
             column.setType(ColumnEnums.Type.charArray);
         } else if (typeStr.equals("char")) {
             column.setType(ColumnEnums.Type.charUnit);
+        } else if (typeStr.equals("bool")) {
+            column.setType(ColumnEnums.Type.bit);
         }
         column.setName(ctx.NAME().getText());
         column.setOptions((List<ColumnEnums.Option>)visit(ctx.options()));
@@ -44,6 +46,8 @@ public class ExtractionVisitor extends DefinitionBaseVisitor<Object> {
                 options.add(ColumnEnums.Option.primaryKey);
             } else if (optionStr.equals("auto_increment")) {
                 options.add(ColumnEnums.Option.autoIncrement);
+            } else if (optionStr.equals("not_null")) {
+                options.add(ColumnEnums.Option.notNull); 
             }
         }
         return options;

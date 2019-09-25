@@ -46,6 +46,8 @@ public class Definition {
             writeFile("insert_proc.sql", gen.generateInsertProc(table));
             writeFile("update_proc.sql", gen.generateUpdateProc(table));
             writeFile("delete_proc.sql", gen.generateDeleteProc(table));
+            BeanGenerator ben = new BeanGenerator();
+            writeFile(String.format("%s.java", table.getName()), ben.generateEntity(table));
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         } finally {
