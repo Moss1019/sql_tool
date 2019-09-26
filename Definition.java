@@ -48,6 +48,8 @@ public class Definition {
             writeFile("delete_proc.sql", gen.generateDeleteProc(table));
             BeanGenerator ben = new BeanGenerator();
             writeFile(String.format("%s.java", table.getName()), ben.generateEntity(table));
+            writeFile(String.format("%sService.java", table.getName()), ben.generateService(table));
+            writeFile(String.format("%sRepository.java", table.getName()), ben.generateRepo(table));
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         } finally {

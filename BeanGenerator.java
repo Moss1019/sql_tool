@@ -5,13 +5,30 @@ import java.util.stream.Collectors;
 public class BeanGenerator {
 
     public String generateRepo(Table table) {
-
-        return "";
+        StringBuilder b = new StringBuilder();
+        b.append("@Repository\npublic class ")
+        .append(table.getName())
+        .append("Repository {\n")
+        
+        .append("}");
+        return b.toString();
     }
 
     public String generateService(Table table) {
-
-        return "";
+        StringBuilder b = new StringBuilder();
+        b.append("@Service\npublic class ")
+        .append(table.getName())
+        .append("Service {\n")
+        .append("\tprivate static final Logger L = Logger.getLogger(")
+        .append(table.getName())
+        .append("Service")
+        .append(".class.toString());\n\n")
+        .append("\t@Autowired\n")
+        .append("\tprivate ")
+        .append(table.getName())
+        .append("Repository repo;")
+        .append("\n}");
+        return b.toString();
     }
 
     private String generateNamedStoredProcedureQueryParameter(Column col) {
