@@ -24,6 +24,19 @@ language application will generate output in the ./output directory. The folders
 <h2>Using the output</h2>
 <p>
 This tool is meant to speed up development of the classes needed for a java and spring boot application.
-Specifically the model class and the repository. The code written in these files are straight forward, and writing
-by hand can take a lot of time.
+Specifically the POJO that will be marked with @Entity and the bean that will be marked with @Repository.
+The code written in these files are straight forward, and writing it by hand can take a lot of time.
+This tool generates a lot code from a simple definition, which can then be tweaked as if written by hand.
+</p>
+<h2>Example definition</h2>
+<p>
+currently the ./test.txt file contains the defintion. This will be changed soon to rather be an argument
+</p>
+<p>
+User {
+   id int primary_key auto_increment;
+   first_name string;
+   last_name string;
+   is_active bool;
+};
 </p>
