@@ -1,5 +1,5 @@
 
-from os import system, environ, chdir, getcwd, path
+from os import system, environ, chdir, getcwd, path, mkdir
 from urllib.request import urlopen
 from platform import system as platform_os
 
@@ -28,11 +28,15 @@ def run_antlr(grammar_file):
     chdir('..')
 
 def compile_java():
+    if not path.exists('./build'):
+        mkdir('./build')
     cp_string = '.;%s/antlr4.jar;%%CLASSPATH%%' if platform_os() == 'Windows' else '.:%s/antlr4.jar:%CLASSPATH%'
     environ['CLASSPATH'] = cp_string % current_dir
     system('javac -d ./build ./parser/*.java ./*.java')
 
 def run_java():
+    if not path.exists('./output'):
+        mkdir('./output')
     chdir('./build')
     system('java Definition')
     chdir('..')
