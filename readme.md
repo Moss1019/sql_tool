@@ -33,10 +33,10 @@ This tool generates a lot code from a simple definition, which can then be tweak
 currently the ./test.txt file contains the defintion. This will be changed soon to rather be an argument
 </p>
 <p>
-User {
-   id int primary_key auto_increment;
-   first_name string;
-   last_name string;
-   is_active bool;
+User { <br/>
+   id int primary_key auto_increment; <br/>
+   first_name string; <br/>
+   last_name string; <br/>
+   is_active bool; <br/>
 };
 </p>
