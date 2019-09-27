@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class Column {
     private String name;
+    private String fieldName;
+    private String fieldNameCaps;
     private ColumnEnums.Type type;
     private List<ColumnEnums.Option> options;
     private boolean isPrimary;
@@ -15,16 +17,31 @@ public class Column {
 
     public Column(String name, ColumnEnums.Type type) {
         this();
-        this.name = name;
+        setName(name);
         this.type = type;
     }
 
     public void setName(String name) {
         this.name = name;
+        String[] words = name.split("_");
+        StringBuilder fieldNameBuilder = new StringBuilder(words[0]);
+        for(int i = 1; i < words.length; ++i) {
+            fieldNameBuilder.append(String.format("%c%s", words[i].toUpperCase().charAt(0), words[i].substring(1)));
+        }
+        fieldName = fieldNameBuilder.toString();
+        fieldNameCaps = String.format("%c%s", fieldName.toUpperCase().charAt(0), fieldName.substring(1));
     }
 
     public String getName() { 
         return name;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public String getFieldNameCaps() {
+        return fieldNameCaps;
     }
 
     public void setType(ColumnEnums.Type type) {

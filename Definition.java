@@ -46,10 +46,10 @@ public class Definition {
             writeFile("insert_proc.sql", gen.generateInsertProc(table));
             writeFile("update_proc.sql", gen.generateUpdateProc(table));
             writeFile("delete_proc.sql", gen.generateDeleteProc(table));
-            BeanGenerator ben = new BeanGenerator();
-            writeFile(String.format("%s.java", table.getName()), ben.generateEntity(table));
-            writeFile(String.format("%sService.java", table.getName()), ben.generateService(table));
-            writeFile(String.format("%sRepository.java", table.getName()), ben.generateRepo(table));
+            BeanGenerator ben = new BeanGenerator(table);
+            writeFile(String.format("%s.java", table.getName()), ben.generateEntity());
+            writeFile(String.format("%sService.java", table.getName()), ben.generateService());
+            writeFile(String.format("%sRepository.java", table.getName()), ben.generateRepo());
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         } finally {

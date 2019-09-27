@@ -3,18 +3,145 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BeanGenerator {
+    private Table table;
+    private List<Column> primaryCols;
+    private List<Column> nonPrimaryCols;
 
-    public String generateRepo(Table table) {
+    public BeanGenerator(Table table) {
+        this.table = table;
+        primaryCols = table.getColumns().stream().filter(c -> c.getIsPrimary()).collect(Collectors.toList());
+        nonPrimaryCols = table.getColumns().stream().filter(c -> !c.getIsPrimary()).collect(Collectors.toList());
+    }
+
+    private String generateQueryCode(String queryName, List<Column> parameterColumns) {
+        StringBuilder b = new StringBuilder();
+        b.append("\t\tStoredProcedureQuery query = em.createNamedStoredProcedureQuery(\"")
+        .append(queryName)
+        .append(table.getName())
+        .append("\");\n");
+        if(parameterColumns != null) {
+            for(Column col: parameterColumns) {
+                b.append("\t\tquery.setParameter(\"")
+                .append(col.getName())
+                .append("\", p.get")
+                .append(col.getFieldNameCaps())
+                .append("());\n");
+            }
+        }
+        return b.toString();
+    }
+
+    private String generateCallSelect() {
+        StringBuilder b = new StringBuilder();
+        b.append("\t")
+        .append("public ")
+        .append(table.getName())
+        .append(" select")
+        .append(table.getName())
+        .append("(")
+        .append(ColumnEnums.resolveJavaType(primaryCols.get(0).getType()))
+        .append(" ")
+        .append(primaryCols.get(0).getFieldName())
+        .append(") {\n")
+        .append(generateQueryCode("select", primaryCols))
+        .append("\t\tObject result = query.getSingleResult();\n")
+        .append("\t\treturn (")
+        .append(table.getName())
+        .append(")result;\n")
+        .append("\t}\n");
+        return b.toString();
+    }
+
+    private String generateCallSelectAll() {
+        StringBuilder b = new StringBuilder();
+        b.append("\tpublic List<")
+        .append(table.getName())
+        .append("> select")
+        .append(table.getName())
+        .append("s() {\n")
+        .append("\t\tStoreProcedureQuery query = em.createNamedStoredProcedureQuery(\"select")
+        .append(table.getName())
+        .append("s\");\n")
+        .append("\t\tList<")
+        .append(table.getName())
+        .append("> result = query.getResultList();\n")
+        .append("\t\treturn (List<")
+        .append(table.getName())
+        .append(">)result;\n\t}\n");
+        return b.toString();
+    }
+
+    private String generateCallInsert() {
+        StringBuilder b = new StringBuilder();
+        b.append("\tpublic boolean insert")
+        .append(table.getName())
+        .append("(")
+        .append(table.getName())
+        .append(" p")
+        .append(") {\n")
+        .append(generateQueryCode("insert", nonPrimaryCols))
+        .append("\t\treturn query.execute();\n")
+        .append("\t}\n");
+        return b.toString();
+    }
+
+    private String generateCallUpdate() {
+        StringBuilder b = new StringBuilder();
+        b.append("\tpublic ")
+        .append(table.getName())
+        .append(" update")
+        .append(table.getName())
+        .append("(")
+        .append(table.getName())
+        .append(" p")
+        .append(") {\n")
+        .append(generateQueryCode("update", table.getColumns()))
+        .append("\t\tint affectedRows = query.executeUpdate();\n")
+        .append("\t\tif(affectedRows > 0) {\n")
+        .append("\t\t\treturn p;\n")
+        .append("\t\t}\n")
+        .append("\t\treturn null;\n\t}\n");
+        return b.toString();
+    }
+
+    private String generateCallDelete() {
+        StringBuilder b = new StringBuilder();
+        b.append("\tpublic ")
+        .append(table.getName())
+        .append(" delete")
+        .append(table.getName())
+        .append("(")
+        .append(table.getName())
+        .append(" p")
+        .append(") {\n")
+        .append(generateQueryCode("delete", primaryCols))
+        .append("\t\tint affectedRows = query.executeUpdate();\n")
+        .append("\t\tif(affectedRows > 0) {\n")
+        .append("\t\t\treturn p;\n")
+        .append("\t\t}\n")
+        .append("\t\treturn null;\n\t}\n");
+        return b.toString();
+    }
+
+    public String generateRepo() {
         StringBuilder b = new StringBuilder();
         b.append("@Repository\npublic class ")
         .append(table.getName())
-        .append("Repository {\n")
-        
+        .append("Repository {\n\t@PersistenceContext\n\tprivate EntityManager em;\n\n")
+        .append(generateCallSelect())
+        .append("\n")
+        .append(generateCallSelectAll())
+        .append("\n")
+        .append(generateCallInsert())
+        .append("\n")
+        .append(generateCallUpdate())
+        .append("\n")
+        .append(generateCallDelete())
         .append("}");
         return b.toString();
     }
 
-    public String generateService(Table table) {
+    public String generateService() {
         StringBuilder b = new StringBuilder();
         b.append("@Service\npublic class ")
         .append(table.getName())
@@ -90,7 +217,7 @@ public class BeanGenerator {
             .append("\")\n\tprivate ")
             .append(ColumnEnums.resolveJavaType(col.getType()))
             .append(" ")
-            .append(col.getName())
+            .append(col.getFieldName())
             .append(";\n");
         }
         b.append("\n");
@@ -101,43 +228,41 @@ public class BeanGenerator {
         StringBuilder b = new StringBuilder();
         for(Column col: columns) {
             b.append("\tpublic void set")
-            .append(col.getName())
+            .append(col.getFieldNameCaps())
             .append("(")
             .append(ColumnEnums.resolveJavaType(col.getType()))
             .append(" ")
-            .append(col.getName().toLowerCase())
+            .append(col.getFieldName())
             .append(") {\n")
             .append("\t\tthis.")
-            .append(col.getName())
+            .append(col.getFieldName())
             .append(" = ")
-            .append(col.getName())
+            .append(col.getFieldName())
             .append(";\n\t}\n\n");
             b.append("\tpublic ")
             .append(ColumnEnums.resolveJavaType(col.getType()))
             .append(" get")
-            .append(col.getName())
+            .append(col.getFieldNameCaps())
             .append("() {\n")
             .append("\t\treturn ")
-            .append(col.getName())
+            .append(col.getFieldName())
             .append(";\n\t}\n\n");
         }
         return b.toString();
     }
 
-    public String generateEntity(Table table) {
+    public String generateEntity() {
         StringBuilder b = new StringBuilder();
         b.append("import javax.persistence.*;\n\n")
         .append("@Entity\n")
         .append("@Table(name = \"")
         .append(table.getName())
         .append("\")\n");
-        List<Column> primaryCol = table.getColumns().stream().filter(c -> c.getIsPrimary()).collect(Collectors.toList());
-        List<Column> otherCols = table.getColumns().stream().filter(c -> !c.getIsPrimary()).collect(Collectors.toList());
         b.append(generateNamedStoredProcedureQuery("selectUsers", null, table.getName()))
-        .append(generateNamedStoredProcedureQuery("selectUser", primaryCol, table.getName()))
-        .append(generateNamedStoredProcedureQuery("insertUser", otherCols, null))
+        .append(generateNamedStoredProcedureQuery("selectUser", primaryCols, table.getName()))
+        .append(generateNamedStoredProcedureQuery("insertUser", nonPrimaryCols, null))
         .append(generateNamedStoredProcedureQuery("updateUser", table.getColumns(), null))
-        .append(generateNamedStoredProcedureQuery("deleteUser", primaryCol, null))
+        .append(generateNamedStoredProcedureQuery("deleteUser", primaryCols, null))
         .append("public class ")
         .append(table.getName())
         .append(" {\n");
