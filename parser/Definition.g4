@@ -12,6 +12,7 @@ TYPE: 'string'
     | 'int'
     | 'char'
     | 'bool'
+    | 'date'
     ;
 
 NAME: [a-zA-Z_]+;

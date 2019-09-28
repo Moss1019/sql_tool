@@ -30,7 +30,9 @@ public class ExtractionVisitor extends DefinitionBaseVisitor<Object> {
         } else if (typeStr.equals("char")) {
             column.setType(ColumnEnums.Type.charUnit);
         } else if (typeStr.equals("bool")) {
-            column.setType(ColumnEnums.Type.bit);
+            column.setType(ColumnEnums.Type.bool);
+        } else if (typeStr.equals("date")) {
+            column.setType(ColumnEnums.Type.date);
         }
         column.setName(ctx.NAME().getText());
         column.setOptions((List<ColumnEnums.Option>)visit(ctx.options()));

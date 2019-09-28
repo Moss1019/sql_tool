@@ -4,8 +4,9 @@ public class ColumnEnums {
     public enum Type {
         integer,
         charArray,
-        bit,
-        charUnit
+        bool,
+        charUnit,
+        date
     }
 
     public enum Option {
@@ -20,24 +21,44 @@ public class ColumnEnums {
             return "integer";
         case charArray:
             return "char(32)";
-        case bit:
+        case bool:
             return "bit";
         case charUnit:
             return "char(1)";
+        case date:
+            return "datetime";
         }
         return "char(16)";
     }
 
-    public static String resolveJavaType(Type type) {
+    public static String resolveWrapperType(Type type) {
         switch(type) {
             case integer:
                 return "Integer";
             case charArray:
                 return "String";
-            case bit:
+            case bool:
                 return "Boolean";
             case charUnit:
                 return "Character";
+            case date:
+                return "DateTime";
+            }
+            return "String";
+    }
+
+    public static String resolvePrimitiveType(Type type) {
+        switch(type) {
+            case integer:
+                return "int";
+            case charArray:
+                return "String";
+            case bool:
+                return "boolean";
+            case charUnit:
+                return "char";
+            case date:
+                return "DateTime";
             }
             return "String";
     }
