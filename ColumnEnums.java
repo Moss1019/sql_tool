@@ -42,7 +42,7 @@ public class ColumnEnums {
             case charUnit:
                 return "Character";
             case date:
-                return "DateTime";
+                return "Date";
             }
             return "String";
     }
@@ -58,7 +58,7 @@ public class ColumnEnums {
             case charUnit:
                 return "char";
             case date:
-                return "DateTime";
+                return "Date";
             }
             return "String";
     }

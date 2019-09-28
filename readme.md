@@ -40,3 +40,6 @@ User { <br/>
    is_active bool; <br/>
 };
 </p>
+<p>
+This project is being actively worked on, so there will be new things every now and then 
+</p>
