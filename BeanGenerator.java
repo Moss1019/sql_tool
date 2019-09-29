@@ -164,7 +164,7 @@ public class BeanGenerator {
     public String generateService() {
         StringBuilder b = new StringBuilder();
         b.append("\n\nimport org.springframework.stereotype.Service;\n")
-        .append("import org.springframework.beans.factory.annotation.Autowired;\n")
+        .append("import org.springframework.beans.factory.annotation.Autowired;\n\n")
         .append("import java.util.logging.Logger;\n\n")
         .append("@Service\npublic class ")
         .append(table.getName())
@@ -172,12 +172,7 @@ public class BeanGenerator {
         .append("\tprivate static final Logger L = Logger.getLogger(")
         .append(table.getName())
         .append("Service")
-        .append(".class.toString());\n\n")
-        .append("\t@Autowired\n")
-        .append("\tprivate ")
-        .append(table.getName())
-        .append("Repository repo;")
-        .append("\n}");
+        .append(".class.toString());\n\n}");
         return b.toString();
     }
 
@@ -223,9 +218,8 @@ public class BeanGenerator {
             .append(resultClass)
             .append(".class");
         }
-        b.append(generateParameterDefinition(columns));
-        
-        b.append(")\n");
+        b.append(generateParameterDefinition(columns))
+        .append(")\n");
         return b.toString();
     }
 
@@ -261,8 +255,8 @@ public class BeanGenerator {
             .append(col.getFieldName())
             .append(" = ")
             .append(col.getFieldName())
-            .append(";\n\t}\n\n");
-            b.append("\tpublic ")
+            .append(";\n\t}\n\n")
+            .append("\tpublic ")
             .append(ColumnEnums.resolvePrimitiveType(col.getType()))
             .append(" get")
             .append(col.getFieldNameCaps())
@@ -281,11 +275,11 @@ public class BeanGenerator {
         .append("@Table(name = \"")
         .append(table.getName())
         .append("\")\n")
-        .append(generateNamedStoredProcedureQuery("selectUsers", null, table.getName()))
-        .append(generateNamedStoredProcedureQuery("selectUser", primaryCols, table.getName()))
-        .append(generateNamedStoredProcedureQuery("insertUser", nonPrimaryCols, null))
-        .append(generateNamedStoredProcedureQuery("updateUser", table.getColumns(), null))
-        .append(generateNamedStoredProcedureQuery("deleteUser", primaryCols, null))
+        .append(generateNamedStoredProcedureQuery(String.format("select%ss", table.getName()), null, table.getName()))
+        .append(generateNamedStoredProcedureQuery(String.format("select%s", table.getName()), primaryCols, table.getName()))
+        .append(generateNamedStoredProcedureQuery(String.format("insert%s", table.getName()), nonPrimaryCols, null))
+        .append(generateNamedStoredProcedureQuery(String.format("update%s", table.getName()), table.getColumns(), null))
+        .append(generateNamedStoredProcedureQuery(String.format("delete%s", table.getName()), primaryCols, null))
         .append("public class ")
         .append(table.getName())
         .append(" {\n")

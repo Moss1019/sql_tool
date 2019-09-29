@@ -40,12 +40,12 @@ public class Definition {
             ExtractionVisitor visitor = new ExtractionVisitor();
             Table table = (Table)visitor.visit(tree);
             SqlGenerator gen = new SqlGenerator();
-            writeFile("create_table.sql", gen.generateCreateTable(table));
-            writeFile("select_app_proc.sql", gen.generateSelectAllProc(table));
-            writeFile("select_one_proc.sql", gen.generateSelectByPKProc(table));
-            writeFile("insert_proc.sql", gen.generateInsertProc(table));
-            writeFile("update_proc.sql", gen.generateUpdateProc(table));
-            writeFile("delete_proc.sql", gen.generateDeleteProc(table));
+            writeFile(String.format("%s_create_table.sql", table.getName()), gen.generateCreateTable(table));
+            writeFile(String.format("%s_select_app_proc.sql", table.getName()), gen.generateSelectAllProc(table));
+            writeFile(String.format("%s_select_one_proc.sql", table.getName()), gen.generateSelectByPKProc(table));
+            writeFile(String.format("%s_insert_proc.sql", table.getName()), gen.generateInsertProc(table));
+            writeFile(String.format("%s_update_proc.sql", table.getName()), gen.generateUpdateProc(table));
+            writeFile(String.format("%s_delete_proc.sql", table.getName()), gen.generateDeleteProc(table));
             BeanGenerator ben = new BeanGenerator(table);
             writeFile(String.format("%s.java", table.getName()), ben.generateEntity());
             writeFile(String.format("%sService.java", table.getName()), ben.generateService());
