@@ -41,11 +41,12 @@ public class Definition {
             Table table = (Table)visitor.visit(tree);
             SqlGenerator gen = new SqlGenerator();
             writeFile(String.format("%s_create_table.sql", table.getName()), gen.generateCreateTable(table));
-            writeFile(String.format("%s_select_app_proc.sql", table.getName()), gen.generateSelectAllProc(table));
+            writeFile(String.format("%s_select_all_proc.sql", table.getName()), gen.generateSelectAllProc(table));
             writeFile(String.format("%s_select_one_proc.sql", table.getName()), gen.generateSelectByPKProc(table));
             writeFile(String.format("%s_insert_proc.sql", table.getName()), gen.generateInsertProc(table));
             writeFile(String.format("%s_update_proc.sql", table.getName()), gen.generateUpdateProc(table));
             writeFile(String.format("%s_delete_proc.sql", table.getName()), gen.generateDeleteProc(table));
+            writeFile(String.format("%s_proc_grants.sql", table.getName()), gen.generateProcGrants(table, "infoteq_user"));
             BeanGenerator ben = new BeanGenerator(table);
             writeFile(String.format("%s.java", table.getName()), ben.generateEntity());
             writeFile(String.format("%sService.java", table.getName()), ben.generateService());

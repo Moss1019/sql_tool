@@ -19,13 +19,24 @@ public class SqlGenerator {
                 statementBuilder.append("\n");
             }
         }
-        statementBuilder.append(");");
+        statementBuilder.append(");\n");
         return statementBuilder.toString();
+    }
+
+    public String generateProcGrants(Table table, String username) {
+        StringBuilder b = new StringBuilder();
+        b
+        .append(String.format("grant execute on procedure sp_delete%s to %s;\n", table.getName().toLowerCase(), username))
+        .append(String.format("grant execute on procedure sp_update%s to %s;\n", table.getName().toLowerCase(), username))
+        .append(String.format("grant execute on procedure sp_insert%s to %s;\n", table.getName().toLowerCase(), username))
+        .append(String.format("grant execute on procedure sp_select%s to %s;\n", table.getName().toLowerCase(), username))
+        .append(String.format("grant execute on procedure sp_select%ss to %s;\n", table.getName().toLowerCase(), username));
+        return b.toString();
     }
 
     public String generateSelectAllProc(Table table) {
         String procName = String.format("sp_select%ss", table.getName().toLowerCase());
-        return String.format("create procedure %s () select * from %s;", procName, table.getName());
+        return String.format("create procedure %s () select * from %s;\n", procName, table.getName());
     }
 
     public String generateSelectByPKProc(Table table) {
@@ -52,7 +63,7 @@ public class SqlGenerator {
         .append(primaryCol.getName())
         .append(" = ")
         .append(primaryCol.getName())
-        .append(";\nend\n\\\\\ndelimiter ;");
+        .append(";\nend\n//\ndelimiter ;\n");
         return procBuilder.toString(); 
     }
 
@@ -67,6 +78,10 @@ public class SqlGenerator {
         int i = 0;
         List<Column> cols = table.getColumns();
         for(Column col: cols) {
+            if(col.getIsPrimary()) {
+                ++i;
+                continue;
+            }
             procBuilder
             .append("in ")
             .append(col.getName())
@@ -91,7 +106,7 @@ public class SqlGenerator {
             }
         }
         procBuilder
-        .append(")\nvalues(\n");
+        .append(")\nvalues(");
         i = 0;
         for(Column col: cols) {
             procBuilder
@@ -101,8 +116,8 @@ public class SqlGenerator {
             }
         }
         procBuilder
-        .append(")\nend \n\\\\\n")
-        .append("delimiter ;");
+        .append(");\nend \n//\n")
+        .append("delimiter ;\n");
         return procBuilder.toString();
     }
 
@@ -130,7 +145,7 @@ public class SqlGenerator {
             }
         }
         procBuilder
-        .append(")\n")
+        .append(")\nbegin\n")
         .append("update ")
         .append(table.getName())
         .append(" t1 set ");
@@ -154,8 +169,8 @@ public class SqlGenerator {
         .append(primaryCol.getName())
         .append(" = ")
         .append(primaryCol.getName())
-        .append(")\nend \n\\\\\n")
-        .append("delimiter ;");
+        .append(";\nend \n//\n")
+        .append("delimiter ;\n");
         return procBuilder.toString();
     }
 
@@ -184,7 +199,7 @@ public class SqlGenerator {
         .append(primaryCol.getName())
         .append(" = ")
         .append(primaryCol.getName())
-        .append(";\nend\n\\\\\ndelimiter ;");
+        .append(";\nend\n//\ndelimiter ;\n");
         return procBuilder.toString();
     }
 } 
