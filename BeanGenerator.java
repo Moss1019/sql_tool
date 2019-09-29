@@ -62,8 +62,13 @@ public class BeanGenerator {
         .append(" ")
         .append(primaryCols.get(0).getFieldName())
         .append(") {\n")
-        .append(generateQueryCode("select", primaryCols))
-        .append("\t\tObject result = query.getSingleResult();\n")
+        .append("\t\tStoredProcedureQuery query = em.createNamedStoredProcedureQuery(\"select")
+        .append(table.getName())
+        .append("\");\n\t\tquery.setParameter(\"")
+        .append(primaryCols.get(0).getName())
+        .append("\",")
+        .append(primaryCols.get(0).getName())
+        .append(");\n\t\tObject result = query.getSingleResult();\n")
         .append("\t\treturn (")
         .append(table.getName())
         .append(")result;\n")
@@ -99,7 +104,7 @@ public class BeanGenerator {
         .append(" p")
         .append(") {\n")
         .append(generateQueryCode("insert", nonPrimaryCols))
-        .append("\t\treturn query.execute()\n\t}\n");
+        .append("\t\treturn query.execute();\n\t}\n");
         return b.toString();
     }
 
