@@ -50,6 +50,7 @@ public class Definition {
             writeFile(String.format("%s.java", table.getName()), ben.generateEntity());
             writeFile(String.format("%sService.java", table.getName()), ben.generateService());
             writeFile(String.format("%sRepository.java", table.getName()), ben.generateRepo());
+            writeFile(String.format("%sContoller.java", table.getName()), ben.generateController());
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         } finally {

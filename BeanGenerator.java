@@ -13,6 +13,25 @@ public class BeanGenerator {
         nonPrimaryCols = table.getColumns().stream().filter(c -> !c.getIsPrimary()).collect(Collectors.toList());
     }
 
+    public String generateController() {
+        StringBuilder b = new StringBuilder();
+        b.append("\n\nimport org.springframework.beans.factory.annotation.Autowired;\n")
+        .append("import org.springframework.http.ResponseEntity;\n")
+        .append("import org.springframework.web.bind.annotation.*;\n\n")
+        .append("import java.util.logging.Logger;\n")
+        .append("import java.util.logging.Level;\n\n")
+        .append("@RestController\n")
+        .append("@RequestMapping(value = \"api/")
+        .append(table.getName().toLowerCase())
+        .append("s\")\npublic class ")
+        .append(table.getName())
+        .append("Controller {\n")
+        .append("\tprivate static final Logger L = Logger.getLogger(")
+        .append(table.getName())
+        .append("Controller.class.toString());\n\n}\n");
+        return b.toString();
+    }
+
     private String generateQueryCode(String queryName, List<Column> parameterColumns) {
         StringBuilder b = new StringBuilder();
         b.append("\t\tStoredProcedureQuery query = em.createNamedStoredProcedureQuery(\"")
@@ -80,8 +99,7 @@ public class BeanGenerator {
         .append(" p")
         .append(") {\n")
         .append(generateQueryCode("insert", nonPrimaryCols))
-        .append("\t\treturn query.execute();\n")
-        .append("\t}\n");
+        .append("\t\treturn query.execute()\n\t}\n");
         return b.toString();
     }
 
@@ -125,7 +143,9 @@ public class BeanGenerator {
 
     public String generateRepo() {
         StringBuilder b = new StringBuilder();
-        b.append("@Repository\npublic class ")
+        b.append("\n\nimport org.springframework.stereotype.Repository;\n\n")
+        .append("import javax.persistence.*;\n\n")
+        .append("@Repository\npublic class ")
         .append(table.getName())
         .append("Repository {\n\t@PersistenceContext\n\tprivate EntityManager em;\n\n")
         .append(generateCallSelect())
@@ -143,7 +163,10 @@ public class BeanGenerator {
 
     public String generateService() {
         StringBuilder b = new StringBuilder();
-        b.append("@Service\npublic class ")
+        b.append("\n\nimport org.springframework.stereotype.Service;\n")
+        .append("import org.springframework.beans.factory.annotation.Autowired;\n")
+        .append("import java.util.logging.Logger;\n\n")
+        .append("@Service\npublic class ")
         .append(table.getName())
         .append("Service {\n")
         .append("\tprivate static final Logger L = Logger.getLogger(")
@@ -253,20 +276,20 @@ public class BeanGenerator {
 
     public String generateEntity() {
         StringBuilder b = new StringBuilder();
-        b.append("import javax.persistence.*;\n\n")
+        b.append("\n\nimport javax.persistence.*;\n\n")
         .append("@Entity\n")
         .append("@Table(name = \"")
         .append(table.getName())
-        .append("\")\n");
-        b.append(generateNamedStoredProcedureQuery("selectUsers", null, table.getName()))
+        .append("\")\n")
+        .append(generateNamedStoredProcedureQuery("selectUsers", null, table.getName()))
         .append(generateNamedStoredProcedureQuery("selectUser", primaryCols, table.getName()))
         .append(generateNamedStoredProcedureQuery("insertUser", nonPrimaryCols, null))
         .append(generateNamedStoredProcedureQuery("updateUser", table.getColumns(), null))
         .append(generateNamedStoredProcedureQuery("deleteUser", primaryCols, null))
         .append("public class ")
         .append(table.getName())
-        .append(" {\n");
-        b.append(generateFields(table.getColumns()))
+        .append(" {\n")
+        .append(generateFields(table.getColumns()))
         .append(generateAccessorsMutators(table.getColumns()))
         .append("}\n");
         return b.toString();
