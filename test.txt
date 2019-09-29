@@ -1,7 +1,5 @@
 
-Record {
+TodoItem {
    id int primary_key auto_increment;
    title string;
-   detail string;
-   date_added date;
 };

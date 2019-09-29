@@ -83,7 +83,7 @@ public class BeanGenerator {
         .append("> select")
         .append(table.getName())
         .append("s() {\n")
-        .append("\t\tStoreProcedureQuery query = em.createNamedStoredProcedureQuery(\"select")
+        .append("\t\tStoredProcedureQuery query = em.createNamedStoredProcedureQuery(\"select")
         .append(table.getName())
         .append("s\");\n")
         .append("\t\tList<")
