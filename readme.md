@@ -1,7 +1,8 @@
 <h1>SQL TOOL</h1>
 <p>
-A custom tool that takes in a definition for a DB table, or a POJO and generates
-SQL queries, an entity POJO and a repo to call stored procedures
+A custom tool that takes in a definition for an entity and generats a series of files that contain the SQL
+necessary to create the DB table and the stored procedures for the common CRUD operations. Other files are 
+Java classes and these are @Entity class, @Repository class, @Service class and @Controller class.
 </p>
 
 <h2>Running the program</h2>
