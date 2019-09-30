@@ -2,6 +2,8 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -28,10 +30,25 @@ public class Definition {
         }
     }
 
+    private static Map<String, String> processArgs(String[] args) {
+        Map<String, String> argMapping = new HashMap<>();
+        for(int i = 0; i < args.length; i += 2) {
+            if(args[i].equals("-f")) {
+                argMapping.put("file_name", args[i + 1]);
+            } else if(args[i].equals("-p")) {
+                argMapping.put("package_name", args[i + 1]);
+            } else if(args[i].equals("-u")) {
+                argMapping.put("db_user", args[i + 1]);
+            }
+        }
+        return argMapping;
+    }
+
     public static void main(String[] args) {
         InputStream iStream = null;
+        Map<String, String> argMapping = processArgs(args);
         try {
-            iStream = new FileInputStream("../test.txt");
+            iStream = new FileInputStream(String.format("../%s", argMapping.get("file_name")));
             ANTLRInputStream antlrIStream = new ANTLRInputStream(iStream);
             DefinitionLexer lexer = new DefinitionLexer(antlrIStream);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -46,8 +63,8 @@ public class Definition {
             writeFile(String.format("%s_insert_proc.sql", table.getName()), gen.generateInsertProc(table));
             writeFile(String.format("%s_update_proc.sql", table.getName()), gen.generateUpdateProc(table));
             writeFile(String.format("%s_delete_proc.sql", table.getName()), gen.generateDeleteProc(table));
-            writeFile(String.format("%s_proc_grants.sql", table.getName()), gen.generateProcGrants(table, "infoteq_user"));
-            BeanGenerator ben = new BeanGenerator(table);
+            writeFile(String.format("%s_proc_grants.sql", table.getName()), gen.generateProcGrants(table, argMapping.get("db_user")));
+            BeanGenerator ben = new BeanGenerator(table, argMapping.get("package_name"));
             writeFile(String.format("%s.java", table.getName()), ben.generateEntity());
             writeFile(String.format("%sService.java", table.getName()), ben.generateService());
             writeFile(String.format("%sRepository.java", table.getName()), ben.generateRepo());

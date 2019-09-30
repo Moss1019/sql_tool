@@ -20,7 +20,7 @@ while is_running:
         print('downloading antlr jar file...')
         download_antlr_jar()
     elif choice == 2:
-        antlr_file = input('enter the name for the file, default "Definition"\n => ')
+        antlr_file = input('enter the name of the file containing the grammar\n => ')
         if len(antlr_file) == 0:
             antlr_file = "Definition"
         print('running antlr...')
@@ -29,7 +29,16 @@ while is_running:
         print('compiling antlr and applicaiton .java files...')
         compile_java()
     elif choice == 4:
+        file_name = input('enter the name of the file containing the definition\n => ')
+        if len(file_name) == 0:
+            file_name = 'test.txt'
+        package_name = input('enter the root package name\n => ')
+        if len(package_name) == 0:
+            package_name = 'com.example'
+        db_user = input('enter the app database user name\n => ')
+        if len(db_user) == 0:
+            db_user = 'default_user'
         print('running java language app...')
-        run_java()
+        run_java(file_name, package_name, db_user)
     else:
         continue

@@ -4,22 +4,33 @@ import java.util.stream.Collectors;
 
 public class BeanGenerator {
     private Table table;
+    private String packageName; 
     private List<Column> primaryCols;
     private List<Column> nonPrimaryCols;
 
-    public BeanGenerator(Table table) {
+    public BeanGenerator(Table table, String packageName) {
         this.table = table;
+        this.packageName = packageName;
         primaryCols = table.getColumns().stream().filter(c -> c.getIsPrimary()).collect(Collectors.toList());
         nonPrimaryCols = table.getColumns().stream().filter(c -> !c.getIsPrimary()).collect(Collectors.toList());
     }
 
     public String generateController() {
         StringBuilder b = new StringBuilder();
-        b.append("\n\nimport org.springframework.beans.factory.annotation.Autowired;\n")
+        b.append("package ")
+        .append(packageName)
+        .append(".controller;\n\n")
+        .append("import org.springframework.beans.factory.annotation.Autowired;\n")
         .append("import org.springframework.http.ResponseEntity;\n")
         .append("import org.springframework.web.bind.annotation.*;\n\n")
         .append("import java.util.logging.Logger;\n")
-        .append("import java.util.logging.Level;\n\n")
+        .append("import java.util.logging.Level;\n")
+        .append("import java.util.List;\n\n")
+        .append("import ")
+        .append(packageName)
+        .append(".service.")
+        .append(table.getName())
+        .append("Service;\n\n")
         .append("@RestController\n")
         .append("@RequestMapping(value = \"api/")
         .append(table.getName().toLowerCase())
@@ -28,7 +39,11 @@ public class BeanGenerator {
         .append("Controller {\n")
         .append("\tprivate static final Logger L = Logger.getLogger(")
         .append(table.getName())
-        .append("Controller.class.toString());\n\n}\n");
+        .append("Controller.class.toString());\n\n")
+        .append("\t@Autowired\n\tprivate ")
+        .append(table.getName())
+        .append("Service service;\n\n")
+        .append("}\n");
         return b.toString();
     }
 
@@ -148,9 +163,16 @@ public class BeanGenerator {
 
     public String generateRepo() {
         StringBuilder b = new StringBuilder();
-        b.append("\n\nimport org.springframework.stereotype.Repository;\n\n")
+        b.append("package ")
+        .append(packageName)
+        .append(".repository;\n\nimport org.springframework.stereotype.Repository;\n\n")
         .append("import javax.persistence.*;\n\n")
-        .append("@Repository\npublic class ")
+        .append("import java.util.List;\n\n")
+        .append("import ")
+        .append(packageName)
+        .append(".model.")
+        .append(table.getName())
+        .append(";\n\n@Repository\npublic class ")
         .append(table.getName())
         .append("Repository {\n\t@PersistenceContext\n\tprivate EntityManager em;\n\n")
         .append(generateCallSelect())
@@ -168,16 +190,27 @@ public class BeanGenerator {
 
     public String generateService() {
         StringBuilder b = new StringBuilder();
-        b.append("\n\nimport org.springframework.stereotype.Service;\n")
+        b.append("package ")
+        .append(packageName)
+        .append(".service;\n\nimport org.springframework.stereotype.Service;\n")
         .append("import org.springframework.beans.factory.annotation.Autowired;\n\n")
-        .append("import java.util.logging.Logger;\n\n")
-        .append("@Service\npublic class ")
+        .append("import java.util.logging.Logger;\n")
+        .append("import java.util.List;\n\n")
+        .append("import ")
+        .append(packageName)
+        .append(".model.")
+        .append(table.getName())
+        .append(";\n\n@Service\npublic class ")
         .append(table.getName())
         .append("Service {\n")
         .append("\tprivate static final Logger L = Logger.getLogger(")
         .append(table.getName())
         .append("Service")
-        .append(".class.toString());\n\n}");
+        .append(".class.toString());\n\n")
+        .append("\t@Autowired\n\tprivate ")
+        .append(table.getName())
+        .append("Repository repo;\n")
+        .append("}");
         return b.toString();
     }
 
@@ -275,7 +308,9 @@ public class BeanGenerator {
 
     public String generateEntity() {
         StringBuilder b = new StringBuilder();
-        b.append("\n\nimport javax.persistence.*;\n\n")
+        b.append("package ")
+        .append(packageName)
+        .append(".model;\n\nimport javax.persistence.*;\n\n")
         .append("@Entity\n")
         .append("@Table(name = \"")
         .append(table.getName())

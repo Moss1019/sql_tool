@@ -30,15 +30,19 @@ def run_antlr(grammar_file):
 def compile_java():
     if not path.exists('./build'):
         mkdir('./build')
-    cp_string = '.;%s/antlr4.jar;%%CLASSPATH%%' if platform_os() == 'Windows' else '.:%s/antlr4.jar:%%CLASSPATH%%'
-    environ['CLASSPATH'] = cp_string % current_dir
+    if not 'CLASSPATH' in environ.keys():
+        cp_string = '.;%s/antlr4.jar;%%CLASSPATH%%' if platform_os() == 'Windows' else '.:%s/antlr4.jar:%%CLASSPATH%%'
+        environ['CLASSPATH'] = cp_string % current_dir
     system('javac -d ./build ./parser/*.java ./*.java')
 
-def run_java():
+def run_java(file_name, package_name, db_user):
     if not path.exists('./output'):
         mkdir('./output')
+    if not 'CLASSPATH' in environ.keys():
+        cp_string = '.;%s/antlr4.jar;%%CLASSPATH%%' if platform_os() == 'Windows' else '.:%s/antlr4.jar:%%CLASSPATH%%'
+        environ['CLASSPATH'] = cp_string % current_dir
     chdir('./build')
-    system('java Definition')
+    system('java Definition -f %s -p %s -u %s' % (file_name, package_name, db_user))
     chdir('..')
 
 if __name__ == '__main__':
