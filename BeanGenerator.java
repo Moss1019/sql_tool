@@ -1,5 +1,6 @@
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class BeanGenerator {
@@ -82,7 +83,7 @@ public class BeanGenerator {
         .append("\");\n\t\tquery.setParameter(\"")
         .append(primaryCols.get(0).getName())
         .append("\",")
-        .append(primaryCols.get(0).getName())
+        .append(primaryCols.get(0).getFieldName())
         .append(");\n\t\tObject result = query.getSingleResult();\n")
         .append("\t\treturn (")
         .append(table.getName())
@@ -97,11 +98,27 @@ public class BeanGenerator {
         .append(table.getName())
         .append("> select")
         .append(table.getName())
-        .append("s() {\n")
+        .append("s(");
+        Optional<Column> foreignKeyCol = table.getColumns().stream()
+            .filter(col -> col.getReferencedTable() != null)
+            .findFirst();
+        if(foreignKeyCol.isPresent()) {
+            b.append(ColumnEnums.resolveWrapperType(foreignKeyCol.get().getType()))
+            .append(" ")
+            .append(foreignKeyCol.get().getFieldName());
+        }
+        b.append(") {\n")
         .append("\t\tStoredProcedureQuery query = em.createNamedStoredProcedureQuery(\"select")
         .append(table.getName())
-        .append("s\");\n")
-        .append("\t\tList<")
+        .append("s\");\n");
+        if(foreignKeyCol.isPresent()) {
+            b.append("\t\tquery.setParameter(\"")
+            .append(foreignKeyCol.get().getName())
+            .append("\", ")
+            .append(foreignKeyCol.get().getFieldName())
+            .append(");\n");
+        }
+        b.append("\t\tList<")
         .append(table.getName())
         .append("> result = query.getResultList();\n")
         .append("\t\treturn (List<")
