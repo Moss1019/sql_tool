@@ -70,6 +70,7 @@ public class Definition {
             writeFile(String.format("%sRepository.java", table.getName()), ben.generateRepo());
             writeFile(String.format("%sController.java", table.getName()), ben.generateController());
         } catch (Exception ex) {
+            System.out.println(ex.getClass().toString());
             System.out.println(ex.getMessage());
         } finally {
             try {

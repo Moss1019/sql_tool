@@ -12,7 +12,8 @@ public class ColumnEnums {
     public enum Option {
         primaryKey,
         autoIncrement,
-        notNull
+        notNull,
+        foreignKey
     }
 
     public static String resolveType(Type type) {

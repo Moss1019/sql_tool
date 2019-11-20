@@ -113,3 +113,4 @@ output/
 antlr4.jar
 run.sh
 
+*.txt

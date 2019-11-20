@@ -7,6 +7,8 @@ import java.util.HashMap;
 
 
 public class ExtractionVisitor extends DefinitionBaseVisitor<Object> {
+    private Column currentColumn = null;
+
     @Override
     public Object visitDefinition(DefinitionParser.DefinitionContext ctx) {
         Table table;
@@ -23,6 +25,7 @@ public class ExtractionVisitor extends DefinitionBaseVisitor<Object> {
     public Object visitColumnDef(DefinitionParser.ColumnDefContext ctx) {
         String typeStr = ctx.TYPE().getText();
         Column column = new Column();
+        currentColumn = column;
         if(typeStr.equals("int")) {
             column.setType(ColumnEnums.Type.integer);   
         } else if (typeStr.equals("string")) {
@@ -50,6 +53,10 @@ public class ExtractionVisitor extends DefinitionBaseVisitor<Object> {
                 options.add(ColumnEnums.Option.autoIncrement);
             } else if (optionStr.equals("not_null")) {
                 options.add(ColumnEnums.Option.notNull); 
+            } else if (optionStr.equals("foreign_key")) {
+                options.add(ColumnEnums.Option.foreignKey);
+            } else {
+                currentColumn.setReferencedTable(optionStr);
             }
         }
         return options;

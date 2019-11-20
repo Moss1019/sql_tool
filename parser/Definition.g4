@@ -2,7 +2,7 @@ grammar Definition;
 
 definition: NAME '{' columnDef* (',' columnDef)* '}'';';
 
-columnDef: NAME TYPE options?';';
+columnDef: NAME TYPE options+';';
 
 options: (option)*;
 

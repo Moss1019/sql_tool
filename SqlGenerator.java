@@ -1,5 +1,6 @@
 
 import java.util.List;
+import java.util.Optional;
 
 public class SqlGenerator {
     public String generateCreateTable(Table table) {
@@ -11,7 +12,15 @@ public class SqlGenerator {
             statementBuilder.append(col.getName()).append(" ");
             statementBuilder.append(ColumnEnums.resolveType(col.getType())).append(" ");
             for(ColumnEnums.Option option: col.getOptions()) {
-                statementBuilder.append(ColumnEnums.resolveOption(option)).append(" ");
+                if(option == ColumnEnums.Option.foreignKey) {
+                    statementBuilder.append("references ")
+                        .append(col.getReferencedTable())
+                        .append("(")
+                        .append(col.getName())
+                        .append(")");
+                } else {
+                    statementBuilder.append(ColumnEnums.resolveOption(option)).append(" ");
+                }
             }
             if (++i < cols.size()) {
                 statementBuilder.append(",\n");
@@ -36,7 +45,32 @@ public class SqlGenerator {
 
     public String generateSelectAllProc(Table table) {
         String procName = String.format("sp_select%ss", table.getName().toLowerCase());
-        return String.format("create procedure %s () select * from %s;\n", procName, table.getName());
+        Optional<Column> foreignKeyCol = table.getColumns().stream()
+            .filter(col -> col.getOptions().contains(ColumnEnums.Option.foreignKey)).findFirst();
+        if(foreignKeyCol.isPresent()) {
+            StringBuilder procBuilder = new StringBuilder();
+            procBuilder
+            .append("delimiter //\n")
+            .append("create procedure ")
+            .append(procName)
+            .append("\n")
+            .append("(in ")
+            .append(foreignKeyCol.get().getName())
+            .append(" ")
+            .append(ColumnEnums.resolveType(foreignKeyCol.get().getType()))
+            .append(")\n")
+            .append("begin\n")
+            .append("select * from ")
+            .append(table.getName())
+            .append(" t1 where t1.")
+            .append(foreignKeyCol.get().getName())
+            .append(" = ")
+            .append(foreignKeyCol.get().getName())
+            .append(";\nend\n//\ndelimiter ;\n");
+            return procBuilder.toString();
+        } else {
+            return String.format("create procedure %s () select * from %s;\n", procName, table.getName());
+        }
     }
 
     public String generateSelectByPKProc(Table table) {

@@ -27,7 +27,7 @@ language application will generate output in the ./output directory. The folders
 This tool is meant to speed up development of the classes needed for a java and spring boot application.
 Specifically the POJO that will be marked with @Entity and the bean that will be marked with @Repository.
 The code written in these files are straight forward, and writing it by hand can take a lot of time.
-This tool generates a lot code from a simple definition, which can then be tweaked as if written by hand.
+This tool generates a lot of code from a simple definition, which can then be tweaked as if written by hand.
 </p>
 <h2>Example definition</h2>
 <p>
@@ -42,5 +42,5 @@ User { <br/>
 };
 </p>
 <p>
-This project is being actively worked on, so there will be new things every now and then 
+This project is being actively worked on, so there will be new things every now and then.
 </p>

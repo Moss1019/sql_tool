@@ -6,6 +6,7 @@ public class Column {
     private String name;
     private String fieldName;
     private String fieldNameCaps;
+    private String referencedTable;
     private ColumnEnums.Type type;
     private List<ColumnEnums.Option> options;
     private boolean isPrimary;
@@ -13,6 +14,7 @@ public class Column {
     public Column() {
         options = new ArrayList<>();
         isPrimary = false;
+        referencedTable = null;
     }
 
     public Column(String name, ColumnEnums.Type type) {
@@ -67,6 +69,14 @@ public class Column {
 
     public boolean getIsPrimary() {
         return isPrimary;
+    }
+
+    public void setReferencedTable(String referencedTable) {
+        this.referencedTable = referencedTable;
+    }
+
+    public String getReferencedTable() {
+        return referencedTable;
     }
 }
 
