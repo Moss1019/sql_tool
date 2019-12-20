@@ -58,9 +58,7 @@ public class Definition {
             Database database = (Database)visitor.visit(tree);
             SqlGenerator gen = new SqlGenerator(database);
 
-            System.out.println(gen.generateCreateTables());
-
-            System.out.println(gen.generateDropDBObjects());
+            System.out.println(gen.generateDeleteProcedures());
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());

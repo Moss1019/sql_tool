@@ -9,6 +9,17 @@ public class SqlGenerator {
       this.db = db;
     }
 
+    public String generateDropDBObjects() {
+      StringBuilder b = new StringBuilder();
+      for(Table t: db.getTables()) {
+        b
+        .append("drop table ")
+        .append(t.getName())
+        .append(";\n");
+      }
+      return b.toString();
+    }
+
     public String generateCreateTables() {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
@@ -50,18 +61,173 @@ public class SqlGenerator {
       return b.toString();
     }
 
-    public String generateDropDBObjects() {
+    public String generateSelectAllProcedures() {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
+        if(t.isJoiningTable()) {
+          // TODO: work here
+          continue;
+        } else if (t.hasJoiningTable()) {
+          // TODO: work here
+        }
         b
-        .append("drop table ")
+        .append("create procedure sp_selectAll")
+        .append(t.getPascalName())
+        .append("s () select * from ")
         .append(t.getName())
         .append(";\n");
       }
       return b.toString();
     }
 
-    public String generateSelectAllProcedures() {
-      return "";
+    public String generateSelectByPKProcedures() {
+      StringBuilder b = new StringBuilder();
+      for(Table t: db.getTables()) {
+        if(t.isJoiningTable()) {
+          // TODO: work here
+          continue;
+        } else if (t.hasJoiningTable()) {
+          // TODO: work here
+        }
+        b
+        .append("delimiter //\n")
+        .append("create procedure sp_select")
+        .append(t.getPascalName())
+        .append("s\n")
+        .append("(in ")
+        .append(t.getPrimaryColumn().getName())
+        .append(" ")
+        .append(ColumnEnums.resolveType(t.getPrimaryColumn().getDataType()))
+        .append(")\n")
+        .append("begin\n")
+        .append("select * from ")
+        .append(t.getName())
+        .append(" t where t.")
+        .append(t.getPrimaryColumn().getName())
+        .append(" = ")
+        .append(t.getPrimaryColumn().getName())
+        .append(";\n")
+        .append("end //\n")
+        .append("delimiter ;\n");
+      }
+      return b.toString();
+    }
+
+    public String generateSelectByUniqueColsProcedures() {
+      StringBuilder b = new StringBuilder();
+      for(Table t: db.getTables()) {
+        for(Column col: t.getUniqueCols()) {
+          b
+          .append("delimiter //\n")
+          .append("create procedure sp_select")
+          .append(t.getPascalName())
+          .append("sBy")
+          .append(col.getPascalName())
+          .append("\n(in ")
+          .append(col.getName())
+          .append(" ")
+          .append(ColumnEnums.resolveType(col.getDataType()))
+          .append(")\n")
+          .append("begin\n")
+          .append("select * from ")
+          .append(t.getName())
+          .append(" t where t.")
+          .append(col.getName())
+          .append(" = ")
+          .append(col.getName())
+          .append(";\n")
+          .append("end //\n")
+          .append("delimiter ;\n");
+        }
+      }
+      return b.toString();
+    }
+
+    public String generateInsertProcedures() {
+      StringBuilder b = new StringBuilder();
+      for(Table t: db.getTables()) {
+        if(t.isJoiningTable()) {
+          // TODO: work here
+          continue;
+        } else if (t.hasJoiningTable()) {
+          // TODO: work here
+        }
+        b
+        .append("delimiter //\n")
+        .append("create procedure sp_insert")
+        .append(t.getPascalName())
+        .append("\n(");
+        int colIndex = 0;
+        for(Column col: t.getNonPrimaryCols()) {
+          b
+          .append("in ")
+          .append(col.getName())
+          .append(" ")
+          .append(ColumnEnums.resolveType(col.getDataType()));
+          if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+            b.append(", ");
+          }
+        }
+        b
+        .append(")\n")
+        .append("begin\n")
+        .append("insert into ")
+        .append(t.getName())
+        .append("(");
+        colIndex = 0;
+        for(Column col: t.getNonPrimaryCols()) {
+          b
+          .append(col.getName());
+          if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+            b.append(", ");
+          }
+        }
+        b.append(") values \n(");
+        colIndex = 0;
+        for(Column col: t.getNonPrimaryCols()) {
+          b
+          .append(col.getName());
+          if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+            b.append(", ");
+          }
+        }
+        b
+        .append(");\n")
+        .append("end //\n")
+        .append("delimiter ;\n");
+      }
+      return b.toString();
+    }
+
+    public String generateDeleteProcedures() {
+      StringBuilder b = new StringBuilder();
+      for(Table t: db.getTables()) {
+        if(t.isJoiningTable()) {
+          // TODO: work here
+          continue;
+        } else if (t.hasJoiningTable()) {
+          // TODO: work here
+        }
+        b
+        .append("delimiter //\n")
+        .append("create procedure sp_delete")
+        .append(t.getPascalName())
+        .append("\n(in ")
+        .append(t.getPrimaryColumn().getName())
+        .append(" ")
+        .append(ColumnEnums.resolveType(t.getPrimaryColumn().getDataType()))
+        .append(")\n")
+        .append("begin\n")
+        .append("delete from ")
+        .append(t.getName())
+        .append(" t where t.")
+        .append(t.getPrimaryColumn().getName())
+        .append(" = ")
+        .append(t.getPrimaryColumn().getName())
+        .append(";\n")
+        .append("end //\n")
+        .append("delimiter ;\n");
+      }
+      return b.toString();
     }
 } 

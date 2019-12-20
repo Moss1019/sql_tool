@@ -36,6 +36,10 @@ public class Column {
     public boolean isPrimary() {
         return isPrimary;
     }
+
+    public String getPascalName() {
+        return String.format("%c%s", name.toUpperCase().charAt(0), name.substring(1));
+    }
 }
 
 // test_id int primary auto_increment
