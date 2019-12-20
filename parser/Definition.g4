@@ -6,20 +6,20 @@ table
     : NAME '{' row* '}'
     ;
 
-row: NAME data_type option*;
+row: NAME DATA_TYPE OPTION*;
 
-data_type
-    : 'int'
-    | 'boolean'
-    | 'string'
-    | 'char'
-    ;
-
-option
+OPTION
     : 'primary'
     | 'auto_increment'
     | 'unique'
     | 'foreign'
+    ;
+
+DATA_TYPE
+    : 'int'
+    | 'boolean'
+    | 'string'
+    | 'char'
     ;
 
 NAME: [a-zA-Z0-9_]+;

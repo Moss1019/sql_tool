@@ -12,7 +12,7 @@ public class ColumnEnums {
     public enum Option {
         primaryKey,
         autoIncrement,
-        notNull,
+        unique,
         foreignKey
     }
 
@@ -70,9 +70,42 @@ public class ColumnEnums {
             return "primary key";
         case autoIncrement:
             return "auto_increment";
-        case notNull:
-            return "not null";
+        case unique:
+            return "unique";
+        case foreignKey:
+            return "references";
         }
         return "";
     }
+
+    static public ColumnEnums.Type resolveType(String typeStr) {
+        if(typeStr.equals("int")) {
+            return ColumnEnums.Type.integer;
+        } else if(typeStr.equals("boolean")) {
+            return ColumnEnums.Type.bool;
+        } else if(typeStr.equals("string")) {
+            return ColumnEnums.Type.charArray;
+        } else if(typeStr.equals("char")) {
+            return ColumnEnums.Type.charUnit;
+        } else {
+            return ColumnEnums.Type.integer;
+        } 
+    }
+
+    static public ColumnEnums.Option resolveOption(String optionStr) {
+        if(optionStr.equals("primary")) {
+            return ColumnEnums.Option.primaryKey;
+        } else if(optionStr.equals("auto_increment")) {
+            return ColumnEnums.Option.autoIncrement;
+        } else if(optionStr.equals("unique")) {
+            return ColumnEnums.Option.unique;
+        } else if(optionStr.equals("foreign")) {
+            return ColumnEnums.Option.foreignKey;
+        } else {
+            return ColumnEnums.Option.foreignKey;
+        }
+        
+    }
 }
+
+//foreign
