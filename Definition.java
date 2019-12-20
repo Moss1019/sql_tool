@@ -55,21 +55,14 @@ public class Definition {
             DefinitionParser parser = new DefinitionParser(tokens);
             ParseTree tree = parser.database();
             DatabaseVisitor visitor = new DatabaseVisitor();
-            Table table = (Table)visitor.visit(tree);
-            // SqlGenerator gen = new SqlGenerator();
-            // writeFile(String.format("%s_create_table.sql", table.getName()), gen.generateCreateTable(table));
-            // writeFile(String.format("%s_select_all_proc.sql", table.getName()), gen.generateSelectAllProc(table));
-            // writeFile(String.format("%s_select_one_proc.sql", table.getName()), gen.generateSelectByPKProc(table));
-            // writeFile(String.format("%s_insert_proc.sql", table.getName()), gen.generateInsertProc(table));
-            // writeFile(String.format("%s_update_proc.sql", table.getName()), gen.generateUpdateProc(table));
-            // writeFile(String.format("%s_delete_proc.sql", table.getName()), gen.generateDeleteProc(table));
-            // writeFile(String.format("%s_proc_grants.sql", table.getName()), gen.generateProcGrants(table, argMapping.get("db_user")));
-            // BeanGenerator ben = new BeanGenerator(table, argMapping.get("package_name"));
-            // writeFile(String.format("%s.java", table.getName()), ben.generateEntity());
-            // writeFile(String.format("%sService.java", table.getName()), ben.generateService());
-            // writeFile(String.format("%sRepository.java", table.getName()), ben.generateRepo());
-            // writeFile(String.format("%sController.java", table.getName()), ben.generateController());
+            Database database = (Database)visitor.visit(tree);
+            SqlGenerator gen = new SqlGenerator(database);
+
+            System.out.println(gen.generateCreateTables());
+
+            System.out.println(gen.generateDropDBObjects());
         } catch (Exception ex) {
+            System.out.println(ex);
             System.out.println(ex.getClass().toString());
             System.out.println(ex.getMessage());
         } finally {

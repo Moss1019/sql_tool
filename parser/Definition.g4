@@ -6,7 +6,9 @@ table
     : NAME '{' row* '}'
     ;
 
-row: NAME DATA_TYPE OPTION*;
+row
+    : 'joined' NAME
+    | NAME DATA_TYPE OPTION*;
 
 OPTION
     : 'primary'

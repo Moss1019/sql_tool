@@ -9,9 +9,7 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
     for(DefinitionParser.TableContext tblCtx : ctx.table()) {
       tables.add((Table)visit(tblCtx));
     }
-    Database d = new Database();
-    d.tables = tables;
-    System.out.println(d);
+    Database d = new Database(tables);
     return d;
   }
 
@@ -19,27 +17,31 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
   public Object visitTable(DefinitionParser.TableContext ctx) {
     List<Column> columns = new ArrayList();
     String name = ctx.NAME().getText();
+    boolean hasJoin = false;
     for(DefinitionParser.RowContext rwCtx: ctx.row()) {
-      columns.add((Column)visit(rwCtx));
+      Column c = (Column)visit(rwCtx);
+      if(c != null) {
+        columns.add(c);
+      } else {
+        hasJoin = true;
+      }
     }
-    Table t = new Table();
-    t.name = name;
-    t.columns = columns;
+    Table t = new Table(name, columns, hasJoin);
     return t;
   }
 
   @Override
   public Object visitRow(DefinitionParser.RowContext ctx) {
     String colName = ctx.NAME().getText();
-    String dataType = ctx.DATA_TYPE().getText();
-    Column c = new Column();
-    c.name = colName;
-    c.dataType = ColumnEnums.resolveType(dataType);
-    List<ColumnEnums.Option> options = new ArrayList();
-    for(Object o: ctx.OPTION()) {
-      options.add(ColumnEnums.resolveOption(o.toString()));
+    try {
+      String dataType = ctx.DATA_TYPE().getText();
+      List<ColumnEnums.Option> options = new ArrayList();
+      for(Object o: ctx.OPTION()) {
+        options.add(ColumnEnums.resolveOption(o.toString()));
+      }
+      return new Column(colName, ColumnEnums.resolveType(dataType), options);
+    } catch (NullPointerException ex) {
+      return null;
     }
-    c.options = options;
-    return c;
   }
 }

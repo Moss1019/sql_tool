@@ -3,23 +3,37 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Database {
-    public List<Table> tables;
+    private List<Table> tables;
+
+    public Database(List<Table> tables) {
+        this.tables = tables;
+    }
+
+    public List<Table> getTables() {
+        return tables;
+    }
 
     @Override 
     public String toString() {
         StringBuilder b = new StringBuilder();
         for(Table t: tables) {
-            b.append(t.name).append("\n");
-            for(Column c: t.columns) {
+            b.append(t.getName()).append("\n");
+            for(Column c: t.getColumns()) {
                 b
                 .append(" ")
-                .append(c.name)
-                .append(" ")
-                .append(ColumnEnums.resolveType(c.dataType))
-                .append(" ");
-                for(ColumnEnums.Option o: c.options) {
+                .append(c.getName());
+                try {
                     b
-                    .append(ColumnEnums.resolveOption(o)).append(" ");
+                    .append(" ")
+                    .append(ColumnEnums.resolveType(c.getDataType()))
+                    .append(" ");
+                    for(ColumnEnums.Option o: c.getOptions()) {
+                        b
+                        .append(ColumnEnums.resolveOption(o))
+                        .append(" ");
+                    }
+                } catch (Exception ex) {
+
                 }
                 b
                 .append("\n");

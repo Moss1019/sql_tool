@@ -6,7 +6,18 @@ test {
 
 subject {
   subject_id int primary auto_increment
-  title string
+  title string unique
+  joined user_subject
 }
 
+user_subject {
+  subject_id int foreign
+  user_id int foreign
+}
+
+user {
+  user_id int primary auto_increment
+  user_name string unique
+  joined user_subject
+}
 
