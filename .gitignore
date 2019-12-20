@@ -114,3 +114,5 @@ antlr4.jar
 run.sh
 
 *.txt
+
+/parser/.antlr/
