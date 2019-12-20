@@ -1,5 +1,7 @@
 
 test {
-  test_id int primary_key auto_increment;
-  subject_id int foreign_key subject;
-};
+  test_id int primary auto_increment
+  subject_id int foreign
+}
+
+

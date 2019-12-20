@@ -1,20 +1,27 @@
 grammar Definition;
 
-definition: NAME '{' columnDef* (',' columnDef)* '}'';';
+database: table+;
 
-columnDef: NAME TYPE options+';';
-
-options: (option)*;
-
-option: NAME;
-
-TYPE: 'string'
-    | 'int'
-    | 'char'
-    | 'bool'
-    | 'date'
+table
+    : NAME '{' row* '}'
     ;
 
-NAME: [a-zA-Z_]+;
+row: NAME data_type option*;
+
+data_type
+    : 'int'
+    | 'boolean'
+    | 'string'
+    | 'char'
+    ;
+
+option
+    : 'primary'
+    | 'auto_increment'
+    | 'unique'
+    | 'foreign'
+    ;
+
+NAME: [a-zA-Z0-9_]+;
 
 WS: [ \t\r\n]+ -> skip;
