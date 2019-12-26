@@ -70,6 +70,19 @@ class Table {
         }
         return cols;
     }
+
+    public String getCleanName() {
+        String[] parts = name.split("_");
+        if(parts.length > 0) {
+            StringBuilder b = new StringBuilder();
+            for(String part: parts) {
+                b.append(String.format("%c%s", part.toUpperCase().charAt(0), part.substring(1)));
+            }
+            return b.toString();
+        } else {
+            return getPascalName();
+        }
+    }
 }
 
 // test {

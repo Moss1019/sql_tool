@@ -4,14 +4,25 @@ import org.antlr.v4.runtime.tree.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 
 public class Definition {
-    public static void writeFile(String fileName, String fileContent) {
-        String filePath = String.format("../output/%s", fileName);
+    public static void writeFile(String fileName, String fileContent, String directory) {
+        String filePath = null;
+        if(directory != null) {
+            File f = new File(String.format("../output/%s", directory));
+            if(!f.exists()) {
+                f.mkdir();
+            }
+            filePath = String.format("../output/%s/%s", directory, fileName);
+        } else {
+            filePath = String.format("../output/%s", fileName);
+        }
         FileOutputStream fOut = null;
         BufferedOutputStream bufOStream = null;
         try {
@@ -57,8 +68,30 @@ public class Definition {
             DatabaseVisitor visitor = new DatabaseVisitor();
             Database database = (Database)visitor.visit(tree);
             SqlGenerator gen = new SqlGenerator(database);
+            StringBuilder b = new StringBuilder();
+            b
+            .append(gen.generateCreateTables())
+            .append("\n")
+            .append(gen.generateSelectAllProcedures())
+            .append("\n")
+            .append(gen.generateSelectByUniqueColsProcedures())
+            .append("\n")
+            .append(gen.generateInsertProcedures())
+            .append("\n")
+            .append(gen.generateDeleteProcedures())
+            .append("\n")
+            .append(gen.generateUpdateProcedure())
+            .append("\n");
+            writeFile("db_objects.sql", b.toString(), null);
+            writeFile("db_drop.sql", gen.generateDropDBObjects(), null);
 
-            System.out.println(gen.generateDeleteProcedures());
+            ModelGenerator modelGenerator = new ModelGenerator(database);
+            Map<String, String> models = modelGenerator.generateModels("tests");
+            for(String modelName: models.keySet()) {
+                System.out.println(modelName);
+                writeFile(String.format("%s.java", modelName), models.get(modelName), "models");
+            }
+            
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());
