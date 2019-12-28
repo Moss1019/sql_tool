@@ -98,6 +98,18 @@ public class Definition {
             for(String modelName: repos.keySet()) {
                 writeFile(String.format("%s.java", modelName), repos.get(modelName), "repository");
             }
+
+            ServiceGenerator serviceGenerator = new ServiceGenerator(database);
+            Map<String, String> services = serviceGenerator.generateServices(argMapping.get("package_name"));
+            for(String modelName: services.keySet()) {
+                writeFile(String.format("%s.java", modelName), services.get(modelName), "service");
+            }
+
+            ControllerGenerator controllerGenerator = new ControllerGenerator(database);
+            Map<String, String> controllers = controllerGenerator.generateControllers(argMapping.get("package_name"));
+            for(String modelName: controllers.keySet()) {
+                writeFile(String.format("%s.java", modelName), controllers.get(modelName), "controller");
+            }
             
         } catch (Exception ex) {
             System.out.println(ex);
