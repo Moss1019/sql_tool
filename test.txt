@@ -23,3 +23,7 @@ user {
   joined user_subject
 }
 
+user_book {
+  book_id int primary auto_increment
+}
+

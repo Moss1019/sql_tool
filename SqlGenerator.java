@@ -88,7 +88,7 @@ public class SqlGenerator {
     public String generateSelectByPKProcedures() {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
-        dbObjects.add("procedure sp_select" + t.getCleanName() + "s");
+        dbObjects.add("procedure sp_select" + t.getCleanName());
         if(t.isJoiningTable()) {
           // TODO: work here
           continue;
@@ -99,7 +99,7 @@ public class SqlGenerator {
         .append("delimiter //\n")
         .append("create procedure sp_select")
         .append(t.getCleanName())
-        .append("s\n")
+        .append("\n")
         .append("(in ")
         .append(t.getPrimaryColumn().getName())
         .append(" ")

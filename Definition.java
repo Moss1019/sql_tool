@@ -74,6 +74,8 @@ public class Definition {
             .append("\n")
             .append(gen.generateSelectAllProcedures())
             .append("\n")
+            .append(gen.generateSelectByPKProcedures())
+            .append("\n")
             .append(gen.generateSelectByUniqueColsProcedures())
             .append("\n")
             .append(gen.generateInsertProcedures())
@@ -86,10 +88,15 @@ public class Definition {
             writeFile("db_drop.sql", gen.generateDropDBObjects(), null);
 
             ModelGenerator modelGenerator = new ModelGenerator(database);
-            Map<String, String> models = modelGenerator.generateModels("tests");
+            Map<String, String> models = modelGenerator.generateModels(argMapping.get("package_name"));
             for(String modelName: models.keySet()) {
-                System.out.println(modelName);
-                writeFile(String.format("%s.java", modelName), models.get(modelName), "models");
+                writeFile(String.format("%s.java", modelName), models.get(modelName), "model");
+            }
+
+            RepositoryGenerator repositoryGenerator = new RepositoryGenerator(database);
+            Map<String, String> repos = repositoryGenerator.generateRepositories(argMapping.get("package_name"));
+            for(String modelName: repos.keySet()) {
+                writeFile(String.format("%s.java", modelName), repos.get(modelName), "repository");
             }
             
         } catch (Exception ex) {

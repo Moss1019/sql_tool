@@ -20,9 +20,9 @@ public class ModelGenerator {
       } 
       StringBuilder b = new StringBuilder();
       b
-      .append("package com.mossonthetree.")
+      .append("package ")
       .append(packageName)
-      .append(".models;\n\n")
+      .append(".model;\n\n")
       .append("import javax.persistence.*;\n\n")
       .append("@Entity\n")
       .append("@Table(name = \"")
@@ -62,7 +62,7 @@ public class ModelGenerator {
 
   private String generateSelectByPKProcedures(Table t) {
     StringBuilder b = new StringBuilder();
-    b.append(generateNamedStoredProcedureQuery(String.format("select%ss", t.getCleanName()), t.getCleanName(), t.getPrimaryColumn()));
+    b.append(generateNamedStoredProcedureQuery(String.format("select%s", t.getCleanName()), t.getCleanName(), t.getPrimaryColumn()));
     return b.toString();
   }
 
