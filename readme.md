@@ -1,5 +1,5 @@
 # SQL Tool
-A tool used to generate MySQL code and Java spring classes that forms the foundations of a web app
+A tool used to generate MySQL code and Java spring classes that form the foundations of a web app
 
 ## Generated code
 - SQL statements to create tables and stored procedures
