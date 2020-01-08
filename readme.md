@@ -14,7 +14,7 @@ First, define the objects in the application using the following syntax <br />
     \<col_name\> \<data_type\> \<options zero or more\> <br />
     ... <br />
     ...
-<br />}
+<br />} <br />
 For example <br />
 user { <br />
 user_id int primary auto_increment <br />
@@ -37,7 +37,7 @@ joined user_subject <br />
 - foreign (marks the column as a foreign key that links to another table)
 
 NOTES <br />
-foreign key uses the column name to generate the SQL used to set up a reference
+foreign key uses the column name to generate the SQL used to set up a reference <br />
 unique is used to generate select by statements
 
 ### Running the program
