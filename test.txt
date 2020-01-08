@@ -1,25 +1,29 @@
 
-test {
-  test_id int primary auto_increment
-  subject_id int foreign
-}
-
-subject {
-  subject_id int primary auto_increment
-  title string unique
-  joined user_subject
-}
-
-user_subject {
-  subject_id int foreign
-  user_id int foreign
-}
 
 user {
   user_id int primary auto_increment
-  user_name string unique
+  user_name string
   last_name string
-  global_id int unique
-  joined user_subject
+  email string
+  credential_id int foreign
 }
+
+credential {
+  credential_id int primary auto_increment
+  password_hash string
+}
+
+item {
+  item_id int primary auto_increment
+  title string
+  description string
+  user_id int foreign
+}
+
+milestone {
+  milestone_id int primary auto_increment
+  description string
+  is_completed boolean
+}
+
 

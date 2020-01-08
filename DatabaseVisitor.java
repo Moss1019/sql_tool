@@ -10,8 +10,7 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
     for(DefinitionParser.TableContext tblCtx : ctx.table()) {
       tables.add((Table)visit(tblCtx));
     }
-    Database d = new Database(tables);
-    return d;
+    return tables;
   }
 
   @Override

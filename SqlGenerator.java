@@ -5,10 +5,12 @@ import java.util.ArrayList;
 public class SqlGenerator {
     private Database db = null;
     private List<String> dbObjects = null;
+    private List<String> procedures = null;
 
     public SqlGenerator(Database db) {
       this.db = db;
-      this.dbObjects = new ArrayList<>();
+      dbObjects = new ArrayList<>();
+      procedures = new ArrayList<>();
     }
 
     public String generateDropDBObjects() {
@@ -68,6 +70,7 @@ public class SqlGenerator {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
         dbObjects.add("procedure sp_selectAll" + t.getCleanName() + "s");
+        procedures.add("sp_selectAll" + t.getCleanName() + "s");
         if(t.isJoiningTable()) {
           // TODO: work here
           continue;
@@ -88,6 +91,7 @@ public class SqlGenerator {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
         dbObjects.add("procedure sp_select" + t.getCleanName());
+        procedures.add("sp_select" + t.getCleanName());
         if(t.isJoiningTable()) {
           // TODO: work here
           continue;
@@ -123,6 +127,7 @@ public class SqlGenerator {
       for(Table t: db.getTables()) {
         for(Column col: t.getUniqueCols()) {
           dbObjects.add("procedure sp_select" + t.getCleanName() + "sBy" + col.getCleanName());
+          procedures.add("sp_select" + t.getCleanName() + "sBy" + col.getCleanName());
           b
           .append("delimiter //\n")
           .append("create procedure sp_select")
@@ -153,6 +158,7 @@ public class SqlGenerator {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
         dbObjects.add("procedure sp_insert" + t.getCleanName());
+        procedures.add("sp_insert" + t.getCleanName());
         if(t.isJoiningTable()) {
           // TODO: work here
           continue;
@@ -210,6 +216,7 @@ public class SqlGenerator {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
         dbObjects.add("procedure sp_delete" + t.getCleanName());
+        procedures.add("sp_delete" + t.getCleanName());
         if(t.isJoiningTable()) {
           // TODO: work here
           continue;
@@ -249,6 +256,7 @@ public class SqlGenerator {
           // TODO: work here
         }
         dbObjects.add("procedure sp_update" + t.getCleanName());
+        procedures.add("sp_update" + t.getCleanName());
         b
         .append("delimiter //\n")
         .append("create procedure sp_update")
@@ -317,6 +325,19 @@ public class SqlGenerator {
         b
         .append(";\nend //\n")
         .append("delimiter ;\n");
+      }
+      return b.toString();
+    }
+
+    public String generateGrants() {
+      StringBuilder b = new StringBuilder();
+      for(String procName: procedures) {
+        b
+        .append("grant execute on procedure ")
+        .append(procName)
+        .append(" to ")
+        .append(db.getUser())
+        .append(";\n");
       }
       return b.toString();
     }

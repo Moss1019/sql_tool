@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.tree.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -66,7 +67,8 @@ public class Definition {
             DefinitionParser parser = new DefinitionParser(tokens);
             ParseTree tree = parser.database();
             DatabaseVisitor visitor = new DatabaseVisitor();
-            Database database = (Database)visitor.visit(tree);
+            String dbUser = argMapping.get("db_user");
+            Database database = new Database(dbUser, (List<Table>)visitor.visit(tree));
             SqlGenerator gen = new SqlGenerator(database);
             StringBuilder b = new StringBuilder();
             b
@@ -83,7 +85,8 @@ public class Definition {
             .append(gen.generateDeleteProcedures())
             .append("\n")
             .append(gen.generateUpdateProcedure())
-            .append("\n");
+            .append("\n")
+            .append(gen.generateGrants());
             writeFile("db_objects.sql", b.toString(), null);
             writeFile("db_drop.sql", gen.generateDropDBObjects(), null);
 

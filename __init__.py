@@ -26,7 +26,7 @@ while is_running:
         print('running antlr...')
         run_antlr(antlr_file)
     elif choice == 3:
-        print('compiling antlr and applicaiton .java files...')
+        print('compiling antlr and application .java files...')
         compile_java()
     elif choice == 4:
         file_name = input('enter the name of the file containing the definition\n => ')
