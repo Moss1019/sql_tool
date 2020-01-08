@@ -62,7 +62,7 @@ class Table {
     }
 
     public List<Column> getNonPrimaryCols() {
-        List<Column> cols = new ArrayList();
+        List<Column> cols = new ArrayList<>();
         for(Column col: columns) {
             if(!col.isPrimary()) {
                 cols.add(col);
@@ -82,6 +82,10 @@ class Table {
         } else {
             return getPascalName();
         }
+    }
+
+    public String getLowerCasedName() {
+        return this.getCleanName().toLowerCase();
     }
 }
 

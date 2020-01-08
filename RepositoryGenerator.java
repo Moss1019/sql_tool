@@ -83,16 +83,16 @@ public class RepositoryGenerator {
     int colIndex = 0;
     for(Column c: t.getUniqueCols()) {
       b
-      .append("\tpublic List<")
+      .append("\tpublic ")
       .append(t.getCleanName())
-      .append("> selectBy")
+      .append(" selectBy")
       .append(c.getCleanName())
       .append("(")
       .append(ColumnEnums.resolvePrimitiveType(c.getDataType()))
       .append(" value) {\n")
       .append(generateStoredProcedureQuery(String.format("select%ssBy%s", t.getCleanName(), c.getCleanName())))
       .append(generateSetParameter(c.getName(), "value"))
-      .append(generateSelect(t, false))
+      .append(generateSelect(t, true))
       .append("\t}\n");
       if(colIndex++ < t.getUniqueCols().size() - 1) {
         b.append("\n");

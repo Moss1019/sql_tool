@@ -41,9 +41,15 @@ public class ServiceGenerator {
       .append(t.getCleanName())
       .append("Repository repo;\n\n")
       .append(generateSelectByPK(t))
+      .append("\n")
       .append(generateSelectAll(t))
+      .append("\n")
       .append(generateSelectByUnique(t))
+      .append("\n")
       .append(generateInsert(t))
+      .append("\n")
+      .append(generateUpdate(t))
+      .append("\n")
       .append(generateDelete(t))
       .append("}\n");
       services.put(String.format("%sService", t.getCleanName()), b.toString());
@@ -59,44 +65,97 @@ public class ServiceGenerator {
     .append(" selectByPk(")
     .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
     .append(" value) {\n")
-    .append(generateReturn(t, "selectByPk", true))
+    .append("\t\t")
+    .append(t.getCleanName())
+    .append(" result = repo.selectByPk(value);\n")
+    .append("\t\treturn result;\n")
     .append("\t}\n");
     return b.toString();
   }
 
   private String generateSelectAll(Table t) {
     StringBuilder b = new StringBuilder();
-    
+    b
+    .append("\tpublic List<")
+    .append(t.getCleanName())
+    .append("> selectAll() {\n")
+    .append("\t\tList<")
+    .append(t.getCleanName())
+    .append("> result = repo.selectAll();\n")
+    .append("\t\treturn result;\n")
+    .append("\t}\n");
     return b.toString();
   }
 
   private String generateSelectByUnique(Table t) {
     StringBuilder b = new StringBuilder();
-    
+    int colIndex = 0;
+    for(Column col: t.getUniqueCols()) {
+      b
+      .append("\tpublic ")
+      .append(t.getCleanName())
+      .append(" selectBy")
+      .append(col.getCleanName())
+      .append("(")
+      .append(ColumnEnums.resolvePrimitiveType(col.getDataType()))
+      .append(" value) {\n")
+      .append("\t\t")
+      .append(t.getCleanName())
+      .append(" result = repo.selectBy")
+      .append(col.getCleanName())
+      .append("(value);\n")
+      .append("\t\treturn result;\n")
+      .append("\t}\n");
+      if(colIndex++ < t.getUniqueCols().size() - 1) {
+        b.append("\n");
+      }
+    }
     return b.toString();
   }
 
   private String generateInsert(Table t) {
     StringBuilder b = new StringBuilder();
-    
+    b
+    .append("\tpublic boolean insert(")
+    .append(t.getCleanName())
+    .append(" new")
+    .append(t.getCleanName())
+    .append(") { \n")
+    .append("\t\tboolean result = repo.insert(new")
+    .append(t.getCleanName())
+    .append(");\n")
+    .append("\t\treturn result;\n")
+    .append("\t}\n");
     return b.toString();
   }
 
   private String generateUpdate(Table t) {
     StringBuilder b = new StringBuilder();
-    
+    b
+    .append("\tpublic boolean update(")
+    .append(t.getCleanName())
+    .append(" updated")
+    .append(t.getCleanName())
+    .append(") { \n")
+    .append("\t\tboolean result = repo.update(updated")
+    .append(t.getCleanName())
+    .append(");\n")
+    .append("\t\treturn result;\n")
+    .append("\t}\n");
     return b.toString();
   }
 
   private String generateDelete(Table t) {
     StringBuilder b = new StringBuilder();
-    
+    b
+    .append("\tpublic boolean delete(")
+    .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+    .append(" id) {\n")
+    .append("\t\tboolean result = repo.delete(id);\n")
+    .append("\t\treturn result;\n")
+    .append("\t}\n");
     return b.toString();
   }
 
-  private String generateReturn(Table t, String methodName, boolean isSingleResult) {
-    return String.format("\t\t%s result = repo.%s();\n\n\t\treturn result;\n",
-      isSingleResult ? t.getCleanName() : String.format("List<%s>", t.getCleanName()),
-      methodName);
-  }
+
 }

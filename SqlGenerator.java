@@ -1,7 +1,6 @@
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class SqlGenerator {
     private Database db = null;
@@ -243,6 +242,12 @@ public class SqlGenerator {
     public String generateUpdateProcedure() {
       StringBuilder b = new StringBuilder();
       for(Table t: db.getTables()) {
+        if(t.isJoiningTable()) {
+          // TODO: work here
+          continue;
+        } else if (t.hasJoiningTable()) {
+          // TODO: work here
+        }
         dbObjects.add("procedure sp_update" + t.getCleanName());
         b
         .append("delimiter //\n")
