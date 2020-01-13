@@ -63,7 +63,7 @@ public class RepositoryGenerator {
     .append(generateSetParameter(t.getPrimaryColumn().getName(), "value"))
     .append("\t\ttry {\n\t")
     .append(generateSelect(t, true))
-    .append("\t\t} catch (NoResultsException ex) {\n")
+    .append("\t\t} catch (NoResultException ex) {\n")
     .append("\t\t\treturn null;\n")
     .append("\t\t}\n")
     .append("\t}\n");
@@ -98,7 +98,7 @@ public class RepositoryGenerator {
       .append(generateSetParameter(c.getName(), "value"))
       .append("\t\ttry {\n\t")
       .append(generateSelect(t, true))
-      .append("\t\t} catch (NoResultsException ex) {\n")
+      .append("\t\t} catch (NoResultException ex) {\n")
       .append("\t\t\treturn null;\n")
       .append("\t\t}\n")
       .append("\t}\n");

@@ -75,7 +75,7 @@ public class ControllerGenerator {
     .append(" value) {\n")
     .append("\t\t")
     .append(t.getCleanName())
-    .append("result = service.selectByPk(value);\n")
+    .append(" result = service.selectByPk(value);\n")
     .append("\t\tif (result == null) {\n")
     .append("\t\t\treturn ResponseEntity.status(404).body(\"Could not find ")
     .append(t.getCleanName())
