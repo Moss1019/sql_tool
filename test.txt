@@ -2,8 +2,9 @@
 
 user {
   user_id int primary auto_increment
-  user_name string
+  first_name string
   last_name string
+  user_name string unique
   email string
   credential_id int foreign
 }

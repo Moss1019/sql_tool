@@ -75,7 +75,12 @@ public class ControllerGenerator {
     .append(" value) {\n")
     .append("\t\t")
     .append(t.getCleanName())
-    .append(" result = service.selectByPk(value);\n")
+    .append("result = service.selectByPk(value);\n")
+    .append("\t\tif (result == null) {\n")
+    .append("\t\t\treturn ResponseEntity.status(404).body(\"Could not find ")
+    .append(t.getCleanName())
+    .append("\");\n")
+    .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
     .append("\t}\n");
     return b.toString();
@@ -91,6 +96,9 @@ public class ControllerGenerator {
     .append("\t\tList<")
     .append(t.getCleanName())
     .append("> result = service.selectAll();\n")
+    .append("\t\tif (result.size() == 0) {\n")
+    .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n")
+    .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
     .append("\t}\n");
     return b.toString();
@@ -120,6 +128,11 @@ public class ControllerGenerator {
       .append("(")
       .append(col.getName())
       .append(");\n")
+      .append("\t\tif (result == null) {\n")
+      .append("\t\t\treturn ResponseEntity.status(404).body(\"Could not find")
+      .append(t.getCleanName())
+      .append("\");\n")
+      .append("\t\t}\n")
       .append("\t\treturn ResponseEntity.ok(result);\n")
       .append("\t}\n");
       if(colIndex++ < t.getUniqueCols().size() - 1) {
@@ -141,6 +154,11 @@ public class ControllerGenerator {
     .append("\t\tboolean result = service.insert(new")
     .append(t.getCleanName())
     .append(");\n")
+    .append("\t\tif (!result) {\n")
+    .append("\t\t\treturn ResponseEntity.status(400).body(\"Could not create new ")
+    .append(t.getCleanName())
+    .append("\");\n")
+    .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
     .append("\t}\n");
     return b.toString();
@@ -158,6 +176,11 @@ public class ControllerGenerator {
     .append("\t\tboolean result = service.update(updated")
     .append(t.getCleanName())
     .append(");\n")
+    .append("\t\tif (!result) {\n")
+    .append("\t\t\treturn ResponseEntity.status(400).body(\"Could not update ")
+    .append(t.getCleanName())
+    .append("\");\n")
+    .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
     .append("\t}\n");
     return b.toString();
@@ -171,6 +194,11 @@ public class ControllerGenerator {
     .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
     .append(" id) {\n")
     .append("\t\tboolean result = service.delete(id);\n")
+    .append("\t\tif (!result) {\n")
+    .append("\t\t\treturn ResponseEntity.status(400).body(\"Could not delete ")
+    .append(t.getCleanName())
+    .append("\");\n")
+    .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
     .append("\t}\n");
     return b.toString();

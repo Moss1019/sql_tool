@@ -61,7 +61,11 @@ public class RepositoryGenerator {
     .append(" value) {\n")
     .append(generateStoredProcedureQuery(String.format("select%s", t.getCleanName())))
     .append(generateSetParameter(t.getPrimaryColumn().getName(), "value"))
+    .append("\t\ttry {\n\t")
     .append(generateSelect(t, true))
+    .append("\t\t} catch (NoResultsException ex) {\n")
+    .append("\t\t\treturn null;\n")
+    .append("\t\t}\n")
     .append("\t}\n");
     return b.toString();
   }
@@ -92,7 +96,11 @@ public class RepositoryGenerator {
       .append(" value) {\n")
       .append(generateStoredProcedureQuery(String.format("select%ssBy%s", t.getCleanName(), c.getCleanName())))
       .append(generateSetParameter(c.getName(), "value"))
+      .append("\t\ttry {\n\t")
       .append(generateSelect(t, true))
+      .append("\t\t} catch (NoResultsException ex) {\n")
+      .append("\t\t\treturn null;\n")
+      .append("\t\t}\n")
       .append("\t}\n");
       if(colIndex++ < t.getUniqueCols().size() - 1) {
         b.append("\n");
@@ -155,10 +163,11 @@ public class RepositoryGenerator {
   }
 
   private String generateSelect(Table t, boolean isSingleResult) {
-    return String.format("\t\t%s result = (%s)q.%s();\n\t\treturn result;\n",
+    return String.format("\t\t%s result = (%s)q.%s();\n\t\t%sreturn result;\n",
       isSingleResult ? t.getCleanName() : String.format("List<%s>", t.getCleanName()),
       isSingleResult ? t.getCleanName() : String.format("List<%s>", t.getCleanName()),
-      isSingleResult ? "getSingleResult" : "getResultList");
+      isSingleResult ? "getSingleResult" : "getResultList",
+      isSingleResult ? "\t" : "");
   }
 
   private String generateExecute() {
