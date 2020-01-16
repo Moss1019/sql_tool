@@ -58,6 +58,8 @@ public class ControllerGenerator {
       .append(generateUpdate(t))
       .append("\n")
       .append(generateDelete(t))
+      .append("\n")
+      .append(generateSelectParentChildren(t))
       .append("}\n");
       controllers.put(String.format("%sController", t.getCleanName()), b.toString());
     }
@@ -101,6 +103,32 @@ public class ControllerGenerator {
     .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
     .append("\t}\n");
+    return b.toString();
+  }
+
+  private String generateSelectParentChildren(Table t) {
+    StringBuilder b = new StringBuilder();
+    for (Table parentTable: t.getParentTables()) {
+      b
+      .append("\t@ResponseMapping(value = \"for")
+      .append(parentTable.getPascalName())
+      .append("/{")
+      .append(parentTable.getPrimaryColumn().getName())
+      .append("}\", Method = ResponseMethod.GET)\n")
+      .append("\tpublic ResponseEntity<?> getOf")
+      .append(parentTable.getCleanName())
+      .append("() { \n")
+      .append("\t\tList<")
+      .append("> result = service.selectOf")
+      .append(parentTable.getCleanName())
+      .append("(")
+      .append(parentTable.getPrimaryColumn().getName())
+      .append(");\n")
+      .append("\t\tif (result.size() == 0) {\n")
+      .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n\t\t}\n")
+      .append("\t\treturn ResponseEntity.ok(result);\n")
+      .append("\t}\n\n");
+    }
     return b.toString();
   }
 

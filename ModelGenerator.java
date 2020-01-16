@@ -34,6 +34,7 @@ public class ModelGenerator {
       .append(generateInsertProcedures(t))
       .append(generateDeleteProcedures(t))
       .append(generateUpdateProcedure(t))
+      .append(generateSelectParentChildren(t))
       .append(generateClassDef(t));
       models.put(t.getCleanName(), b.toString());
     }
@@ -57,6 +58,14 @@ public class ModelGenerator {
     StringBuilder b = new StringBuilder();
     List<Column> cols = null;
     b.append(generateNamedStoredProcedureQuery(String.format("selectAll%ss", t.getCleanName()), t.getCleanName(), cols));
+    return b.toString();
+  }
+
+  private String generateSelectParentChildren(Table t) {
+    StringBuilder b = new StringBuilder();
+    for (Table parentTable : t.getParentTables()) {
+      b.append(generateNamedStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()), parentTable.getCleanName(), parentTable.getPrimaryColumn()));
+    }
     return b.toString();
   }
 

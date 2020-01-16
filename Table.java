@@ -1,20 +1,26 @@
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 class Table {
+    static private Map<String, Table> registry = new HashMap<>();
+
     private String name;
     private List<Column> columns;
     private List<Column> uniqueCols;
     private Column primaryColumn;
     private boolean isJoiningTable;
     private boolean hasJoiningTable;
+    private List<Table> parentTables;
 
     public Table(String name, List<Column> columns, boolean hasJoiningTable) {
         this.name = name;
         this.columns = columns;
-        isJoiningTable = true;
         this.hasJoiningTable = hasJoiningTable;
+        this.isJoiningTable = true;
+        this.parentTables = new ArrayList<>();
         for(Column col: columns) {
             if(col.isPrimary()) {
                 primaryColumn = col;
@@ -31,6 +37,15 @@ class Table {
                 }
             }
         }
+        for(Column col: columns) {
+            if (col.getOptions().contains(ColumnEnums.Option.foreignKey)) {
+                String tableName = col.getName().substring(0, col.getName().indexOf("_"));
+                if(registry.containsKey(tableName)) {
+                    parentTables.add(registry.get(tableName));
+                }
+            }
+        }
+        registry.put(name, this);
     }
 
     public String getName() {
@@ -59,6 +74,14 @@ class Table {
 
     public List<Column> getUniqueCols() {
         return uniqueCols;
+    }
+
+    public List<Table> getParentTables() {
+        return parentTables;
+    }
+
+    public void setParentTables(List<Table> parentTables) {
+        this.parentTables = parentTables;
     }
 
     public List<Column> getNonPrimaryCols() {

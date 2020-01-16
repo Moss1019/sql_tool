@@ -44,6 +44,8 @@ public class RepositoryGenerator {
       .append(generateUpdate(t))
       .append("\n")
       .append(generateDelete(t))
+      .append("\n")
+      .append(generateSelectParentChildren(t))
       .append("}\n");
 
       repositories.put(String.format("%sRepository", t.getCleanName()), b.toString());
@@ -70,6 +72,26 @@ public class RepositoryGenerator {
     return b.toString();
   }
 
+  public String generateSelectParentChildren(Table t) {
+    StringBuilder b = new StringBuilder();
+    for (Table parentTable: t.getParentTables()) {
+      b
+      .append("\tpublic List<")
+      .append(t.getCleanName())
+      .append("> selectOf")
+      .append(parentTable.getCleanName())
+      .append("(")
+      .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
+      .append(" ")
+      .append(parentTable.getPrimaryColumn().getPascalName())
+      .append(") {\n")
+      .append(generateStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName())))
+      .append(generateSelect(t, false))
+      .append("\t}\n\n");
+    }
+    return b.toString();
+  }
+
   private String generateSelectAll(Table t) {
     StringBuilder b = new StringBuilder();
     b
@@ -78,7 +100,7 @@ public class RepositoryGenerator {
     .append("> selectAll() {\n")
     .append(generateStoredProcedureQuery(String.format("selectAll%ss", t.getCleanName())))
     .append(generateSelect(t, false))
-    .append("\t}\n");
+    .append("\t}");
     return b.toString();
   }
 

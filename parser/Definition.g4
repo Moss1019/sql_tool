@@ -22,6 +22,7 @@ DATA_TYPE
     | 'boolean'
     | 'string'
     | 'char'
+    | 'date'
     ;
 
 NAME: [a-zA-Z0-9_]+;

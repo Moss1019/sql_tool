@@ -51,6 +51,8 @@ public class ServiceGenerator {
       .append(generateUpdate(t))
       .append("\n")
       .append(generateDelete(t))
+      .append("\n")
+      .append(generateSelectParentChildren(t))
       .append("}\n");
       services.put(String.format("%sService", t.getCleanName()), b.toString());
     }
@@ -73,6 +75,34 @@ public class ServiceGenerator {
     return b.toString();
   }
 
+  private String generateSelectParentChildren(Table t) {
+    StringBuilder b = new StringBuilder();
+    for (Table parentTable: t.getParentTables()) {
+      b
+      .append("\tpublic ")
+      .append("List<")
+      .append(t.getCleanName())
+      .append("> selectOf")
+      .append(parentTable.getCleanName())
+      .append("(")
+      .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
+      .append(" ")
+      .append(parentTable.getPrimaryColumn().getPascalName())
+      .append(") {\n")
+      .append("\t\tList<")
+      .append(t.getCleanName())
+      .append("> result = repo.selectOf")
+      .append(parentTable.getCleanName())
+      .append("(")
+      .append(parentTable.getPrimaryColumn().getPascalName())
+      .append(");\n")
+      .append("\t\treturn result;\n")
+      .append("\t}\n\n");
+    }
+   
+    return b.toString();
+  }
+
   private String generateSelectAll(Table t) {
     StringBuilder b = new StringBuilder();
     b
@@ -83,7 +113,7 @@ public class ServiceGenerator {
     .append(t.getCleanName())
     .append("> result = repo.selectAll();\n")
     .append("\t\treturn result;\n")
-    .append("\t}\n");
+    .append("\t}");
     return b.toString();
   }
 

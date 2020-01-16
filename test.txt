@@ -6,12 +6,12 @@ user {
   last_name string
   user_name string unique
   email string
-  credential_id int foreign
 }
 
 credential {
   credential_id int primary auto_increment
   password_hash string
+  user_id int foreign
 }
 
 item {
@@ -19,12 +19,12 @@ item {
   title string
   description string
   user_id int foreign
+  date_created date
 }
 
 milestone {
   milestone_id int primary auto_increment
   description string
   is_completed boolean
+  item_id int foreign
 }
-
-
