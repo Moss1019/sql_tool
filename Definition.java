@@ -115,6 +115,9 @@ public class Definition {
             for(String modelName: controllers.keySet()) {
                 writeFile(String.format("%s.java", modelName), controllers.get(modelName), "controller");
             }
+
+            AxiosGenerator axiosGenerator = new AxiosGenerator(database);
+            writeFile("index.js", axiosGenerator.generateActions(), "http");
             
         } catch (Exception ex) {
             System.out.println(ex);
