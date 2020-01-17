@@ -24,6 +24,7 @@ public class ModelGenerator {
       .append(packageName)
       .append(".model;\n\n")
       .append("import javax.persistence.*;\n\n")
+      .append("import java.util.Date;\n\n")
       .append("@Entity\n")
       .append("@Table(name = \"")
       .append(t.getName())
@@ -64,7 +65,7 @@ public class ModelGenerator {
   private String generateSelectParentChildren(Table t) {
     StringBuilder b = new StringBuilder();
     for (Table parentTable : t.getParentTables()) {
-      b.append(generateNamedStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()), parentTable.getCleanName(), parentTable.getPrimaryColumn()));
+      b.append(generateNamedStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()), t.getCleanName(), parentTable.getPrimaryColumn()));
     }
     return b.toString();
   }

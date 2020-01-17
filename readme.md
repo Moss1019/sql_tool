@@ -7,6 +7,7 @@ A tool used to generate MySQL code and Java spring classes that form the foundat
 - @Service beans
 - @Controller beans
 - @Entity POJOS
+- JS code to make HTTP requests using axios
 
 ## Using the code
 First, define the objects in the application using the following syntax <br />
@@ -49,6 +50,11 @@ SQL_Tool requires a Python environment and JVM be installed on the system
 Use the commands presented by the Python script
 
 - 1 - Download the antlr jar file
-- 4 - Run the language app on the definition file
+- 2 - Generate Java classes that form the parser
+- 3 - Compile Java code to create the language app
+- 4 - Run the language app on the 'definition' file
 
-The other options are used when generating a new parser from another grammar (g4) file and to compile the Java code that forms the language app
+# Planned features
+- generate classes to allow messaging with Apache kafka
+- generate HTTP related code for other front end frameworks (Angular)
+

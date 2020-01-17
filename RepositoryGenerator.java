@@ -86,6 +86,7 @@ public class RepositoryGenerator {
       .append(parentTable.getPrimaryColumn().getPascalName())
       .append(") {\n")
       .append(generateStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName())))
+      .append(generateSetParameter(parentTable.getPrimaryColumn().getName(), parentTable.getPrimaryColumn().getPascalName()))
       .append(generateSelect(t, false))
       .append("\t}\n\n");
     }

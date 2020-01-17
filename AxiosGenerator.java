@@ -9,7 +9,9 @@ public class AxiosGenerator {
 
     public String generateActions() {
         StringBuilder b = new StringBuilder();
-        b.append("import axios from 'axios';\n\n");
+        b
+        .append("import axios from 'axios';\n\n")
+        .append("const SERVER_END_POINT = 'http://localhost:8080';\n\n");
         for(Table t: db.getTables()) {
             b
             .append(generateGetAll(t))
@@ -23,7 +25,8 @@ public class AxiosGenerator {
             .append(generatePut(t))
             .append("\n")
             .append(generateDelete(t))
-            .append("\n");
+            .append("\n")
+            .append(generateGetParentChildren(t));
         }
         return b.toString();
     }
@@ -96,6 +99,19 @@ public class AxiosGenerator {
         return b.toString();
     }
 
+    private String generateGetParentChildren(Table t) {
+        StringBuilder b = new StringBuilder();
+        for(Table parentTable: t.getParentTables()) {
+            b
+            .append(generateExportCode(parentTable.getPrimaryColumn().getPascalName(),
+                String.format("get%ssFor%s", t.getCleanName(), parentTable.getCleanName()),
+                String.format("%ss/for%s/${%s}", t.getLowerCasedName(), parentTable.getCleanName(), parentTable.getPrimaryColumn().getPascalName())))
+            .append(getAxiosReturnString("get", null))
+            .append("};\n\n");
+        }        
+        return b.toString();
+    }
+
     private String generateExportCode(String parameter, String functionName, String url) {
         StringBuilder b = new StringBuilder();
         b
@@ -109,7 +125,7 @@ public class AxiosGenerator {
         }
         b
         .append("onSuccess, onError) {\n")
-        .append("\tconst url = `/api/")
+        .append("\tconst url = `${SERVER_END_POINT}/api/")
         .append(url)
         .append("`;\n");
         return b.toString();
