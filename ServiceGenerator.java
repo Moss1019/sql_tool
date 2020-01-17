@@ -83,7 +83,7 @@ public class ServiceGenerator {
     .append(t.getCleanName())
     .append("> result = repo.selectAll();\n")
     .append("\t\treturn result;\n")
-    .append("\t}\n");
+    .append("\t}");
     return b.toString();
   }
 
