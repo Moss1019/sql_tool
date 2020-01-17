@@ -48,7 +48,6 @@ public class SqlGenerator {
             .append(" ");
             if(o == ColumnEnums.Option.foreignKey) {
               String tableName = c.getName().substring(0, c.getName().indexOf("_"));
-              System.out.println(tableName);
               b
               .append(tableName)
               .append("(")
@@ -83,6 +82,46 @@ public class SqlGenerator {
         .append("s () select * from ")
         .append(t.getName())
         .append(";\n");
+      }
+      return b.toString();
+    }
+
+    public String generateSelectParentChildren() {
+      StringBuilder b = new StringBuilder();
+      for (Table t : db.getTables()) {
+        for (Table parentTable: t.getParentTables()) {
+          dbObjects.add("procedure sp_select" + parentTable.getCleanName() + t.getCleanName() + "s");
+          procedures.add("sp_select" + parentTable.getCleanName() + t.getCleanName() + "s");
+          b
+          .append("delimiter //\n")
+          .append("create procedure sp_select")
+          .append(parentTable.getCleanName())
+          .append(t.getCleanName())
+          .append("s(in ")
+          .append(parentTable.getPrimaryColumn().getName())
+          .append(" ")
+          .append(ColumnEnums.resolveType(t.getPrimaryColumn().getDataType()))
+          .append(")\n")
+          .append("begin\n")
+          .append("select * from ")
+          .append(t.getName())
+          .append("\n")
+          .append("where ")
+          .append(parentTable.getPrimaryColumn().getName())
+          .append(" in \n")
+          .append("(select ")
+          .append(parentTable.getPrimaryColumn().getName())
+          .append(" from ")
+          .append(parentTable.getName())
+          .append(" t \n")
+          .append("where t.")
+          .append(parentTable.getPrimaryColumn().getName())
+          .append(" = ")
+          .append(parentTable.getPrimaryColumn().getName())
+          .append(");\n")
+          .append("end //\n")
+          .append("delimiter ;\n");
+        }
       }
       return b.toString();
     }

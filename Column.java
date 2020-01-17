@@ -68,5 +68,3 @@ public class Column {
         }
     }
 }
-
-// test_id int primary auto_increment

@@ -87,6 +87,8 @@ public class ColumnEnums {
             return ColumnEnums.Type.charArray;
         } else if(typeStr.equals("char")) {
             return ColumnEnums.Type.charUnit;
+        } else if(typeStr.equals("date")) {
+            return ColumnEnums.Type.date;
         } else {
             return ColumnEnums.Type.integer;
         } 
@@ -107,5 +109,3 @@ public class ColumnEnums {
         
     }
 }
-
-//foreign
