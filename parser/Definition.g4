@@ -7,15 +7,18 @@ table
     ;
 
 row
-    : 'joined' NAME
-    | NAME DATA_TYPE OPTION*;
+    : JOINED NAME
+    | NAME DATA_TYPE option*;
 
-OPTION
+option
     : 'primary'
     | 'auto_increment'
     | 'unique'
     | 'foreign'
+    | 'foreign(' NAME ')'
     ;
+
+JOINED: 'joined';
 
 DATA_TYPE
     : 'int'

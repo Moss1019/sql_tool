@@ -11,6 +11,7 @@ class Table {
     private List<Column> columns;
     private List<Column> uniqueCols;
     private Column primaryColumn;
+    private Column psudoPrimaryColumn;
     private boolean isJoiningTable;
     private boolean hasJoiningTable;
     private List<Table> parentTables;
@@ -36,13 +37,15 @@ class Table {
                     break;
                 }
             }
-        }
-        for(Column col: columns) {
             if (col.getOptions().contains(ColumnEnums.Option.foreignKey)) {
-                String tableName = col.getName().substring(0, col.getName().indexOf("_"));
+                String columnName = col.getPsudoName() != null ? col.getPsudoName() : col.getName();
+                String tableName = columnName.substring(0, columnName.indexOf("_"));
                 if(registry.containsKey(tableName)) {
                     parentTables.add(registry.get(tableName));
                 }
+            }
+            if (col.getPsudoName() != null) {
+                this.psudoPrimaryColumn = col;
             }
         }
         registry.put(name, this);
@@ -62,6 +65,10 @@ class Table {
 
     public Column getPrimaryColumn() {
         return primaryColumn;
+    }
+
+    public Column getPsudoPrimaryColumn() {
+        return psudoPrimaryColumn;
     }
 
     public boolean isJoiningTable() {

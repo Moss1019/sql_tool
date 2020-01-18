@@ -19,11 +19,19 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
     String name = ctx.NAME().getText();
     boolean hasJoin = false;
     for(DefinitionParser.RowContext rwCtx: ctx.row()) {
-      Column c = (Column)visit(rwCtx);
+      Object o = visit(rwCtx);
+      Column c = null;
+      try {
+        c = (Column)o;
+      } catch (ClassCastException ex) {
+        try {
+          hasJoin = (Boolean)o;
+        } catch (ClassCastException ex_1) {
+          c = null;
+        }
+      }
       if(c != null) {
         columns.add(c);
-      } else {
-        hasJoin = true;
       }
     }
     Table t = new Table(name, columns, hasJoin);
@@ -34,12 +42,20 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
   public Object visitRow(DefinitionParser.RowContext ctx) {
     String colName = ctx.NAME().getText();
     try {
-      String dataType = ctx.DATA_TYPE().getText();
-      List<ColumnEnums.Option> options = new ArrayList();
-      for(Object o: ctx.OPTION()) {
-        options.add(ColumnEnums.resolveOption(o.toString()));
+      if(ctx.JOINED() != null) {
+        System.out.println("Being joined on " + ctx.NAME().getText());
+        return true;
       }
-      return new Column(colName, ColumnEnums.resolveType(dataType), options);
+      String dataType = ctx.DATA_TYPE().getText();
+      String psudoName = null;
+      List<ColumnEnums.Option> options = new ArrayList<>();
+      for(DefinitionParser.OptionContext o: ctx.option()) {
+        options.add(ColumnEnums.resolveOption(o.getText()));
+        if(o.NAME() != null) {
+          psudoName = o.NAME().getText();
+        }
+      }
+      return new Column(colName, ColumnEnums.resolveType(dataType), options, psudoName);
     } catch (NullPointerException ex) {
       return null;
     }

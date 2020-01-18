@@ -8,23 +8,21 @@ user {
   email string
 }
 
-credential {
-  credential_id int primary auto_increment
-  password_hash string
-  user_id int foreign
-}
-
 item {
   item_id int primary auto_increment
-  title string
-  description string
   user_id int foreign
-  date_created date
 }
 
-milestone {
-  milestone_id int primary auto_increment
-  description string
-  is_completed boolean
-  item_id int foreign
+item_collaborator {
+  user_id int foreign(user_id)
+  item_id int foreign(item_id)
+  joined user_item
 }
+
+collaborator {
+  user_id int
+  collaborator_id int foreign(user_id)
+}
+
+
+

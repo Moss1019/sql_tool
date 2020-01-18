@@ -7,11 +7,13 @@ public class AxiosGenerator {
         this.db = db;
     }
 
-    public String generateActions() {
+    public String generateActions(String hostName) {
         StringBuilder b = new StringBuilder();
         b
         .append("import axios from 'axios';\n\n")
-        .append("const SERVER_END_POINT = 'http://localhost:8080';\n\n");
+        .append("const SERVER_END_POINT = '")
+        .append(hostName)
+        .append("';\n\n");
         for(Table t: db.getTables()) {
             b
             .append(generateGetAll(t))

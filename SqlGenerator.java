@@ -26,14 +26,14 @@ public class SqlGenerator {
 
     public String generateCreateTables() {
       StringBuilder b = new StringBuilder();
-      for(Table t: db.getTables()) {
-        dbObjects.add("table " + t.getName());
+      for(Table table: db.getTables()) {
+        dbObjects.add("table " + table.getName());
         b
         .append("create table ")
-        .append(t.getName())
+        .append(table.getName())
         .append("(\n");
         int currentColIndex = 0;
-        for(Column c: t.getColumns()) {
+        for(Column c: table.getColumns()) {
           b
           .append("\t")
           .append(c.getName())
@@ -55,7 +55,7 @@ public class SqlGenerator {
               .append(")");
             }
           }
-          if(currentColIndex++ < t.getColumns().size() - 1) {
+          if(currentColIndex++ < table.getColumns().size() - 1) {
             b.append(",");
           }
           b.append("\n");
@@ -67,20 +67,20 @@ public class SqlGenerator {
 
     public String generateSelectAllProcedures() {
       StringBuilder b = new StringBuilder();
-      for(Table t: db.getTables()) {
-        dbObjects.add("procedure sp_selectAll" + t.getCleanName() + "s");
-        procedures.add("sp_selectAll" + t.getCleanName() + "s");
-        if(t.isJoiningTable()) {
+      for(Table table: db.getTables()) {
+        dbObjects.add("procedure sp_selectAll" + table.getCleanName() + "s");
+        procedures.add("sp_selectAll" + table.getCleanName() + "s");
+        if(table.isJoiningTable()) {
           // TODO: work here
-          continue;
-        } else if (t.hasJoiningTable()) {
+          // continue;
+        } else if (table.hasJoiningTable()) {
           // TODO: work here
         }
         b
         .append("create procedure sp_selectAll")
-        .append(t.getCleanName())
+        .append(table.getCleanName())
         .append("s () select * from ")
-        .append(t.getName())
+        .append(table.getName())
         .append(";\n");
       }
       return b.toString();
@@ -88,39 +88,99 @@ public class SqlGenerator {
 
     public String generateSelectParentChildren() {
       StringBuilder b = new StringBuilder();
-      for (Table t : db.getTables()) {
-        for (Table parentTable: t.getParentTables()) {
-          dbObjects.add("procedure sp_select" + parentTable.getCleanName() + t.getCleanName() + "s");
-          procedures.add("sp_select" + parentTable.getCleanName() + t.getCleanName() + "s");
+      for (Table table : db.getTables()) {
+        for (Table parentTable: table.getParentTables()) {
+          Column primaryColumn = table.getPrimaryColumn();
+          dbObjects.add("procedure sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
+          procedures.add("sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
           b
-          .append("delimiter //\n")
-          .append("create procedure sp_select")
-          .append(parentTable.getCleanName())
-          .append(t.getCleanName())
-          .append("s(in ")
-          .append(parentTable.getPrimaryColumn().getName())
-          .append(" ")
-          .append(ColumnEnums.resolveType(t.getPrimaryColumn().getDataType()))
-          .append(")\n")
-          .append("begin\n")
-          .append("select * from ")
-          .append(t.getName())
-          .append(" t1 \n")
-          .append("where t1.")
-          .append(parentTable.getPrimaryColumn().getName())
-          .append(" in \n")
-          .append("(select t2.")
-          .append(parentTable.getPrimaryColumn().getName())
-          .append(" from ")
-          .append(parentTable.getName())
-          .append(" t2 \n")
-          .append("where t2.")
-          .append(parentTable.getPrimaryColumn().getName())
-          .append(" = ")
-          .append(parentTable.getPrimaryColumn().getName())
-          .append(");\n")
-          .append("end //\n")
-          .append("delimiter ;\n");
+          .append("delimiter //\n");
+          if (table.isJoiningTable()) {
+            primaryColumn = table.getPsudoPrimaryColumn();
+            if(table.hasJoiningTable()) {
+              System.out.println("Joining... " + table.getName() + " " + parentTable.getName());
+              b
+              .append("create procedure sp_select")
+              .append(table.getCleanName())
+              .append("s(in ")
+              .append(primaryColumn.getName())
+              .append(" ")
+              .append(ColumnEnums.resolveType(primaryColumn.getDataType()))
+              .append(")\n")
+              .append("begin\n")
+              .append("select * from ")
+              .append(parentTable.getName())
+              .append("\n")
+              .append("where ")
+              .append(parentTable.getPrimaryColumn().getName())
+              .append(" in \n")
+              .append("(select ")
+              .append(parentTable.getPrimaryColumn().getName())
+              .append(" from ")
+              .append(table.getName())
+              .append("\n")
+              .append("where ")
+              .append(primaryColumn.getName())
+              .append(" = ")
+              .append(primaryColumn.getName())
+              .append(")")
+              .append(";\n")
+              .append("end //\n")
+              .append("delimiter ;\n");
+            } else {
+              b
+              .append("create procedure sp_select")
+              .append(parentTable.getCleanName())
+              .append(table.getCleanName())
+              .append("s(in ")
+              .append(parentTable.getPrimaryColumn().getName())
+              .append(" ")
+              .append(ColumnEnums.resolveType(parentTable.getPrimaryColumn().getDataType()))
+              .append(")\n")
+              .append("begin\n")
+              .append("select * from ")
+              .append(parentTable.getName())
+              .append("\n")
+              .append("where ")
+              .append(parentTable.getPrimaryColumn().getName())
+              .append(" in \n")
+              .append("(select ")
+              .append(primaryColumn.getName())
+              .append(" from ")
+              .append(table.getName())
+              .append("\n")
+              .append("where ")
+              .append(parentTable.getPrimaryColumn().getName())
+              .append(" = ")
+              .append(parentTable.getPrimaryColumn().getName())
+              .append(")")
+              .append(";\n")
+              .append("end //\n")
+              .append("delimiter ;\n");
+            }
+            break;
+          } else {
+            b
+            .append("create procedure sp_select")
+            .append(parentTable.getCleanName())
+            .append(table.getCleanName())
+            .append("s(in ")
+            .append(parentTable.getPrimaryColumn().getName())
+            .append(" ")
+            .append(ColumnEnums.resolveType(primaryColumn.getDataType()))
+            .append(")\n")
+            .append("begin\n")
+            .append("select * from ")
+            .append(table.getName())
+            .append(" t1 \n")
+            .append("where t1.")
+            .append(parentTable.getPrimaryColumn().getName())
+            .append(" = ")
+            .append(parentTable.getPrimaryColumn().getName())
+            .append(";\n")
+            .append("end //\n")
+            .append("delimiter ;\n");
+          }
         }
       }
       return b.toString();
@@ -128,32 +188,32 @@ public class SqlGenerator {
 
     public String generateSelectByPKProcedures() {
       StringBuilder b = new StringBuilder();
-      for(Table t: db.getTables()) {
-        dbObjects.add("procedure sp_select" + t.getCleanName());
-        procedures.add("sp_select" + t.getCleanName());
-        if(t.isJoiningTable()) {
-          // TODO: work here
+      for(Table table: db.getTables()) {
+        dbObjects.add("procedure sp_select" + table.getCleanName());
+        procedures.add("sp_select" + table.getCleanName());
+        Column primaryCol = table.getPrimaryColumn();
+        if(table.isJoiningTable()) {
           continue;
-        } else if (t.hasJoiningTable()) {
+        } else if (table.hasJoiningTable()) {
           // TODO: work here
         }
         b
         .append("delimiter //\n")
         .append("create procedure sp_select")
-        .append(t.getCleanName())
+        .append(table.getCleanName())
         .append("\n")
         .append("(in ")
-        .append(t.getPrimaryColumn().getName())
+        .append(primaryCol.getName())
         .append(" ")
-        .append(ColumnEnums.resolveType(t.getPrimaryColumn().getDataType()))
+        .append(ColumnEnums.resolveType(primaryCol.getDataType()))
         .append(")\n")
         .append("begin\n")
         .append("select * from ")
-        .append(t.getName())
-        .append(" t where t.")
-        .append(t.getPrimaryColumn().getName())
+        .append(table.getName())
+        .append(" t1 where t1.")
+        .append(primaryCol.getName())
         .append(" = ")
-        .append(t.getPrimaryColumn().getName())
+        .append(primaryCol.getName())
         .append(";\n")
         .append("end //\n")
         .append("delimiter ;\n");
@@ -163,14 +223,14 @@ public class SqlGenerator {
 
     public String generateSelectByUniqueColsProcedures() {
       StringBuilder b = new StringBuilder();
-      for(Table t: db.getTables()) {
-        for(Column col: t.getUniqueCols()) {
-          dbObjects.add("procedure sp_select" + t.getCleanName() + "sBy" + col.getCleanName());
-          procedures.add("sp_select" + t.getCleanName() + "sBy" + col.getCleanName());
+      for(Table table: db.getTables()) {
+        for(Column col: table.getUniqueCols()) {
+          dbObjects.add("procedure sp_select" + table.getCleanName() + "sBy" + col.getCleanName());
+          procedures.add("sp_select" + table.getCleanName() + "sBy" + col.getCleanName());
           b
           .append("delimiter //\n")
           .append("create procedure sp_select")
-          .append(t.getCleanName())
+          .append(table.getCleanName())
           .append("sBy")
           .append(col.getCleanName())
           .append("\n(in ")
@@ -180,8 +240,8 @@ public class SqlGenerator {
           .append(")\n")
           .append("begin\n")
           .append("select * from ")
-          .append(t.getName())
-          .append(" t where t.")
+          .append(table.getName())
+          .append(" t1 where t1.")
           .append(col.getName())
           .append(" = ")
           .append(col.getName())
@@ -195,28 +255,27 @@ public class SqlGenerator {
 
     public String generateInsertProcedures() {
       StringBuilder b = new StringBuilder();
-      for(Table t: db.getTables()) {
-        dbObjects.add("procedure sp_insert" + t.getCleanName());
-        procedures.add("sp_insert" + t.getCleanName());
-        if(t.isJoiningTable()) {
+      for(Table table: db.getTables()) {
+        dbObjects.add("procedure sp_insert" + table.getCleanName());
+        procedures.add("sp_insert" + table.getCleanName());
+        if(table.isJoiningTable()) {
           // TODO: work here
-          continue;
-        } else if (t.hasJoiningTable()) {
+        } else if (table.hasJoiningTable()) {
           // TODO: work here
         }
         b
         .append("delimiter //\n")
         .append("create procedure sp_insert")
-        .append(t.getCleanName())
+        .append(table.getCleanName())
         .append("\n(");
         int colIndex = 0;
-        for(Column col: t.getNonPrimaryCols()) {
+        for(Column col: table.getNonPrimaryCols()) {
           b
           .append("in ")
           .append(col.getName())
           .append(" ")
           .append(ColumnEnums.resolveType(col.getDataType()));
-          if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
             b.append(", ");
           }
         }
@@ -224,22 +283,22 @@ public class SqlGenerator {
         .append(")\n")
         .append("begin\n")
         .append("insert into ")
-        .append(t.getName())
+        .append(table.getName())
         .append("(");
         colIndex = 0;
-        for(Column col: t.getNonPrimaryCols()) {
+        for(Column col: table.getNonPrimaryCols()) {
           b
           .append(col.getName());
-          if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
             b.append(", ");
           }
         }
         b.append(") values \n(");
         colIndex = 0;
-        for(Column col: t.getNonPrimaryCols()) {
+        for(Column col: table.getNonPrimaryCols()) {
           b
           .append(col.getName());
-          if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
             b.append(", ");
           }
         }
@@ -253,31 +312,31 @@ public class SqlGenerator {
 
     public String generateDeleteProcedures() {
       StringBuilder b = new StringBuilder();
-      for(Table t: db.getTables()) {
-        dbObjects.add("procedure sp_delete" + t.getCleanName());
-        procedures.add("sp_delete" + t.getCleanName());
-        if(t.isJoiningTable()) {
+      for(Table table: db.getTables()) {
+        dbObjects.add("procedure sp_delete" + table.getCleanName());
+        procedures.add("sp_delete" + table.getCleanName());
+        if(table.isJoiningTable()) {
           // TODO: work here
           continue;
-        } else if (t.hasJoiningTable()) {
+        } else if (table.hasJoiningTable()) {
           // TODO: work here
         }
         b
         .append("delimiter //\n")
         .append("create procedure sp_delete")
-        .append(t.getCleanName())
+        .append(table.getCleanName())
         .append("(in ")
-        .append(t.getPrimaryColumn().getName())
+        .append(table.getPrimaryColumn().getName())
         .append(" ")
-        .append(ColumnEnums.resolveType(t.getPrimaryColumn().getDataType()))
+        .append(ColumnEnums.resolveType(table.getPrimaryColumn().getDataType()))
         .append(")\n")
         .append("begin\n")
         .append("delete from ")
-        .append(t.getName())
-        .append(" t where t.")
-        .append(t.getPrimaryColumn().getName())
+        .append(table.getName())
+        .append(" t1 where t1.")
+        .append(table.getPrimaryColumn().getName())
         .append(" = ")
-        .append(t.getPrimaryColumn().getName())
+        .append(table.getPrimaryColumn().getName())
         .append(";\n")
         .append("end //\n")
         .append("delimiter ;\n");
@@ -287,41 +346,41 @@ public class SqlGenerator {
 
     public String generateUpdateProcedure() {
       StringBuilder b = new StringBuilder();
-      for(Table t: db.getTables()) {
-        if(t.isJoiningTable()) {
+      for(Table table: db.getTables()) {
+        if(table.isJoiningTable()) {
           // TODO: work here
           continue;
-        } else if (t.hasJoiningTable()) {
+        } else if (table.hasJoiningTable()) {
           // TODO: work here
         }
-        dbObjects.add("procedure sp_update" + t.getCleanName());
-        procedures.add("sp_update" + t.getCleanName());
+        dbObjects.add("procedure sp_update" + table.getCleanName());
+        procedures.add("sp_update" + table.getCleanName());
         b
         .append("delimiter //\n")
         .append("create procedure sp_update")
-        .append(t.getCleanName())
+        .append(table.getCleanName())
         .append("(");
         int colIndex = 0;
-          for(Column col: t.getNonPrimaryCols()) {
+          for(Column col: table.getNonPrimaryCols()) {
             b
             .append("in ")
             .append(col.getName())
             .append(" ")
             .append(ColumnEnums.resolveType(col.getDataType()));
-            if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+            if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
               b.append(", ");
             }
           }
-        if(t.isJoiningTable()) {
+        if(table.isJoiningTable()) {
           colIndex = 0;
           b.append(", ");
-          for(Column col: t.getColumns()) {
+          for(Column col: table.getColumns()) {
             b
             .append("in old_")
             .append(col.getName())
             .append(" ")
             .append(ColumnEnums.resolveType(col.getDataType()));
-            if(colIndex++ < t.getColumns().size() - 1) {
+            if(colIndex++ < table.getColumns().size() - 1) {
               b.append(", ");
             }
           }
@@ -329,37 +388,37 @@ public class SqlGenerator {
         b
         .append(")\nbegin\n")
         .append("update ")
-        .append(t.getName())
+        .append(table.getName())
         .append(" \n")
         .append("set ");
         colIndex = 0;
-        for(Column col: t.getNonPrimaryCols()) {
+        for(Column col: table.getNonPrimaryCols()) {
           b
           .append(col.getName())
           .append(" = ")
           .append(col.getName());
-          if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
             b.append(", ");
           }
         }
         b
         .append("\nwhere ");
         colIndex = 0;
-        if(t.isJoiningTable()) {
-          for(Column col: t.getNonPrimaryCols()) {
+        if(table.isJoiningTable()) {
+          for(Column col: table.getNonPrimaryCols()) {
             b
             .append(col.getName())
             .append(" = old_")
             .append(col.getName());
-            if(colIndex++ < t.getNonPrimaryCols().size() - 1) {
+            if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
               b.append(" and ");
             }
           }
         } else {
           b
-          .append(t.getPrimaryColumn().getName())
+          .append(table.getPrimaryColumn().getName())
           .append(" = ")
-          .append(t.getPrimaryColumn().getName());
+          .append(table.getPrimaryColumn().getName());
         }
         b
         .append(";\nend //\n")

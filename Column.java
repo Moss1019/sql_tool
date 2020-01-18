@@ -1,14 +1,14 @@
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class Column {
     private String name;
+    private String psudoName;
     private ColumnEnums.Type dataType;
     private List<ColumnEnums.Option> options;
     private boolean isPrimary;
 
-    public Column(String name, ColumnEnums.Type dataType, List<ColumnEnums.Option> options) {
+    public Column(String name, ColumnEnums.Type dataType, List<ColumnEnums.Option> options, String psudoName) {
         this.name = name;
         this.dataType = dataType;
         this.options = options;
@@ -17,12 +17,24 @@ public class Column {
             if(option == ColumnEnums.Option.primaryKey) {
                 isPrimary = true;
                 break;
-            }
+            } 
         }
+        // if(psudoName != null) {
+        //     isPrimary = true;
+        // }
+        this.psudoName = psudoName;
+    }
+
+    public Column(String name, ColumnEnums.Type dataType, List<ColumnEnums.Option> options) {
+        this(name, dataType, options, null);
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getPsudoName() {
+        return psudoName;
     }
 
     public ColumnEnums.Type getDataType() {
