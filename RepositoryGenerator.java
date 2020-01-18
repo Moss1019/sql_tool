@@ -143,7 +143,7 @@ public class RepositoryGenerator {
       b.append(generateSetParameter(c.getName(), String.format("value.get%s()", c.getCleanName())));
     }
     b
-    .append("\t\treturn q.execute();\n")
+    .append("\t\treturn q.execute(); // TODO: fix this in the generator to return true when inserted\n")
     .append("\t}\n");
     return b.toString();
   }
