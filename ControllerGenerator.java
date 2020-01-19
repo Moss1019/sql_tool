@@ -12,9 +12,6 @@ public class ControllerGenerator {
   public Map<String, String> generateControllers(String packageName) {
     Map<String, String> controllers = new HashMap<>();
     for(Table t: db.getTables()) {
-      if(t.isJoiningTable()) {
-        continue;
-      }
       StringBuilder b = new StringBuilder();
       b
       .append("package ")
@@ -30,9 +27,22 @@ public class ControllerGenerator {
       .append("import java.util.List;\n\n")
       .append("import ")
       .append(packageName)
-      .append(".model.")
-      .append(t.getCleanName())
-      .append(";\n")
+      .append(".model.");
+      if(t.isJoiningTable()) {
+        b
+        .append(t.getParentTables().get(0).getCleanName())
+        .append(";\n")
+        .append("import ")
+        .append(packageName)
+        .append(".model.")
+        .append(t.getCleanName())
+        .append(";\n");
+      } else {
+        b
+        .append(t.getCleanName())
+        .append(";\n");
+      }
+      b
       .append("import ")
       .append(packageName)
       .append(".service.")
@@ -46,19 +56,17 @@ public class ControllerGenerator {
       .append("Controller {\n")
       .append("\t@Autowired\n\tprivate ")
       .append(t.getCleanName())
-      .append("Service service;\n\n")
-      .append(generateSelectByPK(t))
-      .append("\n")
-      .append(generateSelectAll(t))
-      .append("\n")
-      .append(generateSelectByUnique(t))
-      .append("\n")
+      .append("Service service;\n\n");
+      if(!t.isJoiningTable()) {
+        b
+        .append(generateSelectAll(t))
+        .append(generateSelectByPK(t))
+        .append(generateSelectByUnique(t))
+        .append(generateUpdate(t))
+        .append(generateDelete(t));
+      }
+      b
       .append(generateInsert(t))
-      .append("\n")
-      .append(generateUpdate(t))
-      .append("\n")
-      .append(generateDelete(t))
-      .append("\n")
       .append(generateSelectParentChildren(t))
       .append("}\n");
       controllers.put(String.format("%sController", t.getCleanName()), b.toString());
@@ -84,7 +92,7 @@ public class ControllerGenerator {
     .append("\");\n")
     .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -102,37 +110,87 @@ public class ControllerGenerator {
     .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n")
     .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
   private String generateSelectParentChildren(Table t) {
     StringBuilder b = new StringBuilder();
     for (Table parentTable: t.getParentTables()) {
+      if(t.isJoiningTable()) {
+        if(t.hasJoiningTable()) {
+          b
+          .append("\t@RequestMapping(value = \"")
+          .append("{")
+          .append(t.getPsudoPrimaryColumn().getPascalName())
+          .append("}\", method = RequestMethod.GET)\n")
+          .append("\tpublic ResponseEntity<?> get")
+          .append(t.getCleanName())
+          .append("s(@PathVariable ")
+          .append(ColumnEnums.resolvePrimitiveType(t.getPsudoPrimaryColumn().getDataType()))
+          .append(" ")
+          .append(t.getPsudoPrimaryColumn().getPascalName())
+          .append(") { \n")
+          .append("\t\tList<")
+          .append(parentTable.getCleanName())
+          .append("> result = service.select")
+          .append(t.getCleanName())
+          .append("s(")
+          .append(t.getPsudoPrimaryColumn().getPascalName())
+          .append(");\n");
+        } else {
+          b
+          .append("\t@RequestMapping(value = \"{")
+          .append(parentTable.getPrimaryColumn().getPascalName())
+          .append("}\", method = RequestMethod.GET)\n")
+          .append("\tpublic ResponseEntity<?> get")
+          .append(parentTable.getCleanName())
+          .append(t.getCleanName())
+          .append("s")
+          .append("(@PathVariable ")
+          .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
+          .append(" ")
+          .append(parentTable.getPrimaryColumn().getPascalName())
+          .append(") { \n")
+          .append("\t\tList<")
+          .append(parentTable.getCleanName())
+          .append("> result = service.select")
+          .append(parentTable.getCleanName())
+          .append(t.getCleanName())
+          .append("s(")
+          .append(parentTable.getPrimaryColumn().getPascalName())
+          .append(");\n");
+        }
+      } else {
+        b
+        .append("\t@RequestMapping(value = \"for")
+        .append(parentTable.getPascalName())
+        .append("/{")
+        .append(parentTable.getPrimaryColumn().getPascalName())
+        .append("}\", method = RequestMethod.GET)\n")
+        .append("\tpublic ResponseEntity<?> getOf")
+        .append(parentTable.getCleanName())
+        .append("(@PathVariable ")
+        .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
+        .append(" ")
+        .append(parentTable.getPrimaryColumn().getPascalName())
+        .append(") { \n")
+        .append("\t\tList<")
+        .append(t.getCleanName())
+        .append("> result = service.selectOf")
+        .append(parentTable.getCleanName())
+        .append("(")
+        .append(parentTable.getPrimaryColumn().getPascalName())
+        .append(");\n");
+      }
       b
-      .append("\t@RequestMapping(value = \"for")
-      .append(parentTable.getPascalName())
-      .append("/{")
-      .append(parentTable.getPrimaryColumn().getPascalName())
-      .append("}\", method = RequestMethod.GET)\n")
-      .append("\tpublic ResponseEntity<?> getOf")
-      .append(parentTable.getCleanName())
-      .append("(@PathVariable ")
-      .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
-      .append(" ")
-      .append(parentTable.getPrimaryColumn().getPascalName())
-      .append(") { \n")
-      .append("\t\tList<")
-      .append(t.getCleanName())
-      .append("> result = service.selectOf")
-      .append(parentTable.getCleanName())
-      .append("(")
-      .append(parentTable.getPrimaryColumn().getPascalName())
-      .append(");\n")
       .append("\t\tif (result.size() == 0) {\n")
       .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n\t\t}\n")
       .append("\t\treturn ResponseEntity.ok(result);\n")
       .append("\t}\n\n");
+      if(t.hasJoiningTable()) {
+        return b.toString(); 
+      }
     }
     return b.toString();
   }
@@ -167,7 +225,7 @@ public class ControllerGenerator {
       .append("\");\n")
       .append("\t\t}\n")
       .append("\t\treturn ResponseEntity.ok(result);\n")
-      .append("\t}\n");
+      .append("\t}\n\n");
       if(colIndex++ < t.getUniqueCols().size() - 1) {
         b.append("\n");
       }
@@ -193,7 +251,7 @@ public class ControllerGenerator {
     .append("\");\n")
     .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -215,7 +273,7 @@ public class ControllerGenerator {
     .append("\");\n")
     .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -233,7 +291,7 @@ public class ControllerGenerator {
     .append("\");\n")
     .append("\t\t}\n")
     .append("\t\treturn ResponseEntity.ok(result);\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 }

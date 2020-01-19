@@ -15,19 +15,16 @@ public class AxiosGenerator {
         .append(hostName)
         .append("';\n\n");
         for(Table t: db.getTables()) {
+            if(!t.isJoiningTable()) {
+                b
+                .append(generateGetAll(t))
+                .append(generateGetByPk(t))
+                .append(generatGetByUnique(t))
+                .append(generatePut(t))
+                .append(generateDelete(t));
+            }
             b
-            .append(generateGetAll(t))
-            .append("\n")
-            .append(generateGetByPk(t))
-            .append("\n")
-            .append(generatGetByUnique(t))
-            .append("\n")
             .append(generatePost(t))
-            .append("\n")
-            .append(generatePut(t))
-            .append("\n")
-            .append(generateDelete(t))
-            .append("\n")
             .append(generateGetParentChildren(t));
         }
         return b.toString();
@@ -40,7 +37,7 @@ public class AxiosGenerator {
             String.format("getAll%ss", t.getCleanName()), 
             String.format("%ss", t.getLowerCasedName())))
         .append(getAxiosReturnString("get", null))
-        .append("};\n");
+        .append("};\n\n");
         return b.toString();
     }
 
@@ -51,7 +48,7 @@ public class AxiosGenerator {
             String.format("get%sByPk", t.getCleanName()), 
             String.format("%ss/${%s}", t.getLowerCasedName(), t.getPrimaryColumn().getPascalName())))
         .append(getAxiosReturnString("get", null))
-        .append("};\n");
+        .append("};\n\n");
         return b.toString();
     }
 
@@ -63,7 +60,7 @@ public class AxiosGenerator {
                 String.format("get%sBy%s", t.getCleanName(), col.getCleanName()), 
                 String.format("%ss/${%s}", t.getLowerCasedName(), col.getPascalName())))
             .append(getAxiosReturnString("get", null))
-            .append("};\n");
+            .append("};\n\n");
         }
         return b.toString();
     }
@@ -75,7 +72,7 @@ public class AxiosGenerator {
             String.format("post%s", t.getCleanName()), 
             String.format("%ss", t.getLowerCasedName())))
         .append(getAxiosReturnString("post", t.getLowerCasedName()))
-        .append("};\n");
+        .append("};\n\n");
         return b.toString();
     }
 
@@ -86,7 +83,7 @@ public class AxiosGenerator {
             String.format("put%s", t.getCleanName()), 
             String.format("%ss", t.getLowerCasedName())))
         .append(getAxiosReturnString("put", t.getLowerCasedName()))
-        .append("};\n");
+        .append("};\n\n");
         return b.toString();
     }
 
@@ -97,19 +94,40 @@ public class AxiosGenerator {
             String.format("delete%s", t.getCleanName()), 
             String.format("%ss/${%s}", t.getLowerCasedName(), t.getPrimaryColumn().getPascalName())))
         .append(getAxiosReturnString("delete", null))
-        .append("};\n");
+        .append("};\n\n");
         return b.toString();
     }
 
     private String generateGetParentChildren(Table t) {
         StringBuilder b = new StringBuilder();
         for(Table parentTable: t.getParentTables()) {
-            b
-            .append(generateExportCode(parentTable.getPrimaryColumn().getPascalName(),
-                String.format("get%ssFor%s", t.getCleanName(), parentTable.getCleanName()),
-                String.format("%ss/for%s/${%s}", t.getLowerCasedName(), parentTable.getCleanName(), parentTable.getPrimaryColumn().getPascalName())))
-            .append(getAxiosReturnString("get", null))
-            .append("};\n\n");
+            if(t.isJoiningTable()) {
+                if(t.hasJoiningTable()) {
+                    b
+                    .append(generateExportCode(t.getPsudoPrimaryColumn().getPascalName(),
+                        String.format("get%ss", t.getCleanName()), 
+                        String.format("%ss/${%s}", t.getLowerCasedName(), t.getPsudoPrimaryColumn().getPascalName())))
+                    .append(getAxiosReturnString("get", null))
+                    .append("}\n\n");
+                } else {
+                    b
+                    .append(generateExportCode(parentTable.getPrimaryColumn().getPascalName(),
+                        String.format("get%s%ss", parentTable.getCleanName(), t.getCleanName()), 
+                        String.format("%ss/${%s}", t.getLowerCasedName(), parentTable.getPrimaryColumn().getPascalName())))
+                    .append(getAxiosReturnString("get", null))
+                    .append("}\n\n");
+                }
+            } else {
+                b
+                .append(generateExportCode(parentTable.getPrimaryColumn().getPascalName(),
+                    String.format("get%ssFor%s", t.getCleanName(), parentTable.getCleanName()),
+                    String.format("%ss/for%s/${%s}", t.getLowerCasedName(), parentTable.getCleanName(), parentTable.getPrimaryColumn().getPascalName())))
+                .append(getAxiosReturnString("get", null))
+                .append("};\n\n");
+            }
+            if(t.hasJoiningTable()) {
+                return b.toString();
+            }
         }        
         return b.toString();
     }
@@ -151,7 +169,7 @@ public class AxiosGenerator {
         .append("\t\t})\n")
         .append("\t\t.catch(err => {\n")
         .append("\t\t\tonError(err);\n")
-        .append("\t\t});\n");
+        .append("\t\t});\n\n");
         return b.toString();
     }
 }

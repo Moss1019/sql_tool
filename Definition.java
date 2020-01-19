@@ -92,37 +92,38 @@ public class Definition {
             writeFile("db_objects.sql", b.toString(), null);
             writeFile("db_drop.sql", gen.generateDropDBObjects(), null);
 
-            // ModelGenerator modelGenerator = new ModelGenerator(database);
-            // Map<String, String> models = modelGenerator.generateModels(argMapping.get("package_name"));
-            // for(String modelName: models.keySet()) {
-            //     writeFile(String.format("%s.java", modelName), models.get(modelName), "model");
-            // }
+            ModelGenerator modelGenerator = new ModelGenerator(database);
+            Map<String, String> models = modelGenerator.generateModels(argMapping.get("package_name"));
+            for(String modelName: models.keySet()) {
+                writeFile(String.format("%s.java", modelName), models.get(modelName), "model");
+            }
 
-            // RepositoryGenerator repositoryGenerator = new RepositoryGenerator(database);
-            // Map<String, String> repos = repositoryGenerator.generateRepositories(argMapping.get("package_name"));
-            // for(String modelName: repos.keySet()) {
-            //     writeFile(String.format("%s.java", modelName), repos.get(modelName), "repository");
-            // }
+            RepositoryGenerator repositoryGenerator = new RepositoryGenerator(database);
+            Map<String, String> repos = repositoryGenerator.generateRepositories(argMapping.get("package_name"));
+            for(String modelName: repos.keySet()) {
+                writeFile(String.format("%s.java", modelName), repos.get(modelName), "repository");
+            }
 
-            // ServiceGenerator serviceGenerator = new ServiceGenerator(database);
-            // Map<String, String> services = serviceGenerator.generateServices(argMapping.get("package_name"));
-            // for(String modelName: services.keySet()) {
-            //     writeFile(String.format("%s.java", modelName), services.get(modelName), "service");
-            // }
+            ServiceGenerator serviceGenerator = new ServiceGenerator(database);
+            Map<String, String> services = serviceGenerator.generateServices(argMapping.get("package_name"));
+            for(String modelName: services.keySet()) {
+                writeFile(String.format("%s.java", modelName), services.get(modelName), "service");
+            }
 
-            // ControllerGenerator controllerGenerator = new ControllerGenerator(database);
-            // Map<String, String> controllers = controllerGenerator.generateControllers(argMapping.get("package_name"));
-            // for(String modelName: controllers.keySet()) {
-            //     writeFile(String.format("%s.java", modelName), controllers.get(modelName), "controller");
-            // }
+            ControllerGenerator controllerGenerator = new ControllerGenerator(database);
+            Map<String, String> controllers = controllerGenerator.generateControllers(argMapping.get("package_name"));
+            for(String modelName: controllers.keySet()) {
+                writeFile(String.format("%s.java", modelName), controllers.get(modelName), "controller");
+            }
 
-            // AxiosGenerator axiosGenerator = new AxiosGenerator(database);
-            // writeFile("index.js", axiosGenerator.generateActions("http://localhost:8080"), "http");
+            AxiosGenerator axiosGenerator = new AxiosGenerator(database);
+            writeFile("index.js", axiosGenerator.generateActions("http://localhost:8080"), "http");
             
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());
             System.out.println(ex.getMessage());
+            ex.printStackTrace();
         } finally {
             try {
                 iStream.close();

@@ -9,7 +9,16 @@ user {
 
 item {
   item_id int primary auto_increment
+  title string
   user_id int foreign
+}
+
+milestone {
+  milestone_id int primary auto_increment
+  title string
+  date_created date
+  is_complete boolean
+  item_id int foreign
 }
 
 item_collaborator {

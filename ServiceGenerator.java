@@ -12,9 +12,6 @@ public class ServiceGenerator {
   public Map<String, String> generateServices(String packageName) {
     Map<String, String> services = new HashMap<>();
     for(Table t: db.getTables()) {
-      if(t.isJoiningTable()) {
-        continue;
-      }
       StringBuilder b = new StringBuilder();
       b
       .append("package ")
@@ -25,8 +22,20 @@ public class ServiceGenerator {
       .append("import java.util.List;\n\n")
       .append("import ")
       .append(packageName)
-      .append(".model.")
-      .append(t.getCleanName())
+      .append(".model.");
+      if(t.isJoiningTable()) {
+        b
+        .append(t.getParentTables().get(0).getCleanName())
+        .append(";\n")
+        .append("import ")
+        .append(packageName)
+        .append(".model.")
+        .append(t.getCleanName());
+      } else {
+        b
+        .append(t.getCleanName());
+      }
+      b
       .append(";\n")
       .append("import ")
       .append(packageName)
@@ -40,20 +49,25 @@ public class ServiceGenerator {
       .append("\tprivate ")
       .append(t.getCleanName())
       .append("Repository repo;\n\n")
-      .append(generateSelectByPK(t))
-      .append("\n")
-      .append(generateSelectAll(t))
-      .append("\n")
-      .append(generateSelectByUnique(t))
-      .append("\n")
       .append(generateInsert(t))
       .append("\n")
-      .append(generateUpdate(t))
-      .append("\n")
-      .append(generateDelete(t))
-      .append("\n")
       .append(generateSelectParentChildren(t))
+      .append("\n");
+      if(!t.isJoiningTable()) {
+        b
+        .append(generateDelete(t))
+        .append("\n")
+        .append(generateSelectByPK(t))
+        .append(generateSelectAll(t))
+        .append("\n")
+        .append(generateSelectByUnique(t))
+        .append("\n")
+        .append(generateUpdate(t))
+        .append("\n");
+      }
+      b
       .append("}\n");
+      
       services.put(String.format("%sService", t.getCleanName()), b.toString());
     }
     return services;
@@ -78,6 +92,52 @@ public class ServiceGenerator {
   private String generateSelectParentChildren(Table t) {
     StringBuilder b = new StringBuilder();
     for (Table parentTable: t.getParentTables()) {
+      if(t.isJoiningTable()) {
+        if(t.hasJoiningTable()) {
+          b
+          .append("\tpublic ")
+          .append("List<")
+          .append(parentTable.getCleanName())
+          .append("> ")
+          .append(String.format("select%ss", t.getCleanName()))
+          .append("(")
+          .append(ColumnEnums.resolvePrimitiveType(t.getPsudoPrimaryColumn().getDataType()))
+          .append(" ")
+          .append(t.getPsudoPrimaryColumn().getPascalName())
+          .append(") {\n")
+          .append("\t\tList<")
+          .append(parentTable.getCleanName())
+          .append("> result = repo.")
+          .append(String.format("select%ss", t.getCleanName()))
+          .append("(")
+          .append(t.getPsudoPrimaryColumn().getPascalName())
+          .append(");\n")
+          .append("\t\treturn result;\n")
+          .append("\t}\n\n");
+        } else {
+          b
+          .append("\tpublic ")
+          .append("List<")
+          .append(parentTable.getCleanName())
+          .append("> ")
+          .append(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()))
+          .append("(")
+          .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
+          .append(" ")
+          .append(parentTable.getPrimaryColumn().getPascalName())
+          .append(") {\n")
+          .append("\t\tList<")
+          .append(parentTable.getCleanName())
+          .append("> result = repo.")
+          .append(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()))
+          .append("(")
+          .append(parentTable.getPrimaryColumn().getPascalName())
+          .append(");\n")
+          .append("\t\treturn result;\n")
+          .append("\t}\n\n");
+        }
+        break;
+      }
       b
       .append("\tpublic ")
       .append("List<")

@@ -13,9 +13,6 @@ public class RepositoryGenerator {
     Map<String, String> repositories = new HashMap<>();
     for(Table t: db.getTables()) {
       StringBuilder b = new StringBuilder();
-      if(t.isJoiningTable()) {
-        continue;
-      }
       b
       .append("package ")
       .append(packageName)
@@ -25,29 +22,43 @@ public class RepositoryGenerator {
       .append("import java.util.List;\n\n")
       .append("import ")
       .append(packageName)
-      .append(".model.")
-      .append(t.getCleanName())
+      .append(".model.");
+      if(t.isJoiningTable()) {
+        b
+        .append(t.getParentTables().get(0).getCleanName())
+        .append(";\n")
+        .append("import ")
+        .append(packageName)
+        .append(".model.")
+        .append(t.getCleanName());
+      } else {
+        b
+        .append(t.getCleanName());
+      }
+      b
       .append(";\n\n")
       .append("@Repository\n")
       .append("public class ")
       .append(t.getCleanName())
       .append("Repository {\n")
       .append("\t@PersistenceContext\n\tprivate EntityManager em;\n\n")
-      .append(generateSelectByPK(t))
-      .append("\n")
-      .append(generateSelectAll(t))
-      .append("\n")
-      .append(generateSelectByUnique(t))
-      .append("\n")
       .append(generateInsert(t))
       .append("\n")
-      .append(generateUpdate(t))
-      .append("\n")
-      .append(generateDelete(t))
-      .append("\n")
-      .append(generateSelectParentChildren(t))
-      .append("}\n");
-
+      .append(generateSelectParentChildren(t));
+      if(!t.isJoiningTable()) {
+        b
+        .append(generateDelete(t))
+        .append("\n")
+        .append(generateSelectByPK(t))
+        .append("\n")
+        .append(generateSelectAll(t))
+        .append("\n")
+        .append(generateSelectByUnique(t))
+        .append("\n")
+        .append(generateUpdate(t))
+        .append("\n");
+      }
+      b.append("}\n");
       repositories.put(String.format("%sRepository", t.getCleanName()), b.toString());
     }
     return repositories;
@@ -75,20 +86,55 @@ public class RepositoryGenerator {
   public String generateSelectParentChildren(Table t) {
     StringBuilder b = new StringBuilder();
     for (Table parentTable: t.getParentTables()) {
-      b
-      .append("\tpublic List<")
-      .append(t.getCleanName())
-      .append("> selectOf")
-      .append(parentTable.getCleanName())
-      .append("(")
-      .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
-      .append(" ")
-      .append(parentTable.getPrimaryColumn().getPascalName())
-      .append(") {\n")
-      .append(generateStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName())))
-      .append(generateSetParameter(parentTable.getPrimaryColumn().getName(), parentTable.getPrimaryColumn().getPascalName()))
-      .append(generateSelect(t, false))
-      .append("\t}\n\n");
+      if (t.isJoiningTable()) {
+        if(t.hasJoiningTable()) {
+          b
+          .append("\tpublic List<")
+          .append(parentTable.getCleanName())
+          .append("> ")
+          .append(String.format("select%ss", t.getCleanName()))
+          .append("(")
+          .append(ColumnEnums.resolvePrimitiveType(t.getPsudoPrimaryColumn().getDataType()))
+          .append(" ")
+          .append(t.getPsudoPrimaryColumn().getPascalName())
+          .append(") {\n")
+          .append(generateStoredProcedureQuery(String.format("select%ss", t.getCleanName())))
+          .append(generateSetParameter(t.getPsudoPrimaryColumn().getName(), t.getPsudoPrimaryColumn().getPascalName()))
+          .append(generateSelect(parentTable, false))
+          .append("\t}\n\n");
+        } else {
+          b
+          .append("\tpublic List<")
+          .append(parentTable.getCleanName())
+          .append("> ")
+          .append(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()))
+          .append("(")
+          .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
+          .append(" ")
+          .append(parentTable.getPrimaryColumn().getPascalName())
+          .append(") {\n")
+          .append(generateStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName())))
+          .append(generateSetParameter(parentTable.getPrimaryColumn().getName(), parentTable.getPrimaryColumn().getPascalName()))
+          .append(generateSelect(parentTable, false))
+          .append("\t}\n\n");
+        }
+        break;
+      } else {
+        b
+        .append("\tpublic List<")
+        .append(t.getCleanName())
+        .append("> ")
+        .append(String.format("selectOf%s", parentTable.getCleanName()))
+        .append("(")
+        .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
+        .append(" ")
+        .append(parentTable.getPrimaryColumn().getPascalName())
+        .append(") {\n")
+        .append(generateStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName())))
+        .append(generateSetParameter(parentTable.getPrimaryColumn().getName(), parentTable.getPrimaryColumn().getPascalName()))
+        .append(generateSelect(t, false))
+        .append("\t}\n\n");
+      }
     }
     return b.toString();
   }
@@ -101,7 +147,7 @@ public class RepositoryGenerator {
     .append("> selectAll() {\n")
     .append(generateStoredProcedureQuery(String.format("selectAll%ss", t.getCleanName())))
     .append(generateSelect(t, false))
-    .append("\t}");
+    .append("\t}\n");
     return b.toString();
   }
 
@@ -143,7 +189,12 @@ public class RepositoryGenerator {
       b.append(generateSetParameter(c.getName(), String.format("value.get%s()", c.getCleanName())));
     }
     b
-    .append("\t\treturn q.execute(); // TODO: fix this in the generator to return true when inserted\n")
+    .append("\t\ttry {\n")
+    .append("\t\t\tq.execute();\n")
+    .append("\t\t\treturn true;\n")
+    .append("\t\t} catch (Exception ex) {\n")
+    .append("\t\t\treturn false;\n")
+    .append("\t\t}\n")
     .append("\t}\n");
     return b.toString();
   }
@@ -159,7 +210,12 @@ public class RepositoryGenerator {
       b.append(generateSetParameter(c.getName(), String.format("value.get%s()", c.getCleanName())));
     }
     b
-    .append(generateExecute())
+    .append("\t\ttry {\n")
+    .append("\t\t\tq.execute();\n")
+    .append("\t\t\treturn true;\n")
+    .append("\t\t} catch (Exception ex) {\n")
+    .append("\t\t\treturn false;\n")
+    .append("\t\t}\n")
     .append("\t}\n");
     return b.toString();
   }
@@ -172,7 +228,12 @@ public class RepositoryGenerator {
     .append(" value) {\n")
     .append(generateStoredProcedureQuery(String.format("delete%s", t.getCleanName())))
     .append(generateSetParameter(t.getPrimaryColumn().getName(), "value"))
-    .append(generateExecute())
+    .append("\t\ttry {\n")
+    .append("\t\t\tq.execute();\n")
+    .append("\t\t\treturn true;\n")
+    .append("\t\t} catch (Exception ex) {\n")
+    .append("\t\t\treturn false;\n")
+    .append("\t\t}\n")
     .append("\t}\n");
     return b.toString();
   }
@@ -192,9 +253,4 @@ public class RepositoryGenerator {
       isSingleResult ? "getSingleResult" : "getResultList",
       isSingleResult ? "\t" : "");
   }
-
-  private String generateExecute() {
-    return "\t\tint affectedRows = q.executeUpdate();\n\t\treturn affectedRows > 0;\n";
-  }
-
 }

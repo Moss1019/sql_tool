@@ -91,14 +91,13 @@ public class SqlGenerator {
       for (Table table : db.getTables()) {
         for (Table parentTable: table.getParentTables()) {
           Column primaryColumn = table.getPrimaryColumn();
-          dbObjects.add("procedure sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
-          procedures.add("sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
           b
           .append("delimiter //\n");
           if (table.isJoiningTable()) {
             primaryColumn = table.getPsudoPrimaryColumn();
             if(table.hasJoiningTable()) {
-              System.out.println("Joining... " + table.getName() + " " + parentTable.getName());
+              dbObjects.add("procedure sp_select" + table.getCleanName() + "s");
+              procedures.add("sp_select" + table.getCleanName() + "s");
               b
               .append("create procedure sp_select")
               .append(table.getCleanName())
@@ -110,16 +109,16 @@ public class SqlGenerator {
               .append("begin\n")
               .append("select * from ")
               .append(parentTable.getName())
-              .append("\n")
-              .append("where ")
+              .append(" t1 \n")
+              .append("where t1.")
               .append(parentTable.getPrimaryColumn().getName())
               .append(" in \n")
               .append("(select ")
               .append(parentTable.getPrimaryColumn().getName())
               .append(" from ")
               .append(table.getName())
-              .append("\n")
-              .append("where ")
+              .append(" t2 \n")
+              .append("where t2.")
               .append(primaryColumn.getName())
               .append(" = ")
               .append(primaryColumn.getName())
@@ -128,6 +127,8 @@ public class SqlGenerator {
               .append("end //\n")
               .append("delimiter ;\n");
             } else {
+              dbObjects.add("procedure sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
+              procedures.add("sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
               b
               .append("create procedure sp_select")
               .append(parentTable.getCleanName())
@@ -140,16 +141,16 @@ public class SqlGenerator {
               .append("begin\n")
               .append("select * from ")
               .append(parentTable.getName())
-              .append("\n")
-              .append("where ")
+              .append(" t1 \n")
+              .append("where t1.")
               .append(parentTable.getPrimaryColumn().getName())
               .append(" in \n")
               .append("(select ")
               .append(primaryColumn.getName())
               .append(" from ")
               .append(table.getName())
-              .append("\n")
-              .append("where ")
+              .append(" t2 \n")
+              .append("where t2.")
               .append(parentTable.getPrimaryColumn().getName())
               .append(" = ")
               .append(parentTable.getPrimaryColumn().getName())
@@ -160,6 +161,8 @@ public class SqlGenerator {
             }
             break;
           } else {
+            dbObjects.add("procedure sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
+            procedures.add("sp_select" + parentTable.getCleanName() + table.getCleanName() + "s");
             b
             .append("create procedure sp_select")
             .append(parentTable.getCleanName())
@@ -361,13 +364,13 @@ public class SqlGenerator {
         .append(table.getCleanName())
         .append("(");
         int colIndex = 0;
-          for(Column col: table.getNonPrimaryCols()) {
+          for(Column col: table.getColumns()) {
             b
             .append("in ")
             .append(col.getName())
             .append(" ")
             .append(ColumnEnums.resolveType(col.getDataType()));
-            if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
+            if(colIndex++ < table.getColumns().size() - 1) {
               b.append(", ");
             }
           }

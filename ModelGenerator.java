@@ -16,7 +16,6 @@ public class ModelGenerator {
     for(Table t: db.getTables()) {
       if(t.isJoiningTable()) {
           // TODO: work here
-          continue;
       } 
       StringBuilder b = new StringBuilder();
       b
@@ -28,14 +27,18 @@ public class ModelGenerator {
       .append("@Entity\n")
       .append("@Table(name = \"")
       .append(t.getName())
-      .append("\")\n")
-      .append(generateSelectAllProcedures(t))
-      .append(generateSelectByPKProcedures(t))
-      .append(generateSelectByUniqueColsProcedures(t))
-      .append(generateInsertProcedures(t))
-      .append(generateDeleteProcedures(t))
-      .append(generateUpdateProcedure(t))
+      .append("\")\n");
+      if(!t.isJoiningTable()) {
+        b
+        .append(generateSelectAllProcedures(t))
+        .append(generateSelectByPKProcedures(t))
+        .append(generateSelectByUniqueColsProcedures(t))
+        .append(generateDeleteProcedures(t))
+        .append(generateUpdateProcedure(t));
+      }
+      b
       .append(generateSelectParentChildren(t))
+      .append(generateInsertProcedures(t))
       .append(generateClassDef(t));
       models.put(t.getCleanName(), b.toString());
     }
@@ -65,7 +68,24 @@ public class ModelGenerator {
   private String generateSelectParentChildren(Table t) {
     StringBuilder b = new StringBuilder();
     for (Table parentTable : t.getParentTables()) {
-      b.append(generateNamedStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()), t.getCleanName(), parentTable.getPrimaryColumn()));
+      if(t.isJoiningTable()) {
+        if(t.hasJoiningTable()) {
+          b.append(generateNamedStoredProcedureQuery(String.format("select%ss", t.getCleanName()), 
+          parentTable.getCleanName(), 
+          t.getPsudoPrimaryColumn()));
+          break;
+        } else {
+          b.append(generateNamedStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), 
+            t.getCleanName()), 
+            parentTable.getCleanName(), 
+            parentTable.getPrimaryColumn()));
+        }
+      } else {
+        b.append(generateNamedStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), 
+          t.getCleanName()), 
+          t.getCleanName(), 
+          parentTable.getPrimaryColumn()));
+      }
     }
     return b.toString();
   }

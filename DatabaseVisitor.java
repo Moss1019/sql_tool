@@ -43,7 +43,6 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
     String colName = ctx.NAME().getText();
     try {
       if(ctx.JOINED() != null) {
-        System.out.println("Being joined on " + ctx.NAME().getText());
         return true;
       }
       String dataType = ctx.DATA_TYPE().getText();
