@@ -50,20 +50,14 @@ public class ServiceGenerator {
       .append(t.getCleanName())
       .append("Repository repo;\n\n")
       .append(generateInsert(t))
-      .append("\n")
-      .append(generateSelectParentChildren(t))
-      .append("\n");
+      .append(generateSelectParentChildren(t));
       if(!t.isJoiningTable()) {
         b
         .append(generateDelete(t))
-        .append("\n")
         .append(generateSelectByPK(t))
         .append(generateSelectAll(t))
-        .append("\n")
         .append(generateSelectByUnique(t))
-        .append("\n")
-        .append(generateUpdate(t))
-        .append("\n");
+        .append(generateUpdate(t));
       }
       b
       .append("}\n");
@@ -85,7 +79,7 @@ public class ServiceGenerator {
     .append(t.getCleanName())
     .append(" result = repo.selectByPk(value);\n")
     .append("\t\treturn result;\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -173,7 +167,7 @@ public class ServiceGenerator {
     .append(t.getCleanName())
     .append("> result = repo.selectAll();\n")
     .append("\t\treturn result;\n")
-    .append("\t}");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -200,6 +194,7 @@ public class ServiceGenerator {
         b.append("\n");
       }
     }
+    b.append("\n");
     return b.toString();
   }
 
@@ -213,13 +208,13 @@ public class ServiceGenerator {
     .append(" new")
     .append(t.getCleanName())
     .append(") { \n")
-    .append("\t\t ")
+    .append("\t\t")
     .append(t.getCleanName())
     .append(" result = repo.insert(new")
     .append(t.getCleanName())
     .append(");\n")
     .append("\t\treturn result;\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -235,7 +230,7 @@ public class ServiceGenerator {
     .append(t.getCleanName())
     .append(");\n")
     .append("\t\treturn result;\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -247,7 +242,7 @@ public class ServiceGenerator {
     .append(" id) {\n")
     .append("\t\tboolean result = repo.delete(id);\n")
     .append("\t\treturn result;\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 

@@ -244,7 +244,7 @@ public class ControllerGenerator {
     .append(" new")
     .append(t.getCleanName())
     .append(") { \n")
-    .append("\t\t ")
+    .append("\t\t")
     .append(t.getCleanName())
     .append(" result = service.insert(new")
     .append(t.getCleanName())

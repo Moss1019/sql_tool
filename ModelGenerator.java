@@ -140,7 +140,7 @@ public class ModelGenerator {
     String className = String.format("%sPK", t.getCleanName());
     StringBuilder b = new StringBuilder();
     b
-    .append("\tpublic class ")
+    .append("\tpublic static class ")
     .append(className)
     .append(" implements Serializable {\n");
     for(Column col: t.getColumns()) {

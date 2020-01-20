@@ -70,12 +70,6 @@ public class SqlGenerator {
       for(Table table: db.getTables()) {
         dbObjects.add("procedure sp_selectAll" + table.getCleanName() + "s");
         procedures.add("sp_selectAll" + table.getCleanName() + "s");
-        if(table.isJoiningTable()) {
-          // TODO: work here
-          // continue;
-        } else if (table.hasJoiningTable()) {
-          // TODO: work here
-        }
         b
         .append("create procedure sp_selectAll")
         .append(table.getCleanName())

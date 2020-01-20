@@ -43,20 +43,14 @@ public class RepositoryGenerator {
       .append("Repository {\n")
       .append("\t@PersistenceContext\n\tprivate EntityManager em;\n\n")
       .append(generateInsert(t))
-      .append("\n")
       .append(generateSelectParentChildren(t));
       if(!t.isJoiningTable()) {
         b
         .append(generateDelete(t))
-        .append("\n")
         .append(generateSelectByPK(t))
-        .append("\n")
         .append(generateSelectAll(t))
-        .append("\n")
         .append(generateSelectByUnique(t))
-        .append("\n")
-        .append(generateUpdate(t))
-        .append("\n");
+        .append(generateUpdate(t));
       }
       b.append("}\n");
       repositories.put(String.format("%sRepository", t.getCleanName()), b.toString());
@@ -79,7 +73,7 @@ public class RepositoryGenerator {
     .append("\t\t} catch (NoResultException ex) {\n")
     .append("\t\t\treturn null;\n")
     .append("\t\t}\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -147,7 +141,7 @@ public class RepositoryGenerator {
     .append("> selectAll() {\n")
     .append(generateStoredProcedureQuery(String.format("selectAll%ss", t.getCleanName())))
     .append(generateSelect(t, false))
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -175,6 +169,7 @@ public class RepositoryGenerator {
         b.append("\n");
       }
     }
+    b.append("\n");
     return b.toString();
   }
 
@@ -199,7 +194,7 @@ public class RepositoryGenerator {
     .append("\t\t} catch (Exception ex) {\n")
     .append("\t\t\treturn null;\n")
     .append("\t\t}\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -220,7 +215,7 @@ public class RepositoryGenerator {
     .append("\t\t} catch (Exception ex) {\n")
     .append("\t\t\treturn false;\n")
     .append("\t\t}\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
@@ -238,7 +233,7 @@ public class RepositoryGenerator {
     .append("\t\t} catch (Exception ex) {\n")
     .append("\t\t\treturn false;\n")
     .append("\t\t}\n")
-    .append("\t}\n");
+    .append("\t}\n\n");
     return b.toString();
   }
 
