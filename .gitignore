@@ -116,3 +116,5 @@ run.sh
 *.txt
 
 /parser/.antlr/
+
+.vs/

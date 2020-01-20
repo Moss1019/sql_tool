@@ -19,7 +19,7 @@ public class AxiosGenerator {
                 b
                 .append(generateGetAll(t))
                 .append(generateGetByPk(t))
-                .append(generatGetByUnique(t))
+                .append(generateGetByUnique(t))
                 .append(generatePut(t))
                 .append(generateDelete(t));
             }
@@ -52,13 +52,13 @@ public class AxiosGenerator {
         return b.toString();
     }
 
-    private String generatGetByUnique(Table t) {
+    private String generateGetByUnique(Table t) {
         StringBuilder b = new StringBuilder();
         for(Column col: t.getUniqueCols()) {
             b
             .append(generateExportCode(col.getPascalName(),
                 String.format("get%sBy%s", t.getCleanName(), col.getCleanName()), 
-                String.format("%ss/${%s}", t.getLowerCasedName(), col.getPascalName())))
+                String.format("%ss/by%s/${%s}", t.getLowerCasedName(), col.getCleanName(), col.getPascalName())))
             .append(getAxiosReturnString("get", null))
             .append("};\n\n");
         }
@@ -169,7 +169,7 @@ public class AxiosGenerator {
         .append("\t\t})\n")
         .append("\t\t.catch(err => {\n")
         .append("\t\t\tonError(err);\n")
-        .append("\t\t});\n\n");
+        .append("\t\t});\n");
         return b.toString();
     }
 }

@@ -28,7 +28,7 @@ item_collaborator {
 }
 
 collaborator {
-  user_id int
+  user_id int foreign(user_id)
   collaborator_id int foreign(user_id)
 }
 
