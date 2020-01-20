@@ -21,10 +21,6 @@ public class ModelGenerator {
       .append(".model;\n\n")
       .append("import javax.persistence.*;\n\n")
       .append("import java.util.Date;\n\n")
-<<<<<<< HEAD
-      .append("@Entity\n")
-      .append("@Table(name = \"") // TODO: add IdClass for joining models and PK class
-=======
       .append("import java.io.Serializable;\n\n")
       .append("@Entity\n");
       if(t.isJoiningTable()) {
@@ -37,7 +33,6 @@ public class ModelGenerator {
       }
       b
       .append("@Table(name = \"")
->>>>>>> 4460063184b00dcfdc12201bad0f4661095591b1
       .append(t.getName())
       .append("\")\n");
       if(!t.isJoiningTable()) {
