@@ -14,9 +14,6 @@ public class ModelGenerator {
   public Map<String, String> generateModels(String packageName) {
     Map<String, String> models = new HashMap<>();
     for(Table t: db.getTables()) {
-      if(t.isJoiningTable()) {
-          // TODO: work here
-      } 
       StringBuilder b = new StringBuilder();
       b
       .append("package ")
@@ -25,7 +22,7 @@ public class ModelGenerator {
       .append("import javax.persistence.*;\n\n")
       .append("import java.util.Date;\n\n")
       .append("@Entity\n")
-      .append("@Table(name = \"")
+      .append("@Table(name = \"") // TODO: add IdClass for joining models and PK class
       .append(t.getName())
       .append("\")\n");
       if(!t.isJoiningTable()) {
@@ -99,7 +96,6 @@ public class ModelGenerator {
   private String generateSelectByUniqueColsProcedures(Table t) {
     StringBuilder b = new StringBuilder();
     List<Column> uniqueCols = t.getUniqueCols();
-    int colIndex = 0;
     for(Column col: uniqueCols) {
       b.append(generateNamedStoredProcedureQuery(String.format("select%ssBy%s", t.getCleanName(), col.getCleanName()), t.getCleanName(), col));
     }
@@ -137,7 +133,7 @@ public class ModelGenerator {
   }
   
   private String generateNamedStoredProcedureQuery(String queryName, String type, Column col) {
-    List<Column> cols = new ArrayList();
+    List<Column> cols = new ArrayList<>();
     cols.add(col);
     return generateNamedStoredProcedureQuery(queryName, type, cols);
   }

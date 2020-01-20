@@ -31,6 +31,3 @@ collaborator {
   user_id int
   collaborator_id int foreign(user_id)
 }
-
-
-
