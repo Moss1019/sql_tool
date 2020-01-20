@@ -92,6 +92,7 @@ public class ModelGenerator {
             parentTable.getCleanName(), 
             parentTable.getPrimaryColumn()));
         }
+        return b.toString();
       } else {
         b.append(generateNamedStoredProcedureQuery(String.format("select%s%ss", parentTable.getCleanName(), 
           t.getCleanName()), 

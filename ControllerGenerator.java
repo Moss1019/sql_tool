@@ -219,7 +219,7 @@ public class ControllerGenerator {
       .append(" result = service.selectBy")
       .append(col.getCleanName())
       .append("(")
-      .append(col.getName())
+      .append(col.getPascalName())
       .append(");\n")
       .append("\t\tif (result == null) {\n")
       .append("\t\t\treturn ResponseEntity.status(404).body(\"Could not find")
