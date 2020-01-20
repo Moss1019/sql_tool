@@ -181,7 +181,9 @@ public class RepositoryGenerator {
   private String generateInsert(Table t) {
     StringBuilder b = new StringBuilder();
     b
-    .append("\tpublic boolean insert(")
+    .append("\tpublic ")
+    .append(t.getCleanName())
+    .append(" insert(")
     .append(t.getCleanName())
     .append(" value) {\n")
     .append(generateStoredProcedureQuery(String.format("insert%s", t.getCleanName())));
@@ -191,9 +193,11 @@ public class RepositoryGenerator {
     b
     .append("\t\ttry {\n")
     .append("\t\t\tq.execute();\n")
-    .append("\t\t\treturn true;\n")
+    .append("\t\t\treturn (")
+    .append(t.getCleanName())
+    .append(")q.getSingleResult();\n")
     .append("\t\t} catch (Exception ex) {\n")
-    .append("\t\t\treturn false;\n")
+    .append("\t\t\treturn null;\n")
     .append("\t\t}\n")
     .append("\t}\n");
     return b.toString();

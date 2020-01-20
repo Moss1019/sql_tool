@@ -125,7 +125,7 @@ public class AxiosGenerator {
                 .append(getAxiosReturnString("get", null))
                 .append("};\n\n");
             }
-            if(t.hasJoiningTable()) {
+            if(t.isJoiningTable()) {
                 return b.toString();
             }
         }        

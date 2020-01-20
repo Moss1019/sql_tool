@@ -206,12 +206,16 @@ public class ServiceGenerator {
   private String generateInsert(Table t) {
     StringBuilder b = new StringBuilder();
     b
-    .append("\tpublic boolean insert(")
+    .append("\tpublic ")
+    .append(t.getCleanName())
+    .append(" insert(")
     .append(t.getCleanName())
     .append(" new")
     .append(t.getCleanName())
     .append(") { \n")
-    .append("\t\tboolean result = repo.insert(new")
+    .append("\t\t ")
+    .append(t.getCleanName())
+    .append(" result = repo.insert(new")
     .append(t.getCleanName())
     .append(");\n")
     .append("\t\treturn result;\n")

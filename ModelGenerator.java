@@ -120,7 +120,7 @@ public class ModelGenerator {
 
   private String generateInsertProcedures(Table t) {
     StringBuilder b = new StringBuilder();
-    b.append(generateNamedStoredProcedureQuery(String.format("insert%s", t.getCleanName()), null, t.getNonPrimaryCols()));
+    b.append(generateNamedStoredProcedureQuery(String.format("insert%s", t.getCleanName()), t.getCleanName(), t.getNonPrimaryCols()));
     return b.toString();
   }
 

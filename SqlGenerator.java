@@ -307,7 +307,29 @@ public class SqlGenerator {
         }
         b
         .append(");\n")
-        .append("end //\n")
+        .append("select * from ")
+        .append(table.getName())
+        .append(" t1 where ");
+        if(table.isJoiningTable()) {
+          colIndex = 0;
+          for (Column col: table.getColumns()) {
+            b
+            .append("t1.")
+            .append(col.getName())
+            .append(" = ")
+            .append(col.getName());
+            if (++colIndex < table.getColumns().size()) {
+              b.append(" and ");
+            }
+          }
+        } else {
+          b
+          .append("t1.")
+          .append(table.getPrimaryColumn().getName())
+          .append(" = last_insert_id()");
+        }
+        b
+        .append(";\nend //\n")
         .append("delimiter ;\n");
       }
       return b.toString();
