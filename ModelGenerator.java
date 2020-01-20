@@ -114,7 +114,6 @@ public class ModelGenerator {
   private String generateSelectByUniqueColsProcedures(Table t) {
     StringBuilder b = new StringBuilder();
     List<Column> uniqueCols = t.getUniqueCols();
-    int colIndex = 0;
     for(Column col: uniqueCols) {
       b.append(generateNamedStoredProcedureQuery(String.format("select%ssBy%s", t.getCleanName(), col.getCleanName()), t.getCleanName(), col));
     }
