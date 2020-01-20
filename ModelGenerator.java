@@ -21,8 +21,23 @@ public class ModelGenerator {
       .append(".model;\n\n")
       .append("import javax.persistence.*;\n\n")
       .append("import java.util.Date;\n\n")
+<<<<<<< HEAD
       .append("@Entity\n")
       .append("@Table(name = \"") // TODO: add IdClass for joining models and PK class
+=======
+      .append("import java.io.Serializable;\n\n")
+      .append("@Entity\n");
+      if(t.isJoiningTable()) {
+        b
+        .append("@IdClass(")
+        .append(t.getCleanName())
+        .append(".")
+        .append(t.getCleanName())
+        .append("PK.class)\n");
+      }
+      b
+      .append("@Table(name = \"")
+>>>>>>> 4460063184b00dcfdc12201bad0f4661095591b1
       .append(t.getName())
       .append("\")\n");
       if(!t.isJoiningTable()) {
@@ -50,7 +65,12 @@ public class ModelGenerator {
     .append(" {\n")
     .append(generateFields(t.getColumns()))
     .append("\n")
-    .append(generateGettersSetters(t.getColumns()))
+    .append(generateGettersSetters(t.getColumns()));
+    if(t.isJoiningTable()) {
+      b
+      .append(generatePKClass(t));
+    }
+    b
     .append("}\n");
     return b.toString();
   }
@@ -120,6 +140,56 @@ public class ModelGenerator {
     return b.toString();
   }
 
+  private String generatePKClass(Table t) {
+    String className = String.format("%sPK", t.getCleanName());
+    StringBuilder b = new StringBuilder();
+    b
+    .append("\tpublic class ")
+    .append(className)
+    .append(" implements Serializable {\n");
+    for(Column col: t.getColumns()) {
+      b
+      .append("\t\tprotected ")
+      .append(ColumnEnums.resolvePrimitiveType(col.getDataType()))
+      .append(" ")
+      .append(col.getPascalName())
+      .append(";\n");
+    }
+    b
+    .append("\n")
+    .append("\t\tpublic ")
+    .append(className)
+    .append("() {\n")
+    .append("\t\t}\n\n")
+    .append("\t\tpublic ")
+    .append(className)
+    .append("(");
+    int colIndex = 0;
+    for(Column col: t.getColumns()) {
+      b
+      .append(ColumnEnums.resolvePrimitiveType(col.getDataType()))
+      .append(" ")
+      .append(col.getPascalName());
+      if(++colIndex < t.getColumns().size()) {
+        b.append(", ");
+      }
+    }
+    b
+    .append(") {\n");
+    for(Column col: t.getColumns()) {
+      b
+      .append("\t\t\tthis.")
+      .append(col.getPascalName())
+      .append(" = ")
+      .append(col.getPascalName())
+      .append(";\n");
+    }
+    b
+    .append("\t\t}\n")
+    .append("\t}\n");
+    return b.toString();
+  }
+
   private String generateParameter(Column col) {
     StringBuilder b = new StringBuilder();
     b
@@ -174,7 +244,7 @@ public class ModelGenerator {
   private String generateFields(List<Column> cols) {
     StringBuilder b = new StringBuilder();
     for(Column col: cols) {
-      if(col.isPrimary()) {
+      if(col.isPrimary() || col.getPsudoName() != null) {
         b.append("\t@Id\n");
       }
       b

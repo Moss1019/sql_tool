@@ -188,7 +188,7 @@ public class ControllerGenerator {
       .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n\t\t}\n")
       .append("\t\treturn ResponseEntity.ok(result);\n")
       .append("\t}\n\n");
-      if(t.hasJoiningTable()) {
+      if(t.isJoiningTable()) {
         return b.toString(); 
       }
     }
@@ -200,8 +200,10 @@ public class ControllerGenerator {
     int colIndex = 0;
     for(Column col: t.getUniqueCols()) {
       b
-      .append("\t@RequestMapping(value = \"{")
-      .append(col.getName())
+      .append("\t@RequestMapping(value = \"by")
+      .append(col.getCleanName())
+      .append("/{")
+      .append(col.getPascalName())
       .append("}\", method = RequestMethod.GET)\n")
       .append("\tpublic ")
       .append("ResponseEntity<?>")
@@ -210,7 +212,7 @@ public class ControllerGenerator {
       .append("(@PathVariable ")
       .append(ColumnEnums.resolvePrimitiveType(col.getDataType()))
       .append(" ")
-      .append(col.getName())
+      .append(col.getPascalName())
       .append(") {\n")
       .append("\t\t")
       .append(t.getCleanName())
