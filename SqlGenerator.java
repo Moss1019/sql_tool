@@ -408,11 +408,12 @@ public class SqlGenerator {
         .append(")\nbegin\n")
         .append("update ")
         .append(table.getName())
-        .append(" \n")
+        .append(" t1 \n")
         .append("set ");
         colIndex = 0;
         for(Column col: table.getNonPrimaryCols()) {
           b
+          .append("t1.")
           .append(col.getName())
           .append(" = ")
           .append(col.getName());
@@ -421,7 +422,7 @@ public class SqlGenerator {
           }
         }
         b
-        .append("\nwhere ");
+        .append("\nwhere t1.");
         colIndex = 0;
         if(table.isJoiningTable()) {
           for(Column col: table.getNonPrimaryCols()) {
@@ -430,7 +431,7 @@ public class SqlGenerator {
             .append(" = old_")
             .append(col.getName());
             if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
-              b.append(" and ");
+              b.append(" and t1.");
             }
           }
         } else {
