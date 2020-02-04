@@ -50,10 +50,10 @@ public class ServiceGenerator {
       .append(t.getCleanName())
       .append("Repository repo;\n\n")
       .append(generateInsert(t))
-      .append(generateSelectParentChildren(t));
+      .append(generateSelectParentChildren(t))
+      .append(generateDelete(t));
       if(!t.isJoiningTable()) {
         b
-        .append(generateDelete(t))
         .append(generateSelectByPK(t))
         .append(generateSelectAll(t))
         .append(generateSelectByUnique(t))
@@ -190,7 +190,7 @@ public class ServiceGenerator {
       .append("(value);\n")
       .append("\t\treturn result;\n")
       .append("\t}\n");
-      if(colIndex++ < t.getUniqueCols().size() - 1) {
+      if(++colIndex < t.getColumns().size()) {
         b.append("\n");
       }
     }
@@ -237,10 +237,37 @@ public class ServiceGenerator {
   private String generateDelete(Table t) {
     StringBuilder b = new StringBuilder();
     b
-    .append("\tpublic boolean delete(")
-    .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
-    .append(" id) {\n")
-    .append("\t\tboolean result = repo.delete(id);\n")
+    .append("\tpublic boolean delete(");
+    if(t.isJoiningTable()) {
+      int colIndex = 0;
+      for(Column c: t.getColumns()) {
+        b
+        .append(ColumnEnums.resolvePrimitiveType(c.getDataType()))
+        .append(" ")
+        .append(c.getPascalName());
+        if(++colIndex < t.getColumns().size()) {
+          b.append(" ,");
+        }
+      }
+      b
+      .append(") {\n")
+      .append("\t\tboolean result = repo.delete(");
+      colIndex = 0;
+      for(Column c: t.getColumns()) {
+        b
+        .append(c.getPascalName());
+        if(++colIndex < t.getColumns().size()) {
+          b.append(" ,");
+        }
+      }
+      b.append(");\n");
+    } else {
+      b
+      .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .append(" id) {\n")
+      .append("\t\tboolean result = repo.delete(id);\n");
+    }
+    b
     .append("\t\treturn result;\n")
     .append("\t}\n\n");
     return b.toString();

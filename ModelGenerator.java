@@ -40,10 +40,10 @@ public class ModelGenerator {
         .append(generateSelectAllProcedures(t))
         .append(generateSelectByPKProcedures(t))
         .append(generateSelectByUniqueColsProcedures(t))
-        .append(generateDeleteProcedures(t))
         .append(generateUpdateProcedure(t));
       }
       b
+      .append(generateDeleteProcedures(t))
       .append(generateSelectParentChildren(t))
       .append(generateInsertProcedures(t))
       .append(generateClassDef(t));
@@ -126,7 +126,15 @@ public class ModelGenerator {
 
   private String generateDeleteProcedures(Table t) {
     StringBuilder b = new StringBuilder();
-    b.append(generateNamedStoredProcedureQuery(String.format("delete%s", t.getCleanName()), null, t.getPrimaryColumn()));
+    if(t.isJoiningTable()) {
+      if(t.hasJoiningTable()) {
+        b.append(generateNamedStoredProcedureQuery(String.format("delete%s", t.getCleanName()), null, t.getColumns()));
+      } else {
+        b.append(generateNamedStoredProcedureQuery(String.format("delete%s%s", t.getParentTables().get(0).getCleanName(), t.getCleanName()), null, t.getColumns()));
+      }
+    } else {
+      b.append(generateNamedStoredProcedureQuery(String.format("delete%s", t.getCleanName()), null, t.getPrimaryColumn()));
+    }
     return b.toString();
   }
 
@@ -226,7 +234,7 @@ public class ModelGenerator {
       int colIndex = 0;
       for(Column col: parms) {
         b.append(generateParameter(col));
-        if(colIndex++ < parms.size() - 1) {
+        if(++colIndex < parms.size()) {
           b.append(",");
         }
         b.append("\n");

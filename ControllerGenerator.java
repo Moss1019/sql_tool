@@ -62,10 +62,10 @@ public class ControllerGenerator {
         .append(generateSelectAll(t))
         .append(generateSelectByPK(t))
         .append(generateSelectByUnique(t))
-        .append(generateUpdate(t))
-        .append(generateDelete(t));
+        .append(generateUpdate(t));
       }
       b
+      .append(generateDelete(t))
       .append(generateInsert(t))
       .append(generateSelectParentChildren(t))
       .append("}\n");
@@ -228,7 +228,7 @@ public class ControllerGenerator {
       .append("\t\t}\n")
       .append("\t\treturn ResponseEntity.ok(result);\n")
       .append("\t}\n\n");
-      if(colIndex++ < t.getUniqueCols().size() - 1) {
+      if(++colIndex < t.getColumns().size()) {
         b.append("\n");
       }
     }
@@ -283,12 +283,55 @@ public class ControllerGenerator {
 
   private String generateDelete(Table t) {
     StringBuilder b = new StringBuilder();
+    if(t.isJoiningTable()) {
+      b
+      .append("\t@RequestMapping(value = \"");
+      int colIndex = 0;
+      for(Column c: t.getColumns()) {
+        b
+        .append("{")
+        .append(c.getPascalName())
+        .append("}");
+        if(++colIndex < t.getColumns().size()) {
+          b
+          .append("/");
+        }
+      }
+      b
+      .append("\", method = RequestMethod.DELETE)\n")
+      .append("\tpublic ResponseEntity<?> delete(");
+      colIndex = 0;
+      for(Column c: t.getColumns()) {
+        b
+        .append("@PathVariable ")
+        .append(ColumnEnums.resolvePrimitiveType(c.getDataType()))
+        .append(" ")
+        .append(c.getPascalName());
+        if(++colIndex < t.getColumns().size()) {
+          b.append(", ");
+        }
+      }
+      b
+      .append(") {\n")
+      .append("\t\tboolean result = service.delete(");
+      colIndex = 0;
+      for(Column c: t.getColumns()) {
+        b
+        .append(c.getPascalName());
+        if(++colIndex < t.getColumns().size()) {
+          b.append(", ");
+        }
+      }
+      b.append(");\n");
+    } else {
+      b
+      .append("\t@RequestMapping(value = \"{id}\", method = RequestMethod.DELETE)\n")
+      .append("\tpublic ResponseEntity<?> delete(@PathVariable ")
+      .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .append(" id) {\n")
+      .append("\t\tboolean result = service.delete(id);\n");
+    }
     b
-    .append("\t@RequestMapping(value = \"{id}\", method = RequestMethod.DELETE)\n")
-    .append("\tpublic ResponseEntity<?> delete(@PathVariable ")
-    .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
-    .append(" id) {\n")
-    .append("\t\tboolean result = service.delete(id);\n")
     .append("\t\tif (!result) {\n")
     .append("\t\t\treturn ResponseEntity.status(400).body(\"Could not delete ")
     .append(t.getCleanName())

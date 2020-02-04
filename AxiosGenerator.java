@@ -20,10 +20,10 @@ public class AxiosGenerator {
                 .append(generateGetAll(t))
                 .append(generateGetByPk(t))
                 .append(generateGetByUnique(t))
-                .append(generatePut(t))
-                .append(generateDelete(t));
+                .append(generatePut(t));
             }
             b
+            .append(generateDelete(t))
             .append(generatePost(t))
             .append(generateGetParentChildren(t));
         }
@@ -89,12 +89,59 @@ public class AxiosGenerator {
 
     private String generateDelete(Table t) {
         StringBuilder b = new StringBuilder();
-        b
-        .append(generateExportCode(t.getPrimaryColumn().getPascalName(),
-            String.format("delete%s", t.getCleanName()), 
-            String.format("%ss/${%s}", t.getLowerCasedName(), t.getPrimaryColumn().getPascalName())))
-        .append(getAxiosReturnString("delete", null))
-        .append("};\n\n");
+        if(t.isJoiningTable()) {
+            // if(t.hasJoiningTable()) {
+                int colIndex = 0;
+                StringBuilder parameterBuilder = new StringBuilder();
+                for(Column c: t.getColumns()) {
+                    parameterBuilder
+                    .append(c.getPascalName());
+                    if(++colIndex < t.getColumns().size()) {
+                        parameterBuilder
+                        .append(", ");
+                    }
+                }
+                StringBuilder urlBuilder = new StringBuilder();
+                urlBuilder
+                .append(t.getCleanName());
+                colIndex = 0;
+                for(Column c: t.getColumns()) {
+                    urlBuilder
+                    .append("/${")
+                    .append(c.getPascalName())
+                    .append("}");
+                }
+                if(t.hasJoiningTable()) {
+                    b
+                    .append(generateExportCode(parameterBuilder.toString(), 
+                    String.format("delete%s", t.getCleanName()),
+                    urlBuilder.toString()));
+                } else {
+                    StringBuilder methodNameBuilder = new StringBuilder();
+                    for(Table table: t.getParentTables()) {
+                        methodNameBuilder.append(table.getCleanName());
+                    }
+                    b
+                   .append(generateExportCode(parameterBuilder.toString(), 
+                   String.format("delete%s", methodNameBuilder.toString()),
+                   urlBuilder.toString()));
+                }
+                b
+                .append(getAxiosReturnString("delete", null))
+                .append("};\n\n");
+
+            // } else {
+                
+            // }
+        } else {
+            b
+            .append(generateExportCode(t.getPrimaryColumn().getPascalName(),
+                String.format("delete%s", t.getCleanName()), 
+                String.format("%ss/${%s}", t.getLowerCasedName(), t.getPrimaryColumn().getPascalName())))
+            .append(getAxiosReturnString("delete", null))
+            .append("};\n\n");
+        }
+        
         return b.toString();
     }
 

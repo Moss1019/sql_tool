@@ -43,10 +43,10 @@ public class RepositoryGenerator {
       .append("Repository {\n")
       .append("\t@PersistenceContext\n\tprivate EntityManager em;\n\n")
       .append(generateInsert(t))
-      .append(generateSelectParentChildren(t));
+      .append(generateSelectParentChildren(t))
+      .append(generateDelete(t));
       if(!t.isJoiningTable()) {
         b
-        .append(generateDelete(t))
         .append(generateSelectByPK(t))
         .append(generateSelectAll(t))
         .append(generateSelectByUnique(t))
@@ -165,7 +165,7 @@ public class RepositoryGenerator {
       .append("\t\t\treturn null;\n")
       .append("\t\t}\n")
       .append("\t}\n");
-      if(colIndex++ < t.getUniqueCols().size() - 1) {
+      if(++colIndex < t.getColumns().size()) {
         b.append("\n");
       }
     }
@@ -222,11 +222,39 @@ public class RepositoryGenerator {
   private String generateDelete(Table t) {
     StringBuilder b = new StringBuilder();
     b
-    .append("\tpublic boolean delete(")
-    .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
-    .append(" value) {\n")
-    .append(generateStoredProcedureQuery(String.format("delete%s", t.getCleanName())))
-    .append(generateSetParameter(t.getPrimaryColumn().getName(), "value"))
+    .append("\tpublic boolean delete(");
+    int colIndex = 0;
+    if(t.isJoiningTable()) {
+        for(Column c: t.getColumns()) {
+          b
+          .append(ColumnEnums.resolvePrimitiveType(c.getDataType()))
+          .append(" ")
+          .append(c.getPascalName());
+          if(++colIndex < t.getColumns().size()) {
+            b.append(", ");
+          }
+        }
+        b
+        .append(") { \n");
+        if(t.hasJoiningTable()) {
+          b
+          .append(generateStoredProcedureQuery(String.format("delete%s", t.getCleanName())));
+        } else {
+          b
+          .append(generateStoredProcedureQuery(String.format("delete%s%s", t.getParentTables().get(0).getCleanName(), t.getCleanName())));
+        }
+        for(Column c: t.getColumns()) {
+          b
+          .append(generateSetParameter(c.getName(), c.getPascalName()));
+        }
+    } else {
+      b
+      .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .append(" value) {\n")
+      .append(generateStoredProcedureQuery(String.format("delete%s", t.getCleanName())))
+      .append(generateSetParameter(t.getPrimaryColumn().getName(), "value"));
+    }
+    b
     .append("\t\ttry {\n")
     .append("\t\t\tq.execute();\n")
     .append("\t\t\treturn true;\n")

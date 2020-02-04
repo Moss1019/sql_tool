@@ -32,7 +32,7 @@ public class SqlGenerator {
         .append("create table ")
         .append(table.getName())
         .append("(\n");
-        int currentColIndex = 0;
+        int colIndex = 0;
         for(Column c: table.getColumns()) {
           b
           .append("\t")
@@ -55,7 +55,7 @@ public class SqlGenerator {
               .append(")");
             }
           }
-          if(currentColIndex++ < table.getColumns().size() - 1) {
+          if(++colIndex < table.getColumns().size()) {
             b.append(",");
           }
           b.append("\n");
@@ -199,14 +199,14 @@ public class SqlGenerator {
     public String generateSelectByPKProcedures() {
       StringBuilder b = new StringBuilder();
       for(Table table: db.getTables()) {
-        dbObjects.add("procedure sp_select" + table.getCleanName());
-        procedures.add("sp_select" + table.getCleanName());
-        Column primaryCol = table.getPrimaryColumn();
         if(table.isJoiningTable()) {
           continue;
         } else if (table.hasJoiningTable()) {
           // TODO: work here
         }
+        dbObjects.add("procedure sp_select" + table.getCleanName());
+        procedures.add("sp_select" + table.getCleanName());
+        Column primaryCol = table.getPrimaryColumn();
         b
         .append("delimiter //\n")
         .append("create procedure sp_select")
@@ -295,7 +295,7 @@ public class SqlGenerator {
           .append(col.getName())
           .append(" ")
           .append(ColumnEnums.resolveType(col.getDataType()));
-          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
+          if(++colIndex < table.getNonPrimaryCols().size()) {
             b.append(", ");
           }
         }
@@ -309,7 +309,7 @@ public class SqlGenerator {
         for(Column col: table.getNonPrimaryCols()) {
           b
           .append(col.getName());
-          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
+          if(++colIndex < table.getNonPrimaryCols().size()) {
             b.append(", ");
           }
         }
@@ -318,7 +318,7 @@ public class SqlGenerator {
         for(Column col: table.getNonPrimaryCols()) {
           b
           .append(col.getName());
-          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
+          if(++colIndex < table.getNonPrimaryCols().size()) {
             b.append(", ");
           }
         }
@@ -379,7 +379,7 @@ public class SqlGenerator {
             .append(c.getName())
             .append(" ")
             .append(ColumnEnums.resolveType(c.getDataType()));
-            if(colIndex++ < table.getColumns().size() - 1) {
+            if(++colIndex < table.getColumns().size()) {
               b.append(", ");
             }
           }
@@ -396,7 +396,7 @@ public class SqlGenerator {
             .append(c.getName())
             .append(" = ")
             .append(c.getName());
-            if(colIndex++ < table.getColumns().size() - 1) {
+            if(++colIndex < table.getColumns().size()) {
               b.append(" and ");
             }
           }
@@ -454,7 +454,7 @@ public class SqlGenerator {
             .append(col.getName())
             .append(" ")
             .append(ColumnEnums.resolveType(col.getDataType()));
-            if(colIndex++ < table.getColumns().size() - 1) {
+            if(++colIndex < table.getColumns().size()) {
               b.append(", ");
             }
           }
@@ -467,7 +467,7 @@ public class SqlGenerator {
             .append(col.getName())
             .append(" ")
             .append(ColumnEnums.resolveType(col.getDataType()));
-            if(colIndex++ < table.getColumns().size() - 1) {
+            if(++colIndex < table.getColumns().size()) {
               b.append(", ");
             }
           }
@@ -485,7 +485,7 @@ public class SqlGenerator {
           .append(col.getName())
           .append(" = ")
           .append(col.getName());
-          if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
+          if(++colIndex < table.getNonPrimaryCols().size() - 1) {
             b.append(", ");
           }
         }
@@ -498,7 +498,7 @@ public class SqlGenerator {
             .append(col.getName())
             .append(" = old_")
             .append(col.getName());
-            if(colIndex++ < table.getNonPrimaryCols().size() - 1) {
+            if(++colIndex < table.getNonPrimaryCols().size()) {
               b.append(" and t1.");
             }
           }
