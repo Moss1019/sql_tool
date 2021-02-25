@@ -1,33 +1,31 @@
 
+group {
+  group_id int primary auto_increment
+  group_name string
+}
+
 user {
   user_id int primary auto_increment
   first_name string
   last_name string
-  user_name string unique
-  email string
+  group_id int foreign
 }
 
 item {
   item_id int primary auto_increment
   title string
   user_id int foreign
+  group_id int foreign
 }
 
 milestone {
   milestone_id int primary auto_increment
-  title string
-  date_created date
-  is_complete boolean
+  description string
   item_id int foreign
-}
-
-item_collaborator {
-  user_id int foreign(user_id)
-  item_id int foreign(item_id)
-  joined user_item
 }
 
 collaborator {
   user_id int foreign(user_id)
-  collaborator_id int foreign(user_id)
+  item_id int foreign(item_id)
+  joined user_item
 }

@@ -116,9 +116,20 @@ public class Definition {
                 writeFile(String.format("%s.java", modelName), controllers.get(modelName), "controller");
             }
 
+            ViewGenerator viewGenerator = new ViewGenerator(database);
+            Map<String, String> views = viewGenerator.generateViews(argMapping.get("package_name"));
+            for(String viewName: views.keySet()) {
+                writeFile(String.format("%s.java", viewName), views.get(viewName), "view");
+            }
+
+            MapperGenerator mapperGenerator = new MapperGenerator(database);
+            Map<String, String> mappers = mapperGenerator.generateMappers(argMapping.get("package_name"));
+            for(String mapperName: mappers.keySet()) {
+                writeFile(String.format("%s.java", mapperName), mappers.get(mapperName), "mapper");
+            }
+
             AxiosGenerator axiosGenerator = new AxiosGenerator(database);
             writeFile("index.js", axiosGenerator.generateActions("http://localhost:8080"), "http");
-            
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());

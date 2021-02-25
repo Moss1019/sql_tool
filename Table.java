@@ -8,6 +8,7 @@ class Table {
     static private Map<String, Table> registry = new HashMap<>();
 
     private String name;
+    private int numJoiningTables;
     private List<Column> columns;
     private List<Column> uniqueCols;
     private Column primaryColumn;
@@ -15,6 +16,8 @@ class Table {
     private boolean isJoiningTable;
     private boolean hasJoiningTable;
     private List<Table> parentTables;
+    private List<Table> childTables;
+    private List<Table> nonJoiningTables;
 
     public Table(String name, List<Column> columns, boolean hasJoiningTable) {
         this.name = name;
@@ -22,6 +25,8 @@ class Table {
         this.hasJoiningTable = hasJoiningTable;
         this.isJoiningTable = true;
         this.parentTables = new ArrayList<>();
+        this.childTables = new ArrayList<>();
+        numJoiningTables = -1;
         for(Column col: columns) {
             if(col.isPrimary()) {
                 primaryColumn = col;
@@ -41,7 +46,9 @@ class Table {
                 String columnName = col.getPsudoName() != null ? col.getPsudoName() : col.getName();
                 String tableName = columnName.substring(0, columnName.indexOf("_"));
                 if(registry.containsKey(tableName)) {
-                    parentTables.add(registry.get(tableName));
+                    Table parentTable = registry.get(tableName);
+                    parentTable.childTables.add(this);
+                    parentTables.add(parentTable);
                 }
             }
             if (col.getPsudoName() != null) {
@@ -89,6 +96,38 @@ class Table {
 
     public void setParentTables(List<Table> parentTables) {
         this.parentTables = parentTables;
+    }
+
+    public List<Table> getChildTables() {
+        return childTables;
+    }
+
+    public void setChildTables(List<Table> childTables) {
+        this.childTables = childTables;
+    }
+
+    public int getNumJoiningTables() {
+        if(numJoiningTables == -1) {
+            numJoiningTables = 0;
+            for(Table ct: getChildTables()) {
+                if(ct.isJoiningTable()) {
+                    ++numJoiningTables;
+                }
+            }
+        }
+        return numJoiningTables;
+    }
+
+    public List<Table> getNonJoiningTables() {
+        if(nonJoiningTables == null) {
+            nonJoiningTables = new ArrayList<>();
+            for(Table ct: getChildTables()) {
+                if(!ct.isJoiningTable()) {
+                    nonJoiningTables.add(ct);
+                }
+            }
+        }
+        return nonJoiningTables;
     }
 
     public List<Column> getNonPrimaryCols() {

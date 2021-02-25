@@ -19,7 +19,6 @@ public class ServiceGenerator {
       .append(".service;\n\n")
       .append("import org.springframework.stereotype.Service;\n\n")
       .append("import org.springframework.beans.factory.annotation.Autowired;\n\n")
-      .append("import java.util.List;\n\n")
       .append("import ")
       .append(packageName)
       .append(".model.");
@@ -36,19 +35,65 @@ public class ServiceGenerator {
         .append(t.getCleanName());
       }
       b
+      .append(";\nimport ")
+      .append(packageName)
+      .append(".view.");
+      if(t.isJoiningTable()) {
+        b
+        .append(t.getParentTables().get(0).getCleanName())
+        .append("View;\n")
+        .append("import ")
+        .append(packageName)
+        .append(".view.")
+        .append(t.getCleanName())
+        .append("View");
+      } else {
+        b
+        .append(t.getCleanName())
+        .append("View");
+      }
+      b
       .append(";\n")
       .append("import ")
       .append(packageName)
       .append(".repository.")
       .append(t.getCleanName())
-      .append("Repository;\n\n")
-      .append("@Service\npublic class ")
+      .append("Repository;\n")
+      .append("import ")
+      .append(packageName)
+      .append(".mapper.")
+      .append(t.getCleanName())
+      .append("Mapper;\n");
+      for(Table ct: t.getNonJoiningTables()) {
+        b
+        .append("import ")
+        .append(packageName)
+        .append(".view.")
+        .append(ct.getCleanName())
+        .append("View;\n");
+      }
+      b
+      .append("\nimport java.util.List;\n")
+      .append("import java.util.stream.Collectors;\n");
+      b
+      .append("\n@Service\npublic class ")
       .append(t.getCleanName())
       .append("Service {\n")
       .append("\t@Autowired\n")
       .append("\tprivate ")
       .append(t.getCleanName())
-      .append("Repository repo;\n\n")
+      .append("Repository repo;\n");
+      for(Table ct: t.getNonJoiningTables()) {
+        b
+        .append("\t@Autowired\n")
+        .append("\tprivate ")
+        .append(ct.getCleanName())
+        .append("Service ")
+        .append(ct.getName())
+        .append("Service;\n");
+      }
+      b
+      .append('\n')
       .append(generateInsert(t))
       .append(generateSelectParentChildren(t))
       .append(generateDelete(t));
@@ -61,7 +106,6 @@ public class ServiceGenerator {
       }
       b
       .append("}\n");
-      
       services.put(String.format("%sService", t.getCleanName()), b.toString());
     }
     return services;
@@ -72,17 +116,57 @@ public class ServiceGenerator {
     b
     .append("\tpublic ")
     .append(t.getCleanName())
-    .append(" selectByPk(")
+    .append("View selectByPk(")
     .append(ColumnEnums.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
     .append(" value) {\n")
     .append("\t\t")
     .append(t.getCleanName())
-    .append(" result = repo.selectByPk(value);\n")
+    .append(" dbResult = repo.selectByPk(value);\n");
+    for(Table ct: t.getNonJoiningTables()) {
+      b
+      .append("\t\tList<")
+      .append(ct.getCleanName())
+      .append("View> ") 
+      .append(ct.getName())
+      .append("s = ")
+      .append(ct.getName())
+      .append("Service.selectOf")
+      .append(t.getCleanName())
+      .append("(dbResult.get")
+      .append(t.getPrimaryColumn().getCleanName())
+      .append("());\n");
+    }
+    b
+    .append("\t\t")
+    .append(t.getCleanName())
+    .append("View result = ")
+    .append(t.getCleanName())
+    .append("Mapper.map")
+    .append(t.getCleanName())
+    .append("(dbResult");
+    for(Table ct: t.getNonJoiningTables()) {
+      b
+      .append(", ")
+      .append(ct.getName())
+      .append("s");
+    }
+    b
+    .append(");\n")
     .append("\t\treturn result;\n")
     .append("\t}\n\n");
     return b.toString();
   }
-
+// 	public List<ItemView> selectOfUser(int userId) {
+// 		List<Item> dbResult = repo.selectOfUser(userId);
+// 		List<ItemView> result = dbResult.
+// 				stream()
+// 				.map(x -> {
+// 					List<MilestoneView> milestoneViews = milestoneService.selectOfItem(x.getItemId());
+// 					return ItemMapper.mapItem(x, milestoneViews);
+// 				})
+// 				.collect(Collectors.toList());
+// 		return result;
+// 	}
   private String generateSelectParentChildren(Table t) {
     StringBuilder b = new StringBuilder();
     for (Table parentTable: t.getParentTables()) {
@@ -92,7 +176,7 @@ public class ServiceGenerator {
           .append("\tpublic ")
           .append("List<")
           .append(parentTable.getCleanName())
-          .append("> ")
+          .append("View> ")
           .append(String.format("select%ss", t.getCleanName()))
           .append("(")
           .append(ColumnEnums.resolvePrimitiveType(t.getPsudoPrimaryColumn().getDataType()))
@@ -101,11 +185,15 @@ public class ServiceGenerator {
           .append(") {\n")
           .append("\t\tList<")
           .append(parentTable.getCleanName())
-          .append("> result = repo.")
+          .append("> dbResult = repo.")
           .append(String.format("select%ss", t.getCleanName()))
           .append("(")
           .append(t.getPsudoPrimaryColumn().getPascalName())
           .append(");\n")
+          .append("\t\t")
+          .append("List<")
+          .append(parentTable.getCleanName())
+          .append("View> result = null;\n")
           .append("\t\treturn result;\n")
           .append("\t}\n\n");
         } else {
@@ -113,7 +201,7 @@ public class ServiceGenerator {
           .append("\tpublic ")
           .append("List<")
           .append(parentTable.getCleanName())
-          .append("> ")
+          .append("View> ")
           .append(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()))
           .append("(")
           .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
@@ -122,11 +210,15 @@ public class ServiceGenerator {
           .append(") {\n")
           .append("\t\tList<")
           .append(parentTable.getCleanName())
-          .append("> result = repo.")
+          .append("> dbResult = repo.")
           .append(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()))
           .append("(")
           .append(parentTable.getPrimaryColumn().getPascalName())
           .append(");\n")
+          .append("\t\t")
+          .append("List<")
+          .append(t.getCleanName())
+          .append("View> result = null;\n")
           .append("\t\treturn result;\n")
           .append("\t}\n\n");
         }
@@ -136,7 +228,7 @@ public class ServiceGenerator {
       .append("\tpublic ")
       .append("List<")
       .append(t.getCleanName())
-      .append("> selectOf")
+      .append("View> selectOf")
       .append(parentTable.getCleanName())
       .append("(")
       .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
@@ -145,15 +237,35 @@ public class ServiceGenerator {
       .append(") {\n")
       .append("\t\tList<")
       .append(t.getCleanName())
-      .append("> result = repo.selectOf")
+      .append("> dbResult = repo.selectOf")
       .append(parentTable.getCleanName())
       .append("(")
       .append(parentTable.getPrimaryColumn().getPascalName())
       .append(");\n")
+      .append("\t\t")
+      .append("List<")
+      .append(t.getCleanName())
+      .append("View> result = null;\n")
       .append("\t\treturn result;\n")
       .append("\t}\n\n");
     }
-   
+    return b.toString();
+  }
+
+  private String generateStreamResult(Table t, Table parentTable) {
+    StringBuilder b = new StringBuilder();
+    b
+    .append("\t\t\t\tList<")
+    .append(t.getCleanName())
+    .append("View> ")
+    .append(t.getName())
+    .append("Views = ")
+    .append(t.getName())
+    .append("Service.selectOf")
+    .append(parentTable.getCleanName())
+    .append("(x.get")
+    .append(parentTable.getPrimaryColumn().getCleanName())
+    .append("());\n");
     return b.toString();
   }
 
@@ -162,10 +274,34 @@ public class ServiceGenerator {
     b
     .append("\tpublic List<")
     .append(t.getCleanName())
-    .append("> selectAll() {\n")
+    .append("View> selectAll() {\n")
     .append("\t\tList<")
     .append(t.getCleanName())
-    .append("> result = repo.selectAll();\n")
+    .append("> dbResult = repo.selectAll();\n")
+    .append("\t\tList<")
+    .append(t.getCleanName())
+    .append("View> result = ")
+    .append("dbResult\n\t\t\t.stream()\n\t\t\t.map(x -> {\n");
+    for(Table ct: t.getNonJoiningTables()) {
+      b
+      .append(generateStreamResult(ct, t));
+    }
+    b
+    .append("\t\t\t\treturn ")
+    .append(t.getCleanName())
+    .append("Mapper.map")
+    .append(t.getCleanName())
+    .append("(x");
+    for(Table ct: t.getNonJoiningTables()) {
+      b
+      .append(", ")
+      .append(ct.getName())
+      .append("Views");
+    }
+    b
+    .append(");")
+    .append("\n\t\t\t})")
+    .append("\n\t\t\t.collect(Collectors.toList());\n")
     .append("\t\treturn result;\n")
     .append("\t}\n\n");
     return b.toString();
@@ -178,16 +314,19 @@ public class ServiceGenerator {
       b
       .append("\tpublic ")
       .append(t.getCleanName())
-      .append(" selectBy")
+      .append("View selectBy")
       .append(col.getCleanName())
       .append("(")
       .append(ColumnEnums.resolvePrimitiveType(col.getDataType()))
       .append(" value) {\n")
       .append("\t\t")
       .append(t.getCleanName())
-      .append(" result = repo.selectBy")
+      .append(" dbResult = repo.selectBy")
       .append(col.getCleanName())
       .append("(value);\n")
+      .append("\t\t")
+      .append(t.getCleanName())
+      .append("View result = null;\n")
       .append("\t\treturn result;\n")
       .append("\t}\n");
       if(++colIndex < t.getColumns().size()) {
@@ -197,22 +336,35 @@ public class ServiceGenerator {
     b.append("\n");
     return b.toString();
   }
-
+// public ItemView insert(ItemView newItem) { 
+// 		Item dbResult = repo.insert(ItemMapper.mapItemView(newItem));
+// 		List<MilestoneView> milestones = milestoneService.selectOfItem(dbResult.getItemId());
+// 		ItemView result = ItemMapper.mapItem(dbResult, milestones);
+// 		return result;
+// 	}
   private String generateInsert(Table t) {
     StringBuilder b = new StringBuilder();
     b
     .append("\tpublic ")
     .append(t.getCleanName())
-    .append(" insert(")
+    .append("View insert(")
     .append(t.getCleanName())
-    .append(" new")
+    .append("View new")
     .append(t.getCleanName())
     .append(") { \n")
     .append("\t\t")
     .append(t.getCleanName())
-    .append(" result = repo.insert(new")
+    .append(" dbResult = repo.insert(")
     .append(t.getCleanName())
-    .append(");\n")
+    .append("Mapper.map")
+    .append(t.getCleanName())
+    .append("View(")
+    .append("new")
+    .append(t.getCleanName())
+    .append("));\n")
+    .append("\t\t")
+    .append(t.getCleanName())
+    .append("View result = null;\n")
     .append("\t\treturn result;\n")
     .append("\t}\n\n");
     return b.toString();
@@ -223,12 +375,17 @@ public class ServiceGenerator {
     b
     .append("\tpublic boolean update(")
     .append(t.getCleanName())
-    .append(" updated")
+    .append("View updated")
     .append(t.getCleanName())
     .append(") { \n")
-    .append("\t\tboolean result = repo.update(updated")
+    .append("\t\tboolean result = repo.update(")
     .append(t.getCleanName())
-    .append(");\n")
+    .append("Mapper.map")
+    .append(t.getCleanName())
+    .append("View(")
+    .append("updated")
+    .append(t.getCleanName())
+    .append("));\n")
     .append("\t\treturn result;\n")
     .append("\t}\n\n");
     return b.toString();
@@ -272,6 +429,8 @@ public class ServiceGenerator {
     .append("\t}\n\n");
     return b.toString();
   }
-
-
 }
+
+
+
+

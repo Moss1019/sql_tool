@@ -27,20 +27,20 @@ public class ControllerGenerator {
       .append("import java.util.List;\n\n")
       .append("import ")
       .append(packageName)
-      .append(".model.");
+      .append(".view.");
       if(t.isJoiningTable()) {
         b
         .append(t.getParentTables().get(0).getCleanName())
-        .append(";\n")
+        .append("View;\n")
         .append("import ")
         .append(packageName)
-        .append(".model.")
+        .append(".view.")
         .append(t.getCleanName())
-        .append(";\n");
+        .append("View;\n");
       } else {
         b
         .append(t.getCleanName())
-        .append(";\n");
+        .append("View;\n");
       }
       b
       .append("import ")
@@ -85,7 +85,7 @@ public class ControllerGenerator {
     .append(" value) {\n")
     .append("\t\t")
     .append(t.getCleanName())
-    .append(" result = service.selectByPk(value);\n")
+    .append("View result = service.selectByPk(value);\n")
     .append("\t\tif (result == null) {\n")
     .append("\t\t\treturn ResponseEntity.status(404).body(\"Could not find ")
     .append(t.getCleanName())
@@ -105,7 +105,7 @@ public class ControllerGenerator {
     .append(" selectAll() {\n")
     .append("\t\tList<")
     .append(t.getCleanName())
-    .append("> result = service.selectAll();\n")
+    .append("View> result = service.selectAll();\n")
     .append("\t\tif (result.size() == 0) {\n")
     .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n")
     .append("\t\t}\n")
@@ -133,7 +133,7 @@ public class ControllerGenerator {
           .append(") { \n")
           .append("\t\tList<")
           .append(parentTable.getCleanName())
-          .append("> result = service.select")
+          .append("View> result = service.select")
           .append(t.getCleanName())
           .append("s(")
           .append(t.getPsudoPrimaryColumn().getPascalName())
@@ -154,7 +154,7 @@ public class ControllerGenerator {
           .append(") { \n")
           .append("\t\tList<")
           .append(parentTable.getCleanName())
-          .append("> result = service.select")
+          .append("View> result = service.select")
           .append(parentTable.getCleanName())
           .append(t.getCleanName())
           .append("s(")
@@ -177,7 +177,7 @@ public class ControllerGenerator {
         .append(") { \n")
         .append("\t\tList<")
         .append(t.getCleanName())
-        .append("> result = service.selectOf")
+        .append("View> result = service.selectOf")
         .append(parentTable.getCleanName())
         .append("(")
         .append(parentTable.getPrimaryColumn().getPascalName())
@@ -216,7 +216,7 @@ public class ControllerGenerator {
       .append(") {\n")
       .append("\t\t")
       .append(t.getCleanName())
-      .append(" result = service.selectBy")
+      .append("View result = service.selectBy")
       .append(col.getCleanName())
       .append("(")
       .append(col.getPascalName())
@@ -241,12 +241,12 @@ public class ControllerGenerator {
     .append("\t@RequestMapping(value = \"\", method = RequestMethod.POST)\n")
     .append("\tpublic ResponseEntity<?> insert(@RequestBody ")
     .append(t.getCleanName())
-    .append(" new")
+    .append("View new")
     .append(t.getCleanName())
     .append(") { \n")
     .append("\t\t")
     .append(t.getCleanName())
-    .append(" result = service.insert(new")
+    .append("View result = service.insert(new")
     .append(t.getCleanName())
     .append(");\n")
     .append("\t\tif (result == null) {\n")
@@ -265,7 +265,7 @@ public class ControllerGenerator {
     .append("\t@RequestMapping(value = \"\", method = RequestMethod.PUT)\n")
     .append("\tpublic ResponseEntity<?> update(@RequestBody ")
     .append(t.getCleanName())
-    .append(" updated")
+    .append("View updated")
     .append(t.getCleanName())
     .append(") { \n")
     .append("\t\tboolean result = service.update(updated")

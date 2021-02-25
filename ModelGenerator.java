@@ -34,7 +34,8 @@ public class ModelGenerator {
       b
       .append("@Table(name = \"")
       .append(t.getName())
-      .append("\")\n");
+      .append("\")\n")
+      .append("@NamedStoredProcedureQueries({\n");
       if(!t.isJoiningTable()) {
         b
         .append(generateSelectAllProcedures(t))
@@ -46,6 +47,7 @@ public class ModelGenerator {
       .append(generateDeleteProcedures(t))
       .append(generateSelectParentChildren(t))
       .append(generateInsertProcedures(t))
+      .append("})\n")
       .append(generateClassDef(t));
       models.put(t.getCleanName(), b.toString());
     }
@@ -241,7 +243,7 @@ public class ModelGenerator {
       }
       b.append("\t}\n");
     }
-    b.append(")\n");
+    b.append("),\n");
     return b.toString();
   }
 
