@@ -32,17 +32,12 @@ public class MapperGenerator {
         b
         .append("import ")
         .append(packageName)
-        .append(".model.")
-        .append(ct.getCleanName())
-        .append(";\n")
-        .append("import ")
-        .append(packageName)
         .append(".view.")
         .append(ct.getCleanName())
         .append("View;\n\n");
       }
       b
-      .append("import java.util.List;\n")
+      .append("import java.util.List;\n\n")
       .append("public class ")
       .append(t.getCleanName())
       .append("Mapper {\n")
@@ -67,7 +62,7 @@ public class MapperGenerator {
     .append(t.getName());
     int tableCount = 0;
     for(Table ct: t.getNonJoiningTables()) {
-      if(tableCount++ < t.getChildTables().size()) {
+      if(tableCount++ < t.getNonJoiningTables().size()) {
         b
         .append(", ");
       }
@@ -94,15 +89,15 @@ public class MapperGenerator {
         b.append(", ");
       }
     }
-    if(colCount > 0 && t.getChildTables().size() > 0) {
+    if(colCount > 0 && t.getNonJoiningTables().size() > 0) {
       b.append(", ");
     }
     colCount = t.getNumJoiningTables();
     for(Table ct: t.getNonJoiningTables()) {
       b
       .append(ct.getName())
-      .append("Views");
-      if(colCount++ < t.getChildTables().size() - 1) {
+      .append("s");
+      if(colCount++ < t.getNonJoiningTables().size() - 1) {
         b.append(", ");
       }
     }

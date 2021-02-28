@@ -5,13 +5,26 @@ import java.util.HashMap;
 public class ControllerGenerator {
   private Database db;
 
+  private boolean isCurrentJoining;
+  private Table joiningPrimary;
+  private Table joiningSecondary;
+
+
   public ControllerGenerator(Database db) {
     this.db = db;
+    isCurrentJoining = false;
+    joiningPrimary = null;
+    joiningSecondary = null;
   }
 
   public Map<String, String> generateControllers(String packageName) {
     Map<String, String> controllers = new HashMap<>();
     for(Table t: db.getTables()) {
+      isCurrentJoining = t.isJoiningTable();
+      if(isCurrentJoining) {
+        joiningPrimary = Table.getJoiningPrimary(t);
+        joiningSecondary = Table.getJoiningSecondary(t);
+      }
       StringBuilder b = new StringBuilder();
       b
       .append("package ")
@@ -116,52 +129,34 @@ public class ControllerGenerator {
 
   private String generateSelectParentChildren(Table t) {
     StringBuilder b = new StringBuilder();
-    for (Table parentTable: t.getParentTables()) {
-      if(t.isJoiningTable()) {
-        if(t.hasJoiningTable()) {
-          b
-          .append("\t@RequestMapping(value = \"")
-          .append("{")
-          .append(t.getPsudoPrimaryColumn().getPascalName())
-          .append("}\", method = RequestMethod.GET)\n")
-          .append("\tpublic ResponseEntity<?> get")
-          .append(t.getCleanName())
-          .append("s(@PathVariable ")
-          .append(ColumnEnums.resolvePrimitiveType(t.getPsudoPrimaryColumn().getDataType()))
-          .append(" ")
-          .append(t.getPsudoPrimaryColumn().getPascalName())
-          .append(") { \n")
-          .append("\t\tList<")
-          .append(parentTable.getCleanName())
-          .append("View> result = service.select")
-          .append(t.getCleanName())
-          .append("s(")
-          .append(t.getPsudoPrimaryColumn().getPascalName())
-          .append(");\n");
-        } else {
-          b
-          .append("\t@RequestMapping(value = \"{")
-          .append(parentTable.getPrimaryColumn().getPascalName())
-          .append("}\", method = RequestMethod.GET)\n")
-          .append("\tpublic ResponseEntity<?> get")
-          .append(parentTable.getCleanName())
-          .append(t.getCleanName())
-          .append("s")
-          .append("(@PathVariable ")
-          .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
-          .append(" ")
-          .append(parentTable.getPrimaryColumn().getPascalName())
-          .append(") { \n")
-          .append("\t\tList<")
-          .append(parentTable.getCleanName())
-          .append("View> result = service.select")
-          .append(parentTable.getCleanName())
-          .append(t.getCleanName())
-          .append("s(")
-          .append(parentTable.getPrimaryColumn().getPascalName())
-          .append(");\n");
-        }
-      } else {
+    if(isCurrentJoining) {
+      b
+      .append("\t@RequestMapping(value = \"{")
+      .append(joiningPrimary.getPrimaryColumn().getPascalName())
+      .append("}\"")
+      .append(", method = RequestMethod.GET)\n\t")
+      .append("public ResponseEntity<?> get")
+      .append(joiningPrimary.getCleanName())
+      .append(t.getCleanName())
+      .append("s(@PathVariable ")
+      .append(ColumnEnums.resolvePrimitiveType(joiningPrimary.getPrimaryColumn().getDataType()))
+      .append(" ")
+      .append(joiningPrimary.getPrimaryColumn().getPascalName())
+      .append(") { \n")
+      .append("\t\tList<")
+      .append(joiningSecondary.getCleanName())
+      .append("View> result = service.select")
+      .append(joiningPrimary.getCleanName())
+      .append(t.getCleanName())
+      .append("s(")
+      .append(joiningPrimary.getPrimaryColumn().getPascalName())
+      .append(");\n")
+      .append("\t\tif (result.size() == 0) {\n")
+      .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n\t\t}\n")
+      .append("\t\treturn ResponseEntity.ok(result);\n")
+      .append("\t}\n\n");
+    } else {
+      for (Table parentTable: t.getParentTables()) {
         b
         .append("\t@RequestMapping(value = \"for")
         .append(parentTable.getPascalName())
@@ -181,15 +176,11 @@ public class ControllerGenerator {
         .append(parentTable.getCleanName())
         .append("(")
         .append(parentTable.getPrimaryColumn().getPascalName())
-        .append(");\n");
-      }
-      b
-      .append("\t\tif (result.size() == 0) {\n")
-      .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n\t\t}\n")
-      .append("\t\treturn ResponseEntity.ok(result);\n")
-      .append("\t}\n\n");
-      if(t.isJoiningTable()) {
-        return b.toString(); 
+        .append(");\n")
+        .append("\t\tif (result.size() == 0) {\n")
+        .append("\t\t\treturn ResponseEntity.status(404).body(\"No results\");\n\t\t}\n")
+        .append("\t\treturn ResponseEntity.ok(result);\n")
+        .append("\t}\n\n");
       }
     }
     return b.toString();

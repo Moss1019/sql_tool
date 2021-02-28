@@ -1,21 +1,15 @@
 
-group {
-  group_id int primary auto_increment
-  group_name string
-}
-
 user {
   user_id int primary auto_increment
   first_name string
   last_name string
-  group_id int foreign
+  email string unique
 }
 
 item {
   item_id int primary auto_increment
-  title string
+  title string unique
   user_id int foreign
-  group_id int foreign
 }
 
 milestone {

@@ -72,23 +72,7 @@ public class Definition {
             SqlGenerator gen = new SqlGenerator(database);
             StringBuilder b = new StringBuilder();
             b
-            .append(gen.generateCreateTables())
-            .append("\n")
-            .append(gen.generateSelectAllProcedures())
-            .append("\n")
-            .append(gen.generateSelectByPKProcedures())
-            .append("\n")
-            .append(gen.generateSelectByUniqueColsProcedures())
-            .append("\n")
-            .append(gen.generateInsertProcedures())
-            .append("\n")
-            .append(gen.generateDeleteProcedures())
-            .append("\n")
-            .append(gen.generateUpdateProcedure())
-            .append("\n")
-            .append(gen.generateSelectParentChildren())
-            .append("\n")
-            .append(gen.generateGrants());
+            .append(gen.generateSql());
             writeFile("db_objects.sql", b.toString(), null);
             writeFile("db_drop.sql", gen.generateDropDBObjects(), null);
 

@@ -18,25 +18,15 @@ public class ViewGenerator {
       b
       .append("package ")
       .append(packageName)
-      .append(".view;\n\n");
-      for(Table ct: t.getNonJoiningTables()) {
-        b
-        .append("import ")
-        .append(packageName)
-        .append(".view.")
-        .append(ct.getCleanName())
-        .append("View;\n");
-      }
-      b
+      .append(".view;\n\n")
       .append("\nimport java.util.List;\n\n")
       .append("public class ")
       .append(t.getCleanName())
-      .append("View {\n");
-      b
+      .append("View {\n")
       .append(generateFields(t))
       .append(generateConstructor(t))
-      .append(generateGettersSetters(t));
-      b.append("}\n");
+      .append(generateGettersSetters(t))
+      .append("}\n");
       views.put(t.getCleanName() + "View", b.toString());
     }
     return views;
@@ -52,7 +42,6 @@ public class ViewGenerator {
       .append(c.getPascalName())
       .append(";\n\n");
     }
-    System.out.println("Child tables");
     for(Table ct: t.getNonJoiningTables()) {
       b
       .append('\t')
@@ -82,7 +71,9 @@ public class ViewGenerator {
         b.append(", ");
       }
     }
-    if(colCount > 0 && t.getChildTables().size() > 0) {
+    if(colCount > 0 && t.getNonJoiningTables().size() > 0) {
+      System.out.println(t.getName());
+      System.out.println(t.getNumJoiningTables());
       b.append(", ");
     }
     colCount = t.getNumJoiningTables();
@@ -94,7 +85,7 @@ public class ViewGenerator {
       .append("> ")
       .append(ct.getName())
       .append("s");
-      if(colCount++ < t.getChildTables().size() - 1) {
+      if(colCount++ < t.getNonJoiningTables().size() - 1) {
         b.append(", ");
       }
     }

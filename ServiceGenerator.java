@@ -1,17 +1,30 @@
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class ServiceGenerator {
   private Database db;
 
+  private boolean isCurrentJoining;
+  private Table joiningPrimary;
+  private Table joiningSecondary;
+
   public ServiceGenerator(Database db) {
     this.db = db;
+    isCurrentJoining = false;
+    joiningPrimary = null;
+    joiningSecondary = null;
   }
 
   public Map<String, String> generateServices(String packageName) {
     Map<String, String> services = new HashMap<>();
     for(Table t: db.getTables()) {
+      isCurrentJoining = t.isJoiningTable();
+      if(isCurrentJoining) {
+        joiningPrimary = Table.getJoiningPrimary(t);
+        joiningSecondary = Table.getJoiningSecondary(t);
+      }
       StringBuilder b = new StringBuilder();
       b
       .append("package ")
@@ -22,23 +35,29 @@ public class ServiceGenerator {
       .append("import ")
       .append(packageName)
       .append(".model.");
-      if(t.isJoiningTable()) {
+      if(isCurrentJoining) {
         b
         .append(t.getParentTables().get(0).getCleanName())
         .append(";\n")
         .append("import ")
         .append(packageName)
         .append(".model.")
-        .append(t.getCleanName());
+        .append(t.getCleanName())
+        .append(";\nimport ")
+        .append(packageName)
+        .append(".mapper.")
+        .append(joiningSecondary.getCleanName())
+        .append("Mapper;\n");
       } else {
         b
-        .append(t.getCleanName());
+        .append(t.getCleanName())
+        .append(";\n");
       }
       b
-      .append(";\nimport ")
+      .append("import ")
       .append(packageName)
       .append(".view.");
-      if(t.isJoiningTable()) {
+      if(isCurrentJoining) {
         b
         .append(t.getParentTables().get(0).getCleanName())
         .append("View;\n")
@@ -74,8 +93,7 @@ public class ServiceGenerator {
       }
       b
       .append("\nimport java.util.List;\n")
-      .append("import java.util.stream.Collectors;\n");
-      b
+      .append("import java.util.stream.Collectors;\n")
       .append("\n@Service\npublic class ")
       .append(t.getCleanName())
       .append("Service {\n")
@@ -92,12 +110,21 @@ public class ServiceGenerator {
         .append(ct.getName())
         .append("Service;\n");
       }
+      if(isCurrentJoining) {
+        b
+        .append("\t@Autowired\n")
+        .append("\tprivate ")
+        .append(joiningSecondary.getCleanName())
+        .append("Service ")
+        .append(joiningSecondary.getName())
+        .append("Service;\n");
+      }
       b
       .append('\n')
       .append(generateInsert(t))
       .append(generateSelectParentChildren(t))
       .append(generateDelete(t));
-      if(!t.isJoiningTable()) {
+      if(!isCurrentJoining) {
         b
         .append(generateSelectByPK(t))
         .append(generateSelectAll(t))
@@ -156,101 +183,6 @@ public class ServiceGenerator {
     .append("\t}\n\n");
     return b.toString();
   }
-// 	public List<ItemView> selectOfUser(int userId) {
-// 		List<Item> dbResult = repo.selectOfUser(userId);
-// 		List<ItemView> result = dbResult.
-// 				stream()
-// 				.map(x -> {
-// 					List<MilestoneView> milestoneViews = milestoneService.selectOfItem(x.getItemId());
-// 					return ItemMapper.mapItem(x, milestoneViews);
-// 				})
-// 				.collect(Collectors.toList());
-// 		return result;
-// 	}
-  private String generateSelectParentChildren(Table t) {
-    StringBuilder b = new StringBuilder();
-    for (Table parentTable: t.getParentTables()) {
-      if(t.isJoiningTable()) {
-        if(t.hasJoiningTable()) {
-          b
-          .append("\tpublic ")
-          .append("List<")
-          .append(parentTable.getCleanName())
-          .append("View> ")
-          .append(String.format("select%ss", t.getCleanName()))
-          .append("(")
-          .append(ColumnEnums.resolvePrimitiveType(t.getPsudoPrimaryColumn().getDataType()))
-          .append(" ")
-          .append(t.getPsudoPrimaryColumn().getPascalName())
-          .append(") {\n")
-          .append("\t\tList<")
-          .append(parentTable.getCleanName())
-          .append("> dbResult = repo.")
-          .append(String.format("select%ss", t.getCleanName()))
-          .append("(")
-          .append(t.getPsudoPrimaryColumn().getPascalName())
-          .append(");\n")
-          .append("\t\t")
-          .append("List<")
-          .append(parentTable.getCleanName())
-          .append("View> result = null;\n")
-          .append("\t\treturn result;\n")
-          .append("\t}\n\n");
-        } else {
-          b
-          .append("\tpublic ")
-          .append("List<")
-          .append(parentTable.getCleanName())
-          .append("View> ")
-          .append(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()))
-          .append("(")
-          .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
-          .append(" ")
-          .append(parentTable.getPrimaryColumn().getPascalName())
-          .append(") {\n")
-          .append("\t\tList<")
-          .append(parentTable.getCleanName())
-          .append("> dbResult = repo.")
-          .append(String.format("select%s%ss", parentTable.getCleanName(), t.getCleanName()))
-          .append("(")
-          .append(parentTable.getPrimaryColumn().getPascalName())
-          .append(");\n")
-          .append("\t\t")
-          .append("List<")
-          .append(t.getCleanName())
-          .append("View> result = null;\n")
-          .append("\t\treturn result;\n")
-          .append("\t}\n\n");
-        }
-        break;
-      }
-      b
-      .append("\tpublic ")
-      .append("List<")
-      .append(t.getCleanName())
-      .append("View> selectOf")
-      .append(parentTable.getCleanName())
-      .append("(")
-      .append(ColumnEnums.resolvePrimitiveType(parentTable.getPrimaryColumn().getDataType()))
-      .append(" ")
-      .append(parentTable.getPrimaryColumn().getPascalName())
-      .append(") {\n")
-      .append("\t\tList<")
-      .append(t.getCleanName())
-      .append("> dbResult = repo.selectOf")
-      .append(parentTable.getCleanName())
-      .append("(")
-      .append(parentTable.getPrimaryColumn().getPascalName())
-      .append(");\n")
-      .append("\t\t")
-      .append("List<")
-      .append(t.getCleanName())
-      .append("View> result = null;\n")
-      .append("\t\treturn result;\n")
-      .append("\t}\n\n");
-    }
-    return b.toString();
-  }
 
   private String generateStreamResult(Table t, Table parentTable) {
     StringBuilder b = new StringBuilder();
@@ -266,6 +198,102 @@ public class ServiceGenerator {
     .append("(x.get")
     .append(parentTable.getPrimaryColumn().getCleanName())
     .append("());\n");
+    return b.toString();
+  }
+
+  private String generateSelectParentChildren(Table t) {
+    StringBuilder b = new StringBuilder();
+    if(isCurrentJoining) {
+      b
+      .append("\tpublic List<")
+      .append(joiningSecondary.getCleanName())
+      .append("View> select")
+      .append(joiningPrimary.getCleanName())
+      .append(t.getCleanName())
+      .append("s")
+      .append("(")
+      .append(ColumnEnums.resolvePrimitiveType(joiningPrimary.getPrimaryColumn().getDataType()))
+      .append(" ")
+      .append(joiningPrimary.getPrimaryColumn().getPascalName())
+      .append(") {\n")
+      .append("\t\tList<")
+      .append(joiningSecondary.getCleanName())
+      .append("> dbResult = repo.select")
+      .append(joiningPrimary.getCleanName())
+      .append(t.getCleanName())
+      .append("s")
+      .append("(")
+      .append(joiningPrimary.getPrimaryColumn().getPascalName())
+      .append(");\n")
+      .append("\t\t")
+      .append("List<")
+      .append(joiningSecondary.getCleanName())
+      .append("View> result = dbResult.stream()\n\t\t\t")
+      .append(".map(x -> {\n")
+      .append("\t\t\t\treturn ")
+      .append(joiningSecondary.getCleanName())
+      .append("Mapper.map")
+      .append(joiningSecondary.getCleanName())
+      .append("(x");
+      for(Table ct: joiningSecondary.getNonJoiningTables()) {
+        b
+        .append(", null");
+      }
+      b
+      .append(");\n")
+      .append("\t\t\t})\n\t\t\t")
+      .append(".collect(Collectors.toList());\n")
+      .append("\t\treturn result;\n")
+      .append("\t}\n\n");
+    } else {
+      for(Table pt: t.getParentTables()) {
+        b
+        .append("\tpublic ")
+        .append("List<")
+        .append(t.getCleanName())
+        .append("View> selectOf")
+        .append(pt.getCleanName())
+        .append("(")
+        .append(ColumnEnums.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
+        .append(" ")
+        .append(pt.getPrimaryColumn().getPascalName())
+        .append(") {\n")
+        .append("\t\tList<")
+        .append(t.getCleanName())
+        .append("> dbResult = repo.selectOf")
+        .append(pt.getCleanName())
+        .append("(")
+        .append(pt.getPrimaryColumn().getPascalName())
+        .append(");\n")
+        .append("\t\t")
+        .append("List<")
+        .append(t.getCleanName())
+        .append("View> result = dbResult.stream()\n\t\t\t")
+        .append(".map(x -> {\n");
+        for(Table ct: t.getNonJoiningTables()) {
+          b
+          .append(generateStreamResult(ct, t));
+        }
+        b
+        .append("\t\t\t\treturn ")
+        .append(t.getCleanName())
+        .append("Mapper.map")
+        .append(t.getCleanName())
+        .append("(x");
+        for(Table ct: t.getNonJoiningTables()) {
+        b
+        .append(", ")
+        .append(ct.getName())
+        .append("Views");
+        }
+        b
+        .append(");\n")
+        .append("\t\t\t})\n\t\t\t")
+        .append(".collect(Collectors.toList());\n")
+        .append("\t\treturn result;\n")
+        .append("\t}\n\n");
+      }
+    }
     return b.toString();
   }
 
@@ -323,10 +351,37 @@ public class ServiceGenerator {
       .append(t.getCleanName())
       .append(" dbResult = repo.selectBy")
       .append(col.getCleanName())
-      .append("(value);\n")
+      .append("(value);\n");
+      for(Table ct: t.getNonJoiningTables()) {
+        b
+        .append("\t\tList<")
+        .append(ct.getCleanName())
+        .append("View> ") 
+        .append(ct.getName())
+        .append("s = ")
+        .append(ct.getName())
+        .append("Service.selectOf")
+        .append(t.getCleanName())
+        .append("(dbResult.get")
+        .append(t.getPrimaryColumn().getCleanName())
+        .append("());\n");
+      }
+      b
       .append("\t\t")
       .append(t.getCleanName())
-      .append("View result = null;\n")
+      .append("View result = ")
+      .append(t.getCleanName())
+      .append("Mapper.map")
+      .append(t.getCleanName())
+      .append("(dbResult");
+      for(Table ct: t.getNonJoiningTables()) {
+        b
+        .append(", ")
+        .append(ct.getName())
+        .append("s");
+      }
+      b
+      .append(");\n")
       .append("\t\treturn result;\n")
       .append("\t}\n");
       if(++colIndex < t.getColumns().size()) {
@@ -336,12 +391,7 @@ public class ServiceGenerator {
     b.append("\n");
     return b.toString();
   }
-// public ItemView insert(ItemView newItem) { 
-// 		Item dbResult = repo.insert(ItemMapper.mapItemView(newItem));
-// 		List<MilestoneView> milestones = milestoneService.selectOfItem(dbResult.getItemId());
-// 		ItemView result = ItemMapper.mapItem(dbResult, milestones);
-// 		return result;
-// 	}
+  
   private String generateInsert(Table t) {
     StringBuilder b = new StringBuilder();
     b
@@ -361,10 +411,37 @@ public class ServiceGenerator {
     .append("View(")
     .append("new")
     .append(t.getCleanName())
-    .append("));\n")
+    .append("));\n");
+    for(Table ct: t.getNonJoiningTables()) {
+      b
+      .append("\t\tList<")
+      .append(ct.getCleanName())
+      .append("View> ")
+      .append(ct.getName())
+      .append("Views = ")
+      .append(ct.getName())
+      .append("Service.selectOf")
+      .append(t.getCleanName())
+      .append("(dbResult.get")
+      .append(t.getPrimaryColumn().getCleanName())
+      .append("());\n");
+    }
+    b
     .append("\t\t")
     .append(t.getCleanName())
-    .append("View result = null;\n")
+    .append("View result = ")
+    .append(t.getCleanName())
+    .append("Mapper.map")
+    .append(t.getCleanName())
+    .append("(dbResult");
+    for(Table ct: t.getNonJoiningTables()) {
+      b
+      .append(", ")
+      .append(ct.getName())
+      .append("Views");
+    }
+    b
+    .append(");\n")
     .append("\t\treturn result;\n")
     .append("\t}\n\n");
     return b.toString();
@@ -395,7 +472,7 @@ public class ServiceGenerator {
     StringBuilder b = new StringBuilder();
     b
     .append("\tpublic boolean delete(");
-    if(t.isJoiningTable()) {
+    if(isCurrentJoining) {
       int colIndex = 0;
       for(Column c: t.getColumns()) {
         b

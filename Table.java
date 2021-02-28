@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
+import java.util.stream.Collectors;
+
 class Table {
     static private Map<String, Table> registry = new HashMap<>();
 
@@ -155,6 +157,28 @@ class Table {
 
     public String getLowerCasedName() {
         return this.getCleanName().toLowerCase();
+    }
+
+    public static Table getJoiningPrimary(Table childTable) {
+        if(!childTable.isJoiningTable()) {
+            return null;
+        }
+        return childTable.getParentTables()
+          .stream()
+          .filter(pt -> pt.getPrimaryColumn().getName().equals(childTable.getPsudoPrimaryColumn().getName()))
+          .collect(Collectors.toList())
+          .get(0);
+    }
+
+    public static Table getJoiningSecondary(Table childTable) {
+        if(!childTable.isJoiningTable()) {
+            return null;
+        }
+        return childTable.getParentTables()
+          .stream()
+          .filter(pt -> !pt.getName().equals(childTable.getPsudoPrimaryColumn().getName()))
+          .collect(Collectors.toList())
+          .get(0);
     }
 }
 
