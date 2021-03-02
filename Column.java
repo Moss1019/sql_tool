@@ -1,82 +1,67 @@
 
-import java.util.List;
 
 public class Column {
-    private String name;
-    private String psudoName;
-    private ColumnEnums.Type dataType;
-    private List<ColumnEnums.Option> options;
-    private boolean isPrimary;
+  private String name;
+  private String pascalName;
+  private String camelName;
+  private String foreignKeyName;
+  private String dataType;
+  private boolean isPrimary;
+  private boolean isAutoIncrement;
+  private boolean isUnique;
+  private boolean isForeign;
 
-    public Column(String name, ColumnEnums.Type dataType, List<ColumnEnums.Option> options, String psudoName) {
-        this.name = name;
-        this.dataType = dataType;
-        this.options = options;
-        isPrimary = false;
-        for(ColumnEnums.Option option: options) {
-            if(option == ColumnEnums.Option.primaryKey) {
-                isPrimary = true;
-                break;
-            } 
-        }
-        // if(psudoName != null) {
-        //     isPrimary = true;
-        // }
-        this.psudoName = psudoName;
-    }
+  public Column(String name, String dataType, Options options) {
+    this.name = name;
+    this.dataType = dataType;
+    foreignKeyName = options.foreignKeyName;
+    isPrimary = options.isPrimary;
+    isAutoIncrement = options.isAutoIncrement;
+    isUnique = options.isUnique;
+    isForeign = options.isForeign;
+  }
 
-    public Column(String name, ColumnEnums.Type dataType, List<ColumnEnums.Option> options) {
-        this(name, dataType, options, null);
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getPascalName() {
+    return pascalName;
+  }
 
-    public String getPsudoName() {
-        return psudoName;
-    }
+  public String getCamelName() {
+    return camelName;
+  }
 
-    public ColumnEnums.Type getDataType() {
-        return dataType;
-    } 
+  public String getForeignKeyName() {
+    return foreignKeyName;
+  }
 
-    public List<ColumnEnums.Option> getOptions() {
-        return options;
-    }
+  public boolean getIsPrimary() {
+    return isPrimary;
+  }
 
-    public boolean isPrimary() {
-        return isPrimary;
-    }
+  public boolean getIsAutoIncrement() {
+    return isAutoIncrement;
+  }
 
-    public String getPascalName() {
-        String[] parts = name.split("_");
-        if(parts.length > 0) {
-            StringBuilder b = new StringBuilder();
-            int index = 0;
-            for(String part: parts) {
-                if(index++ == 0) {
-                    b.append(part);
-                } else {
-                    b.append(String.format("%c%s", part.toUpperCase().charAt(0), part.substring(1)));
-                }
-            }
-            return b.toString();
-        } else {
-            return name;
-        }
-    }
+  public boolean getIsUnique() {
+    return isUnique;
+  }
 
-    public String getCleanName() {
-        String[] parts = name.split("_");
-        if(parts.length > 0) {
-            StringBuilder b = new StringBuilder();
-            for(String part: parts) {
-                b.append(String.format("%c%s", part.toUpperCase().charAt(0), part.substring(1)));
-            }
-            return b.toString();
-        } else {
-            return getPascalName();
-        }
-    }
+  public boolean getIsForeign() {
+    return isForeign;
+  }
+
+  public static Options createOptions() {
+    return new Options();
+  }
+
+  public static class Options {
+    public boolean isPrimary;
+    public boolean isAutoIncrement;
+    public boolean isUnique;
+    public boolean isForeign;
+    public String foreignKeyName;
+  }
 }

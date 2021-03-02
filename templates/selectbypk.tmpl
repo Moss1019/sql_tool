@@ -1,0 +1,7 @@
+delimiter //
+create procedure sp_select{tablenameupper}
+(in {primarykey} integer)
+begin
+select * from {tablenamelower} t1 where t1.{primarykey} = {primarykey};
+end //
+delimiter ;

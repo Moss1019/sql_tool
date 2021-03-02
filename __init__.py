@@ -8,12 +8,12 @@ def get_choice():
     print('2. run antlr on a specified g4 grammar file')
     print('3. compile all java file in the root and ./parser directories')
     print('4. run java language application')
-    choise = -1
+    choice = -1
     try:
-        choise = int(input())
+        choice = int(input())
     except:
         pass
-    return choise
+    return choice
 
 is_running = True
 while is_running:

@@ -2,13 +2,9 @@ grammar Definition;
 
 database: table+;
 
-table
-    : NAME '{' row* '}'
-    ;
+table : NAME '{' column* LOOPED? JOINED?'}';
 
-row
-    : JOINED NAME
-    | NAME DATA_TYPE option*;
+column : NAME DATA_TYPE option*;
 
 option
     : 'primary'
@@ -19,6 +15,8 @@ option
     ;
 
 JOINED: 'joined';
+
+LOOPED: 'looped';
 
 DATA_TYPE
     : 'int'

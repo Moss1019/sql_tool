@@ -68,52 +68,9 @@ public class Definition {
             ParseTree tree = parser.database();
             DatabaseVisitor visitor = new DatabaseVisitor();
             String dbUser = argMapping.get("db_user");
-            Database database = new Database(dbUser, (List<Table>)visitor.visit(tree));
-            SqlGenerator gen = new SqlGenerator(database);
-            StringBuilder b = new StringBuilder();
-            b
-            .append(gen.generateSql());
-            writeFile("db_objects.sql", b.toString(), null);
-            writeFile("db_drop.sql", gen.generateDropDBObjects(), null);
+            
+            Object db = visitor.visit(tree);
 
-            ModelGenerator modelGenerator = new ModelGenerator(database);
-            Map<String, String> models = modelGenerator.generateModels(argMapping.get("package_name"));
-            for(String modelName: models.keySet()) {
-                writeFile(String.format("%s.java", modelName), models.get(modelName), "model");
-            }
-
-            RepositoryGenerator repositoryGenerator = new RepositoryGenerator(database);
-            Map<String, String> repos = repositoryGenerator.generateRepositories(argMapping.get("package_name"));
-            for(String modelName: repos.keySet()) {
-                writeFile(String.format("%s.java", modelName), repos.get(modelName), "repository");
-            }
-
-            ServiceGenerator serviceGenerator = new ServiceGenerator(database);
-            Map<String, String> services = serviceGenerator.generateServices(argMapping.get("package_name"));
-            for(String modelName: services.keySet()) {
-                writeFile(String.format("%s.java", modelName), services.get(modelName), "service");
-            }
-
-            ControllerGenerator controllerGenerator = new ControllerGenerator(database);
-            Map<String, String> controllers = controllerGenerator.generateControllers(argMapping.get("package_name"));
-            for(String modelName: controllers.keySet()) {
-                writeFile(String.format("%s.java", modelName), controllers.get(modelName), "controller");
-            }
-
-            ViewGenerator viewGenerator = new ViewGenerator(database);
-            Map<String, String> views = viewGenerator.generateViews(argMapping.get("package_name"));
-            for(String viewName: views.keySet()) {
-                writeFile(String.format("%s.java", viewName), views.get(viewName), "view");
-            }
-
-            MapperGenerator mapperGenerator = new MapperGenerator(database);
-            Map<String, String> mappers = mapperGenerator.generateMappers(argMapping.get("package_name"));
-            for(String mapperName: mappers.keySet()) {
-                writeFile(String.format("%s.java", mapperName), mappers.get(mapperName), "mapper");
-            }
-
-            AxiosGenerator axiosGenerator = new AxiosGenerator(database);
-            writeFile("index.js", axiosGenerator.generateActions("http://localhost:8080"), "http");
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());
