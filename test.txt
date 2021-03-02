@@ -1,5 +1,4 @@
 
-
 user {
   user_id int primary auto_increment
   first_name string
