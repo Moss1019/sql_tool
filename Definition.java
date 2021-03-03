@@ -68,8 +68,12 @@ public class Definition {
             ParseTree tree = parser.database();
             DatabaseVisitor visitor = new DatabaseVisitor();
             String dbUser = argMapping.get("db_user");
-            
-            Object db = visitor.visit(tree);
+
+            Database db = (Database)visitor.visit(tree);
+
+            SqlGenerator gen = new SqlGenerator(db);
+            String sql = gen.generateSql();
+            writeFile("db_objects.sql", sql, "");
 
         } catch (Exception ex) {
             System.out.println(ex);

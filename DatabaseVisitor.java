@@ -26,16 +26,14 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
   public Column visitColumn(DefinitionParser.ColumnContext ctx) {
     Column.Options options = Column.createOptions();
     for(DefinitionParser.OptionContext oc: ctx.option()) {
-      options.isPrimary = oc.getText().equals("primary");
-      options.isAutoIncrement = oc.getText().equals("auto_increment");
-      options.isUnique = oc.getText().equals("unique");
-      options.isForeign = oc.getText().equals("foreign");
+      options.setIsPrimary(oc.getText().equals("primary"));
+      options.setIsAutoIncrement(oc.getText().equals("auto_increment"));
+      options.setIsUnique(oc.getText().equals("unique"));
+      options.setIsForeign(oc.getText().contains("foreign"));
       if(oc.NAME() != null) {
         options.foreignKeyName = oc.NAME().getText();
       }
     }
     return new Column(ctx.NAME().getText(), ctx.DATA_TYPE().getText(), options);
-  }
-
-  
+  }  
 }

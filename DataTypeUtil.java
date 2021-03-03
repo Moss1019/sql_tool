@@ -1,5 +1,4 @@
 
-
 public class DataTypeUtil {
   private static String intStr = "int";
   private static String stringStr = "string";

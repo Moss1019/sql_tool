@@ -108,7 +108,7 @@ parser/*.java
 parser/*.interp
 parser/*.tokens
 
-output/
+output*/
 
 antlr4.jar
 run.sh

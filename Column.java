@@ -8,6 +8,7 @@ public class Column {
   private String pascalName;
   private String camelName;
   private String foreignKeyName;
+  private String foreignTableName; 
   private String dataType;
   private boolean isPrimary;
   private boolean isAutoIncrement;
@@ -17,7 +18,7 @@ public class Column {
   public Column(String name, String dataType, Options options) {
     this.name = name;
     this.dataType = dataType;
-    foreignKeyName = options.foreignKeyName;
+    foreignKeyName = options.foreignKeyName != null ? options.foreignKeyName : name;
     isPrimary = options.isPrimary;
     isAutoIncrement = options.isAutoIncrement;
     isUnique = options.isUnique;
@@ -35,6 +36,9 @@ public class Column {
       })
       .collect(Collectors.toList()));
     camelName = String.format("%c%s", Character.toLowerCase(camelName.charAt(0)), camelName.substring(1));
+    if(isForeign) {
+      foreignTableName = foreignKeyName.split("_")[0];
+    }
   }
 
   public String getName() {
@@ -51,6 +55,14 @@ public class Column {
 
   public String getForeignKeyName() {
     return foreignKeyName;
+  }
+
+  public String getForeignKeyTable() {
+    return foreignTableName;
+  }
+
+  public String getDataType() {
+    return dataType;
   }
 
   public boolean getIsPrimary() {
@@ -74,10 +86,31 @@ public class Column {
   }
 
   public static class Options {
-    public boolean isPrimary;
-    public boolean isAutoIncrement;
-    public boolean isUnique;
-    public boolean isForeign;
+    public boolean isPrimary = false;
+    public boolean isAutoIncrement = false;
+    public boolean isUnique = false;
+    public boolean isForeign = false;
     public String foreignKeyName;
+
+    public void setIsPrimary(boolean value) {
+      if(!isPrimary && value) {
+        isPrimary = value;
+      }
+    }
+    public void setIsAutoIncrement(boolean value) {
+      if(!isAutoIncrement && value) {
+        isAutoIncrement = value;
+      }
+    }
+    public void setIsUnique(boolean value) {
+      if(!isUnique && value) {
+        isUnique = value;
+      }
+    }
+    public void setIsForeign(boolean value) {
+      if(!isForeign && value) {
+        isForeign = value;
+      }
+    }
   }
 }

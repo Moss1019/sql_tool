@@ -1,7 +1,7 @@
 delimiter //
-create procedure sp_select{tablenameupper}
+create procedure sp_select{tablenamepascal}
 (in {primarykey} integer)
 begin
-select * from {tablenamelower} t1 where t1.{primarykey} = {primarykey};
+select * from {tablename} t1 where t1.{primarykey} = {primarykey};
 end //
 delimiter ;

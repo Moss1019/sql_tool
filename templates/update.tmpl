@@ -1,0 +1,8 @@
+delimiter //
+create procedure sp_updateUser({paramlist})
+begin
+update {tablename} t1 
+set {setlist}
+where t1.{primarykey} = {primarykey};
+end //
+delimiter ;
