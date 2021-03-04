@@ -69,11 +69,13 @@ public class Definition {
             DatabaseVisitor visitor = new DatabaseVisitor();
             String dbUser = argMapping.get("db_user");
 
-            Database db = (Database)visitor.visit(tree);
+            Database db = new Database(dbUser, (List<Table>)visitor.visit(tree));
 
             SqlGenerator gen = new SqlGenerator(db);
-            String sql = gen.generateSql();
-            writeFile("db_objects.sql", sql, "");
+            Map<String, String> sql = gen.generateSql();
+            for(String f: sql.keySet()) {
+                writeFile(String.format("%s.sql", f), sql.get(f), "");
+            }
 
         } catch (Exception ex) {
             System.out.println(ex);

@@ -5,12 +5,12 @@ import java.util.ArrayList;
 
 public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
   @Override
-  public Database visitDatabase(DefinitionParser.DatabaseContext ctx) {
+  public List<Table> visitDatabase(DefinitionParser.DatabaseContext ctx) {
     List<Table> tables = new ArrayList<>();
     for(DefinitionParser.TableContext tc: ctx.table()) {
       tables.add(visitTable(tc));
     }
-    return new Database(tables);
+    return tables;
   }
 
   @Override

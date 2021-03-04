@@ -1,4 +1,9 @@
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
 public class SqlGenerator extends Generator {
   private Database db;
 
@@ -18,13 +23,19 @@ public class SqlGenerator extends Generator {
   private String setValueTmpl;
   private String uniqueFieldTmpl;
   private String foreignKeyTmpl;
+  private String grantExecTmpl;
+
+  private List<String> procedures;
+  private List<String> tables;
 
   public SqlGenerator(Database db) {
     this.db = db;
     loadTemplates();
+    procedures = new ArrayList<>();
+    tables = new ArrayList<>();
   }
 
-  public String generateSql() {
+  public Map<String, String> generateSql() {
     StringBuilder b = new StringBuilder();
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
@@ -43,8 +54,21 @@ public class SqlGenerator extends Generator {
       }
       b.append("\n");
     }
-    // generate grants on procedures
-    // generate drops
+    b.append(generateGrants());
+    Map<String, String> sql = new HashMap<>();
+    sql.put("create", b.toString());
+    sql.put("drop", generateDrops());
+    return sql;
+  }
+
+  private String generateDrops() {
+    StringBuilder b = new StringBuilder();
+    for(String p : procedures) {
+      b.append("drop procedure ").append(p).append(";\n");
+    }
+    for(String t: tables) {
+      b.append("drop table ").append(t).append(";\n");
+    }
     return b.toString();
   }
 
@@ -77,6 +101,7 @@ public class SqlGenerator extends Generator {
     .append(createTableTmpl
       .replace("{tablename}", t.getName())
       .replace("{tablefields}", tableFields.toString()));
+    tables.add(t.getName());
     return b.toString();
   }
 
@@ -87,6 +112,7 @@ public class SqlGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{tablename}", t.getName())
       .replace("{tablename}", t.getName()));
+    procedures.add(String.format("sp_selectAll%ss", t.getPascalName()));
     return b.toString();
   }
 
@@ -97,6 +123,7 @@ public class SqlGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{tablename}", t.getName())
       .replace("{primarykey}", t.getPrimaryColumn().getName()));
+    procedures.add(String.format("sp_select%s", t.getPascalName()));
     return b.toString();
   }
 
@@ -110,6 +137,7 @@ public class SqlGenerator extends Generator {
         .replace("{colname}", c.getName())
         .replace("{coldatatype}", DataTypeUtil.resolveSqlType(c.getDataType()))
         .replace("{tablename}", t.getName()));
+      procedures.add(String.format("sp_select%ssBy%s", t.getPascalName(), c.getPascalName()));
     }
     return b.toString();
   }
@@ -145,6 +173,7 @@ public class SqlGenerator extends Generator {
       .replace("{tablename}", t.getName())
       .replace("{setlist}", setList.toString())
       .replace("{primarykey}", t.getPrimaryColumn().getName()));
+    procedures.add(String.format("sp_update%s", t.getPascalName()));
     return b.toString();
   }
 
@@ -172,6 +201,7 @@ public class SqlGenerator extends Generator {
       .replace("{tablename}", t.getName())
       .replace("{colnames}", colNames.toString())
       .replace("{primarykey}", t.getPrimaryColumn().getName()));
+    procedures.add(String.format("sp_insert%s", t.getPascalName()));
     return b.toString();
   }
 
@@ -182,6 +212,7 @@ public class SqlGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{primarykey}", t.getPrimaryColumn().getName())
       .replace("{tablename}", t.getName()));
+    procedures.add(String.format("sp_delete%s", t.getPascalName()));
     return b.toString();
   }
 
@@ -193,8 +224,19 @@ public class SqlGenerator extends Generator {
       .replace("{tablename}", t.getName())
       .replace("{pk1}", t.getColumns().get(0).getName())
       .replace("{pk2}", t.getColumns().get(1).getName()));
+    procedures.add(String.format("sp_delete%s", t.getPascalName()));
     return b.toString();
   }
+
+  private String generateGrants() {
+    StringBuilder b = new StringBuilder();
+    for(String p : procedures) {
+      b.append(grantExecTmpl
+        .replace("{procedure}", p)
+        .replace("{dbuser}", db.getUser()));
+    }
+    return b.toString();
+  } 
 
   private void loadTemplates() {
     createTableTmpl = loadTemplate("createtable");
@@ -211,6 +253,7 @@ public class SqlGenerator extends Generator {
     setValueTmpl = loadTemplate("setvalue");
     uniqueFieldTmpl = loadTemplate("uniquefield");
     foreignKeyTmpl = loadTemplate("foreignkey");
+    grantExecTmpl = loadTemplate("grantexec");
   }
 
   private String loadTemplate(String fileName) {
