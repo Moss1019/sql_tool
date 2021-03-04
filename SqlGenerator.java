@@ -4,6 +4,7 @@ public class SqlGenerator extends Generator {
 
   private String createTableTmpl;
 
+  private String deleteJoinedTmpl;
   private String deleteByPkTmpl;
   private String selectAllTmpl;
   private String selectByPkTmpl;
@@ -29,14 +30,53 @@ public class SqlGenerator extends Generator {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
       b
       .append(generateCreateTable(t))
-      .append(generateSelectAll(t));
-      if(!currentLoopedOrJoined) {
+      .append(generateSelectAll(t))
+      .append(generateInsert(t));
+      if(currentLoopedOrJoined) {
+        b.append(generateDeleteJoined(t));
+      } else {
         b
         .append(generateSelectByPk(t))
-        .append(generatorSelectByUnique(t));
+        .append(generatorSelectByUnique(t))
+        .append(generateUpdate(t))
+        .append(generateDeleteByPk(t));
       }
       b.append("\n");
     }
+    // generate grants on procedures
+    // generate drops
+    return b.toString();
+  }
+
+  private String generateCreateTable(Table t) {
+    StringBuilder tableFields = new StringBuilder();
+    int colIndex = 0;
+    for(Column c: t.getColumns()) {
+      if(c.getIsPrimary()) {
+        tableFields.append(primaryKeyTmpl.replace("{primarykey}", c.getName()));
+      } else if(c.getIsUnique()) {
+        tableFields.append(uniqueFieldTmpl
+          .replace("{columnname}", c.getName())
+          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      } else if (c.getIsForeign()) {
+        tableFields.append(foreignKeyTmpl
+          .replace("{columnname}", c.getName())
+          .replace("{foreigntablename}", c.getForeignKeyTable())
+          .replace("{foreigncolumnname}", c.getForeignKeyName()));
+      } else {
+        tableFields.append(fieldTmpl
+          .replace("{columnname}", c.getName())
+          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      }
+      if(colIndex++ < t.getNumColumns() - 1) {
+        tableFields.append(",\n\t");
+      }
+    }
+    StringBuilder b = new StringBuilder();
+    b
+    .append(createTableTmpl
+      .replace("{tablename}", t.getName())
+      .replace("{tablefields}", tableFields.toString()));
     return b.toString();
   }
 
@@ -74,42 +114,56 @@ public class SqlGenerator extends Generator {
     return b.toString();
   }
 
-  private String generateCreateTable(Table t) {
-    StringBuilder tableFields = new StringBuilder();
+  private String generateUpdate(Table t) {
+    StringBuilder paramList = new StringBuilder();
+    StringBuilder setList = new StringBuilder();
+    paramList
+      .append("\n\t")
+      .append(inparamTmpl
+        .replace("{columnname}", t.getPrimaryColumn().getName())
+        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(t.getPrimaryColumn().getDataType())))
+      .append(",\n\t");
     int colIndex = 0;
-    for(Column c: t.getColumns()) {
-      if(c.getIsPrimary()) {
-        tableFields.append(primaryKeyTmpl.replace("{primarykey}", c.getName()));
-      } else if(c.getIsUnique()) {
-        tableFields.append(uniqueFieldTmpl
+    for(Column c: t.getNonPrimaryColumns()) {
+      paramList
+        .append(inparamTmpl
           .replace("{columnname}", c.getName())
           .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
-      } else if (c.getIsForeign()) {
-        tableFields.append(foreignKeyTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{foreigntablename}", c.getForeignKeyTable())
-          .replace("{foreigncolumnname}", c.getForeignKeyName()));
-      } else {
-        tableFields.append(fieldTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
-      }
-      if(colIndex++ < t.getNumColumns() - 1) {
-        tableFields.append(",\n\t");
+      setList
+        .append(setValueTmpl
+          .replace("{columnname}", c.getName()));
+      if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
+        paramList.append(",\n\t");
+        setList.append(", ");
       }
     }
     StringBuilder b = new StringBuilder();
     b
-    .append(createTableTmpl
+    .append(updateTmpl
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{paramlist}", paramList.toString())
       .replace("{tablename}", t.getName())
-      .replace("{tablefields}", tableFields.toString()));
+      .replace("{setlist}", setList.toString())
+      .replace("{primarykey}", t.getPrimaryColumn().getName()));
     return b.toString();
   }
 
   private String generateInsert(Table t) {
     StringBuilder paramList = new StringBuilder();
     StringBuilder colNames = new StringBuilder();
-
+    int colIndex = 0;
+    for(Column c: t.getNonPrimaryColumns()) {
+      paramList
+        .append(inparamTmpl
+          .replace("{columnname}", c.getName())
+          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      colNames.append(c.getName());
+      if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
+        paramList.append(", ");
+        colNames.append(", ");
+      }
+    }
+    System.out.println(colNames.toString() + paramList.toString());
     StringBuilder b = new StringBuilder();
     b
     .append(insertTmpl
@@ -121,8 +175,30 @@ public class SqlGenerator extends Generator {
     return b.toString();
   }
 
+  private String generateDeleteByPk(Table t) {
+    StringBuilder b = new StringBuilder();
+    b
+    .append(deleteByPkTmpl
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{primarykey}", t.getPrimaryColumn().getName())
+      .replace("{tablename}", t.getName()));
+    return b.toString();
+  }
+
+  private String generateDeleteJoined(Table t) {
+    StringBuilder b = new StringBuilder();
+    b
+    .append(deleteJoinedTmpl
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{tablename}", t.getName())
+      .replace("{pk1}", t.getColumns().get(0).getName())
+      .replace("{pk2}", t.getColumns().get(1).getName()));
+    return b.toString();
+  }
+
   private void loadTemplates() {
     createTableTmpl = loadTemplate("createtable");
+    deleteJoinedTmpl = loadTemplate("deletejoined");
     deleteByPkTmpl = loadTemplate("deletebypk");
     selectAllTmpl = loadTemplate("selectall");
     selectByPkTmpl = loadTemplate("selectbypk");

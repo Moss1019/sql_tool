@@ -1,0 +1,6 @@
+delimiter //
+create procedure sp_delete{tablenamepascal}(in {pk1} integer, in {pk2} integer)
+begin
+delete from {tablename} t1 where t1.{pk1} = {pk1} and t1.{pk2} = {pk2};
+end //
+delimiter ;

@@ -14,6 +14,7 @@ public class Table {
   private Column primaryCol;
   private List<Column> columns;
   private List<Column> uniqueColumns;
+  private List<Column> nonPrimaryColumns;
 
   public Table(String name, boolean isLooped, boolean isJoined, List<Column> columns) {
     this.name = name;
@@ -41,9 +42,13 @@ public class Table {
       }
     }
     uniqueColumns = new ArrayList<>();
+    nonPrimaryColumns = new ArrayList<>();
     for(Column c: this.columns) {
       if(c.getIsUnique()) {
         uniqueColumns.add(c);
+      }
+      if(!c.getIsPrimary()) {
+        nonPrimaryColumns.add(c);
       }
     }
     if(primaryCol == null) {
@@ -92,5 +97,9 @@ public class Table {
 
   public List<Column> getUniqueColumns() {
     return uniqueColumns;
+  }
+
+  public List<Column> getNonPrimaryColumns() {
+    return nonPrimaryColumns;
   }
 }
