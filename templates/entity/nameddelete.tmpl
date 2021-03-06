@@ -1,0 +1,10 @@
+@NamedStoredProcedureQuery(
+	name = "delete{tablenamepascal}",
+	procedureName = "sp_delete{tablenamepascal}",
+	parameters = {
+	@StoredProcedureParameter(
+		mode = ParameterMode.IN,
+		type = Integer.class,
+		name = "{primarykeyname}")
+	}
+),

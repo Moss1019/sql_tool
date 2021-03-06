@@ -56,6 +56,12 @@ public class Definition {
         return argMapping;
     }
 
+    private static void writeFiles(Map<String, String> contents, String extension, String folder) {
+        for(String f: contents.keySet()) {
+            writeFile(String.format("%s.%s", f, extension), contents.get(f), folder);
+        }
+    }
+
     public static void main(String[] args) {
         InputStream iStream = null;
         Map<String, String> argMapping = processArgs(args);
@@ -68,14 +74,15 @@ public class Definition {
             ParseTree tree = parser.database();
             DatabaseVisitor visitor = new DatabaseVisitor();
             String dbUser = argMapping.get("db_user");
+            String packageName = argMapping.get("package_name");
 
-            Database db = new Database(dbUser, (List<Table>)visitor.visit(tree));
+            Database db = new Database(dbUser, packageName, (List<Table>)visitor.visit(tree));
 
-            SqlGenerator gen = new SqlGenerator(db);
-            Map<String, String> sql = gen.generateSql();
-            for(String f: sql.keySet()) {
-                writeFile(String.format("%s.sql", f), sql.get(f), "");
-            }
+            SqlGenerator sqlGen = new SqlGenerator(db);
+            writeFiles(sqlGen.generate(), "sql", "");
+
+            EntityGenerator eGen = new EntityGenerator(db);
+            writeFiles(eGen.generate(), "java", "entity");
 
         } catch (Exception ex) {
             System.out.println(ex);

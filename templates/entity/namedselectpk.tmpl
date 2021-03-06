@@ -1,0 +1,11 @@
+@NamedStoredProcedureQuery(
+	name = "select{tablenamepascal}",
+	procedureName = "sp_select{tablenamepascal}",
+	resultClasses = {tablenamepascal}.class,
+	parameters = {
+	@StoredProcedureParameter(
+		mode = ParameterMode.IN,
+		type = Integer.class,
+		name = "{primarykeyname}")
+	}
+),

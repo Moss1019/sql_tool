@@ -1,0 +1,11 @@
+@NamedStoredProcedureQuery(
+	name = "select{parenttablenamepascal}{childtablenamepascal}s",
+	procedureName = "sp_select{parenttablenamepascal}{childtablenamepascal}s",
+	resultClasses = {childtablenamepascal}.class,
+	parameters = {
+	@StoredProcedureParameter(
+		mode = ParameterMode.IN,
+		type = Integer.class,
+		name = "{parentprimarykey}")
+	}
+),

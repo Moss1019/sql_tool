@@ -1,0 +1,32 @@
+package {packagename}.entity;
+
+import javax.persistence.*;
+
+import java.util.Date;
+
+import java.io.Serializable;
+
+@Entity
+@IdClass({tablenamepascal}.{tablenamepascal}PK.class)
+@Table(name = "{tablename}")
+@NamedStoredProcedureQueries({
+{namedstoredprocedures}
+})
+public class Collaborator {
+{primaryfield1}
+{primaryfield2}
+{getters}
+{setters}
+	public static class {tablenamepascal}PK implements Serializable {
+		protected int {primarykey1camel};
+		protected int {primarykey2camel};
+
+		public {tablenamepascal}PK() {
+		}
+
+		public {tablenamepascal}PK(int {primarykey1camel}, int {primarykey2camel}) {
+			this.{primarykey1camel} = {primarykey1camel};
+			this.{primarykey2camel} = {primarykey2camel};
+		}
+	}
+}

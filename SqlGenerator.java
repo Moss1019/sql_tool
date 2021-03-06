@@ -14,6 +14,7 @@ public class SqlGenerator extends Generator {
   private String selectAllTmpl;
   private String selectByPkTmpl;
   private String selectByUniqueTmpl;
+  private String selectOfParentTmpl;
   private String insertTmpl;
   private String updateTmpl;
 
@@ -35,14 +36,15 @@ public class SqlGenerator extends Generator {
     tables = new ArrayList<>();
   }
 
-  public Map<String, String> generateSql() {
+  public Map<String, String> generate() {
     StringBuilder b = new StringBuilder();
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
       b
       .append(generateCreateTable(t))
       .append(generateSelectAll(t))
-      .append(generateInsert(t));
+      .append(generateInsert(t))
+      .append(generateSelectOfParents(t));
       if(currentLoopedOrJoined) {
         b.append(generateDeleteJoined(t));
       } else {
@@ -142,6 +144,20 @@ public class SqlGenerator extends Generator {
     return b.toString();
   }
 
+  private String generateSelectOfParents(Table t) {
+    StringBuilder b = new StringBuilder();
+    for(Table pt: t.getParentTables()) {
+      b
+      .append(selectOfParentTmpl
+        .replace("{parenttablenamepascal}", pt.getPascalName())
+        .replace("{childtablenamepascal}", t.getPascalName())
+        .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
+        .replace("{childtablename}", t.getName()));
+      procedures.add(String.format("sp_select%s%ss", pt.getPascalName(), t.getPascalName()));
+    }
+    return b.toString();
+  }
+
   private String generateUpdate(Table t) {
     StringBuilder paramList = new StringBuilder();
     StringBuilder setList = new StringBuilder();
@@ -192,7 +208,6 @@ public class SqlGenerator extends Generator {
         colNames.append(", ");
       }
     }
-    System.out.println(colNames.toString() + paramList.toString());
     StringBuilder b = new StringBuilder();
     b
     .append(insertTmpl
@@ -239,30 +254,21 @@ public class SqlGenerator extends Generator {
   } 
 
   private void loadTemplates() {
-    createTableTmpl = loadTemplate("createtable");
-    deleteJoinedTmpl = loadTemplate("deletejoined");
-    deleteByPkTmpl = loadTemplate("deletebypk");
-    selectAllTmpl = loadTemplate("selectall");
-    selectByPkTmpl = loadTemplate("selectbypk");
-    selectByUniqueTmpl = loadTemplate("selectbyunique");
-    insertTmpl = loadTemplate("insert");
-    updateTmpl = loadTemplate("update");
-    inparamTmpl = loadTemplate("inparam");
-    fieldTmpl = loadTemplate("field");
-    primaryKeyTmpl = loadTemplate("primarykey");
-    setValueTmpl = loadTemplate("setvalue");
-    uniqueFieldTmpl = loadTemplate("uniquefield");
-    foreignKeyTmpl = loadTemplate("foreignkey");
-    grantExecTmpl = loadTemplate("grantexec");
-  }
-
-  private String loadTemplate(String fileName) {
-    FileHandler fh = new FileHandler(String.format("../templates/%s.tmpl", fileName));
-    String content = fh.readFile();
-    if(fh.isInError()) {
-      System.out.println("Could not read " + fileName);
-      return "";
-    }
-    return content;
+    createTableTmpl = loadTemplate("../templates/sql", "createtable");
+    deleteJoinedTmpl = loadTemplate("../templates/sql", "deletejoined");
+    deleteByPkTmpl = loadTemplate("../templates/sql", "deletebypk");
+    selectAllTmpl = loadTemplate("../templates/sql", "selectall");
+    selectByPkTmpl = loadTemplate("../templates/sql", "selectbypk");
+    selectByUniqueTmpl = loadTemplate("../templates/sql", "selectbyunique");
+    selectOfParentTmpl = loadTemplate("../templates/sql", "selectofparent");
+    insertTmpl = loadTemplate("../templates/sql", "insert");
+    updateTmpl = loadTemplate("../templates/sql", "update");
+    inparamTmpl = loadTemplate("../templates/sql", "inparam");
+    fieldTmpl = loadTemplate("../templates/sql", "field");
+    primaryKeyTmpl = loadTemplate("../templates/sql", "primarykey");
+    setValueTmpl = loadTemplate("../templates/sql", "setvalue");
+    uniqueFieldTmpl = loadTemplate("../templates/sql", "uniquefield");
+    foreignKeyTmpl = loadTemplate("../templates/sql", "foreignkey");
+    grantExecTmpl = loadTemplate("../templates/sql", "grantexec");
   }
 }

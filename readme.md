@@ -7,7 +7,8 @@ A tool used to generate MySQL code and Java spring classes that form the foundat
 - @Service beans
 - @Controller beans
 - @Entity POJOS
-- JS code to make HTTP requests using axios
+- TS code to make HTTP requests using axios
+- TypeScript Type definitions
 
 ## Using the code
 First, define the objects in the application using the following syntax <br />
@@ -22,7 +23,7 @@ user_id int primary auto_increment <br />
 user_name string unique <br />
 last_name string <br />
 global_id int unique <br />
-joined user_subject <br />
+group_id int foreign <br />
 }
 
 ### Data types
@@ -30,6 +31,7 @@ joined user_subject <br />
 - string
 - boolean
 - char
+- date
 
 ### Options
 - primary 
@@ -39,7 +41,7 @@ joined user_subject <br />
 
 NOTES <br />
 foreign key uses the column name to generate the SQL used to set up a reference <br />
-unique is used to generate select by statements
+unique is used to generate "select by unique column" statements
 
 ### Running the program
 SQL_Tool requires a Python environment and JVM be installed on the system
@@ -54,7 +56,7 @@ Use the commands presented by the Python script
 - 3 - Compile Java code to create the language app
 - 4 - Run the language app on the 'definition' file
 
-NOTE: options 2 - 4 has default values if none are specified. Hitting Return/Enter will use the defaults.
+NOTE: options 2 - 4 have default values if none are specified. Hitting Return/Enter will use the defaults.
 
 ### Defaults
 - 2 - use the 'Definition.g4' file in the parser dir
@@ -63,5 +65,5 @@ NOTE: options 2 - 4 has default values if none are specified. Hitting Return/Ent
 
 # Planned features
 - generate classes to allow messaging with Apache kafka
-- generate HTTP related code for other front end frameworks (Angular)
+- 
 
