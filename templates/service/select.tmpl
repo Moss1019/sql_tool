@@ -1,0 +1,5 @@
+	public {tablenamepascal}View selectByPk(int value) {
+		{tablenamepascal} dbResult = repo.selectByPk(value);{viewlists}
+		{tablenamepascal}View result = {tablenamepascal}Mapper.map{tablenamepascal}(dbResult{childtables});
+		return result;
+	}

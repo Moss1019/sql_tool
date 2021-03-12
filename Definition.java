@@ -84,6 +84,15 @@ public class Definition {
             EntityGenerator eGen = new EntityGenerator(db);
             writeFiles(eGen.generate(), "java", "entity");
 
+            ViewGenerator vGen = new ViewGenerator(db);
+            writeFiles(vGen.generate(), "java", "view");
+
+            RepositoryGenerator rGen = new RepositoryGenerator(db);
+            writeFiles(rGen.generate(), "java", "repository");
+
+            ServiceGenerator sGen = new ServiceGenerator(db);
+            writeFiles(sGen.generate(), "java", "service");
+
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());

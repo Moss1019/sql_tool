@@ -1,0 +1,10 @@
+	public boolean update({tablenamepascal} value) {
+		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("update{tablenamepascal}");
+		{parameters}
+		try {
+			q.execute();
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}

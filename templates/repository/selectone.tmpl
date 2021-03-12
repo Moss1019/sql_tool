@@ -1,0 +1,10 @@
+  public {tablenamepascal} select{methodsuffix}({javatype} value) {
+		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("select{methodsuffix}");
+		q.setParameter("{columnname}", value);
+		try {
+			{tablenamepascal} result = ({tablenamepascal})q.getSingleResult();
+			return result;
+		} catch (NoResultException ex) {
+			return null;
+		}
+	}

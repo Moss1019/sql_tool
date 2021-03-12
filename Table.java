@@ -16,6 +16,7 @@ public class Table {
   private Column primaryCol;
   private List<Table> childTables;
   private List<Table> parentTables;
+  private List<Table> nonJoinedTables;
   private List<Column> columns;
   private List<Column> uniqueColumns;
   private List<Column> nonPrimaryColumns;
@@ -137,6 +138,18 @@ public class Table {
 
   public List<Table> getChildTables() {
     return childTables;
+  }
+
+  public List<Table> getNonJoinedTables() {
+    if(nonJoinedTables == null) {
+      nonJoinedTables = new ArrayList<>();
+      for(Table ct: childTables) {
+        if(!ct.isJoined && !ct.isLooped) {
+          nonJoinedTables.add(ct);
+        }
+      }
+    }
+    return nonJoinedTables;
   }
 
   public List<Column> getColumns() {

@@ -1,0 +1,9 @@
+	public List<{tablenamepascal}View> selectOf{joinednamepascal}(int {joinednamecamel}Id) {
+		List<{tablenamepascal}> dbResult = repo.selectOf{joinednamepascal}({joinednamecamel}Id);
+		List<{tablenamepascal}View> result = dbResult.stream()
+			.map(x -> {{viewlists}
+				return {tablenamepascal}Mapper.map{tablenamepascal}(x{childtables});
+			})
+			.collect(Collectors.toList());
+		return result;
+	}

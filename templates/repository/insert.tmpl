@@ -1,0 +1,10 @@
+  public {tablenamepascal} insert({tablenamepascal} value) {
+		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("insert{tablenamepascal}");
+		{parameters}
+		try {
+			q.execute();
+			return ({tablenamepascal})q.getSingleResult();
+		} catch (Exception ex) {
+			return null;
+		}
+	}

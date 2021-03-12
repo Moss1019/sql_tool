@@ -1,0 +1,10 @@
+	public boolean delete(int value) {
+		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("delete{tablenamepascal}");
+		q.setParameter("{primarykeyname}", value);
+		try {
+			q.execute();
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}

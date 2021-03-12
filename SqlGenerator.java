@@ -150,10 +150,9 @@ public class SqlGenerator extends Generator {
       b
       .append(selectOfParentTmpl
         .replace("{parenttablenamepascal}", pt.getPascalName())
-        .replace("{childtablenamepascal}", t.getPascalName())
         .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
         .replace("{childtablename}", t.getName()));
-      procedures.add(String.format("sp_select%s%ss", pt.getPascalName(), t.getPascalName()));
+      procedures.add(String.format("sp_selectOf%s", pt.getPascalName()));
     }
     return b.toString();
   }

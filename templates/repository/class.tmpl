@@ -1,0 +1,16 @@
+package {packagename}.repository;
+
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.*;
+
+import java.util.List;
+
+{modelimports}
+@Repository
+public class {tablenamepascal}Repository {
+	@PersistenceContext
+	private EntityManager em;
+	
+{methods}
+}

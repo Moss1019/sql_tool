@@ -1,0 +1,5 @@
+	public {tablenamepascal}View insert({tablenamepascal}View new{tablenamepascal}) { 
+		{tablenamepascal} dbResult = repo.insert({tablenamepascal}Mapper.map{tablenamepascal}View(new{tablenamepascal}));{viewlists}
+		{tablenamepascal}View result = {tablenamepascal}Mapper.map{tablenamepascal}(dbResult{childtables});
+		return result;
+	}
