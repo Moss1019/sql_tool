@@ -149,6 +149,7 @@ public class SqlGenerator extends Generator {
     for(Table pt: t.getParentTables()) {
       b
       .append(selectOfParentTmpl
+        .replace("{tablenamepascal}", t.getPascalName())
         .replace("{parenttablenamepascal}", pt.getPascalName())
         .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
         .replace("{childtablename}", t.getName()));

@@ -1,34 +1,11 @@
 
-user {
-  user_id int primary auto_increment
-  first_name string
-  last_name string
-  email string unique
-}
-
 item {
   item_id int primary auto_increment
   title string unique
-  user_id int foreign
   date_created date
 }
 
 milestone {
   milestone_id int primary auto_increment
-  descript string
-  is_done boolean
-  date_created date
   item_id int foreign
-}
-
-item_collaborator {
-  item_id int foreign(item_id)
-  collaborator_id int foreign(user_id)
-  joined
-}
-
-collaborator {
-  user_id int foreign(user_id)
-  collaborator_id int foreign(user_id)
-  looped
 }

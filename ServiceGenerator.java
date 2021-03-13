@@ -19,6 +19,8 @@ public class ServiceGenerator extends Generator {
   private String selectParentChildren;
   private String updateTmpl;
   private String viewListTmpl;
+  private String viewListMapTmpl;
+  private String viewListUniqueTmpl;
   private String importTmpl;
 
   public ServiceGenerator(Database db) {
@@ -60,17 +62,8 @@ public class ServiceGenerator extends Generator {
     for(Table st: tables) {
       b
       .append(importTmpl
-        .replace("{subpackage}", "entity")
-        .replace("{classname}", st.getPascalName()))
-      .append(importTmpl
         .replace("{subpackage}", "view")
-        .replace("{classname}", st.getPascalName() + "View"))
-      .append(importTmpl
-        .replace("{subpackage}", "repository")
-        .replace("{classname}", st.getPascalName() + "Repository"))
-      .append(importTmpl
-        .replace("{subpackage}", "mapper")
-        .replace("{classname}", st.getPascalName() + "Mapper"));
+        .replace("{classname}", st.getPascalName() + "View"));
     }
     return b.toString();
   }
@@ -78,7 +71,7 @@ public class ServiceGenerator extends Generator {
   private String generateMethods(Table t) {
     StringBuilder b = new StringBuilder();
     b
-    .append(generateInsertSelect(t, insertTmpl, 2))
+    .append(generateInsert(t))
     .append("\n");
     if(currentLoopedOrJoined) {
       System.out.println(t.getPascalName());
@@ -90,9 +83,9 @@ public class ServiceGenerator extends Generator {
       b
       .append(generateDelete(t))
       .append("\n")
-      .append(generateInsertSelect(t, selectTmpl, 2))
+      .append(generateSelectByPk(t))
       .append("\n")
-      .append(generateInsertSelect(t, selectAllTmpl, 4))
+      .append(generateSelectAll(t))
       .append("\n")
       .append(generateSelectByUnique(t))
       .append("\n")
@@ -113,26 +106,44 @@ public class ServiceGenerator extends Generator {
       .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName());
   }
 
-  private String generateInsertSelect(Table t, String template, int tabs) {
+  private String generateInsert(Table t) {
+    return insertTmpl
+      .replace("{tablenamepascal}", t.getPascalName());
+  }
+
+  private String generateSelectByPk(Table t) {
     StringBuilder viewLists = new StringBuilder();
     StringBuilder childTables = new StringBuilder();
     for(Table ct: t.getChildTables()) {
-      if(ct.getIsJoined()) {
-        continue;
-      }
-      viewLists.append("\n");
-      for(int i = 0; i < tabs; ++i) {
-        viewLists.append("\t");
-      }
-      viewLists
-      .append(viewListTmpl
-        .replace("{tablenamepascal}", ct.getPascalName())
-        .replace("{tablenamecamel}", ct.getCamelName())
-        .replace("{parenttablenamepascal}", t.getPascalName()));
-      childTables.append(", ").append(ct.getCamelName()).append("s");
+      viewLists 
+        .append("\n\t\t")
+        .append(viewListTmpl
+          .replace("{childtablenamepascal}", ct.getPascalName())
+          .replace("{childtablenamecamel}", ct.getCamelName())
+          .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+      childTables.append(", ").append(ct.getCamelName()).append("Views");
     }
-    return template
+    return selectTmpl
       .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{viewlists}", viewLists)
+      .replace("{childtables}", childTables.toString());
+  }
+
+  private String generateSelectAll(Table t) {
+    StringBuilder viewLists = new StringBuilder();
+    StringBuilder childTables = new StringBuilder();
+    int tableIndex = 0;
+    for(Table ct: t.getChildTables()) {
+      viewLists
+        .append("\n\t\t\t\t")
+        .append(viewListMapTmpl
+          .replace("{childtablenamecamel}", ct.getCamelName())
+          .replace("{childtablenamepascal}", ct.getPascalName())
+          .replace("{tablenamepascal}", t.getPascalName())
+          .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+      childTables.append(", ").append(ct.getCamelName()).append("Views");
+    }
+    return selectAllTmpl
       .replace("{viewlists}", viewLists.toString())
       .replace("{childtables}", childTables.toString());
   }
@@ -140,25 +151,22 @@ public class ServiceGenerator extends Generator {
   private String generateSelectByUnique(Table t) {
     StringBuilder b = new StringBuilder();
     int colIndex = 0;
-    for(Column uc: t.getUniqueColumns()) {
+    for(Column c: t.getUniqueColumns()) {
       StringBuilder viewLists = new StringBuilder();
       StringBuilder childTables = new StringBuilder();
       for(Table ct: t.getChildTables()) {
-        if(ct.getIsJoined() || ct.getIsLooped()) {
-          continue;
-        }
         viewLists
-        .append("\n\t\t")
-        .append(viewListTmpl
-          .replace("{tablenamepascal}", ct.getPascalName())
-          .replace("{tablenamecamel}", ct.getCamelName())
-          .replace("{parenttablenamepascal}", t.getPascalName()));
-        childTables.append(", ").append(ct.getCamelName()).append("s");
+          .append("\n\t\t")
+          .append(viewListUniqueTmpl
+            .replace("{childtablenamepascal}", ct.getPascalName())
+            .replace("{childtablenamecamel}", ct.getCamelName())
+            .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+        childTables.append(", ").append(ct.getCamelName()).append("Views");
       }
       b.append(selectByUniqueTmpl
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(uc.getDataType()))
         .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{columnnamepascal}", uc.getPascalName())
+        .replace("{columnnamepascal}", c.getPascalName())
+        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
         .replace("{viewlists}", viewLists.toString())
         .replace("{childtables}", childTables.toString()));
       if(colIndex++ < t.getUniqueColumns().size() - 1) {
@@ -170,14 +178,25 @@ public class ServiceGenerator extends Generator {
 
   private String generateSelectOf(Table t) {
     StringBuilder b = new StringBuilder();
-    int tableIndex = 0;
     for(Table pt: t.getParentTables()) {
-      b.append(generateInsertSelect(t, selectOfTmpl, 4)
-        .replace("{joinednamepascal}", pt.getPascalName())
-        .replace("{joinednamecamel}", pt.getCamelName()));
-      if(tableIndex++ < t.getParentTables().size() - 1) {
-        b.append("\n");
+      StringBuilder viewLists = new StringBuilder();
+      StringBuilder childTables = new StringBuilder();
+      for(Table ct: t.getChildTables()) {
+        viewLists
+        .append("\n\t\t")
+        .append(viewListUniqueTmpl
+          .replace("{childtablenamepascal}", ct.getPascalName())
+          .replace("{childtablenamecamel}", ct.getCamelName())
+          .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+        childTables.append(", ").append(ct.getCamelName()).append("Views");
       }
+      b.append(selectOfTmpl
+        .replace("{tablenamepascal}", t.getPascalName())
+        .replace("{joinednamepascal}", pt.getPascalName())
+        .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getCamelName())
+        .replace("{joinednamepascal}", pt.getPascalName())
+        .replace("{viewlists}", viewLists.toString())
+        .replace("{childtables}", childTables.toString()));
     }
     return b.toString();
   }
@@ -209,6 +228,8 @@ public class ServiceGenerator extends Generator {
       selectParentChildren = loadTemplate("../templates/service", "selectparentchildren");
       updateTmpl = loadTemplate("../templates/service", "update");
       viewListTmpl = loadTemplate("../templates/service", "viewlist");
+      viewListUniqueTmpl = loadTemplate("../templates/service", "viewlistunique");
+      viewListMapTmpl = loadTemplate("../templates/service", "viewlistmap");
       importTmpl = loadTemplate("../templates/service", "import");
   }
 }

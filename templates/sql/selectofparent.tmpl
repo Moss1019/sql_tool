@@ -1,5 +1,5 @@
 delimiter //
-create procedure sp_selectOf{parenttablenamepascal}
+create procedure sp_select{tablenamepascal}sOf{parenttablenamepascal}
 (in {parentprimarykey} integer)
 begin
 select * from {childtablename} t1 where t1.{parentprimarykey} = {parentprimarykey};

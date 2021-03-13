@@ -93,6 +93,9 @@ public class Definition {
             ServiceGenerator sGen = new ServiceGenerator(db);
             writeFiles(sGen.generate(), "java", "service");
 
+            MapperGenerator mGen = new MapperGenerator(db);
+            writeFiles(mGen.generate(), "java", "mapper");
+
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());

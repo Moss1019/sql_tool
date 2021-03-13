@@ -7,6 +7,7 @@ public class RepositoryGenerator extends Generator {
 
   private String classTmpl;
   private String setParamTmpl;
+  private String setParamColTmpl;
   private String argumentTmpl;
   private String selectOneTmpl;
   private String selectListTmpl;
@@ -78,7 +79,7 @@ public class RepositoryGenerator extends Generator {
       b
       .append(selectOneTmpl
         .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{methodsuffix}", "By" + c.getPascalName())
+        .replace("{methodsuffix}", String.format("%ssBy%s", t.getPascalName(), c.getPascalName()))
         .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
         .replace("{columnname}", c.getName()))
       .append("\n");
@@ -99,11 +100,11 @@ public class RepositoryGenerator extends Generator {
       .append("\n\n")
       .append(selectListTmpl
         .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{methodsuffix}", "Of" + pt.getPascalName())
+        .replace("{methodsuffix}", String.format("%ssOf%s", t.getPascalName(), pt.getPascalName()))
         .replace("{arguments}", argumentTmpl
           .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
           .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName()))  
-        .replace("{setparams}", "\n\t\t" + setParamTmpl
+        .replace("{setparams}", "\n\t\t" + setParamColTmpl
           .replace("{columnname}", pt.getPrimaryColumn().getName())
           .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName())));
     }
@@ -117,7 +118,7 @@ public class RepositoryGenerator extends Generator {
     for(Column c: t.getNonPrimaryColumns()) {
       parameters.append(setParamTmpl
         .replace("{columnname}", c.getName())
-        .replace("{columnnamecamel}", c.getCamelName()));
+        .replace("{columnnamepascal}", c.getPascalName()));
       if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
         parameters.append("\n\t\t");
       }
@@ -136,7 +137,7 @@ public class RepositoryGenerator extends Generator {
     for(Column c: t.getColumns()) {
       parameters.append(setParamTmpl
         .replace("{columnname}", c.getName())
-        .replace("{columnnamecamel}", c.getCamelName()));
+        .replace("{columnnamepascal}", c.getPascalName()));
       if(colIndex++ < t.getColumns().size() - 1) {
         parameters.append("\n\t\t");
       }
@@ -173,6 +174,7 @@ public class RepositoryGenerator extends Generator {
     classTmpl = loadTemplate("../templates/repository", "class");
     argumentTmpl = loadTemplate("../templates/repository", "argument");
     setParamTmpl = loadTemplate("../templates/repository", "setparameter");
+    setParamColTmpl = loadTemplate("../templates/repository", "setparametercol");
     selectListTmpl = loadTemplate("../templates/repository", "selectlist");
     selectOneTmpl = loadTemplate("../templates/repository", "selectone");
     insertTmpl = loadTemplate("../templates/repository", "insert");

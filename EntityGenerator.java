@@ -145,7 +145,7 @@ public class EntityGenerator extends Generator {
       b.append(namedSelectOfParentTmpl
         .replace("{parenttablenamepascal}", pt.getPascalName())
         .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
-        .replace("{childtablename}", t.getName()));
+        .replace("{childtablenamepascal}", t.getPascalName()));
     }
     return b.toString();
   }
