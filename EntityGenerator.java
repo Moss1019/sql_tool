@@ -63,14 +63,22 @@ public class EntityGenerator extends Generator {
 
   private String generateNamedProcedures(Table t) {
     StringBuilder b = new StringBuilder();
-    b
-    .append(currentLoopedOrJoined ? generateJoinedDelete(t) : generateNamedDelete(t))
-    .append(generateNamedInsert(t))
-    .append(generateNamedSelectAll(t))
-    .append(generateNamedSelectByPk(t))
-    .append(generateNamedSelectUnique(t))
-    .append(generateNamedUpdate(t))
-    .append(generateNamedSelectOfParent(t));
+    if(currentLoopedOrJoined) {
+      b
+      .append(generateJoinedDelete(t))
+      .append(generateNamedInsert(t))
+      .append(generateNamedSelectJoined(t));
+    } else {
+      b
+      .append(generateNamedDelete(t))
+      .append(generateNamedInsert(t))
+      .append(generateNamedSelectAll(t))
+      .append(generateNamedSelectByPk(t))
+      .append(generateNamedSelectUnique(t))
+      .append(generateNamedUpdate(t))
+      .append(generateNamedSelectOfParent(t));
+    }
+    
     return b.toString();
   }
 
@@ -145,8 +153,19 @@ public class EntityGenerator extends Generator {
       b.append(namedSelectOfParentTmpl
         .replace("{parenttablenamepascal}", pt.getPascalName())
         .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
-        .replace("{childtablenamepascal}", t.getPascalName()));
+        .replace("{childtablenamepascal}", t.getPascalName())
+        .replace("{tablenamepascal}", t.getPascalName()));
     }
+    return b.toString();
+  }
+
+  private String generateNamedSelectJoined(Table t) {
+    StringBuilder b = new StringBuilder();
+    b.append(namedSelectOfParentTmpl
+      .replace("{parenttablenamepascal}", t.getParentTables().get(0).getPascalName())
+      .replace("{parentprimarykey}", t.getParentTables().get(0).getPrimaryColumn().getName())
+      .replace("{childtablenamepascal}", t.getPascalName())
+      .replace("{tablenamepascal}", t.getPascalName()));
     return b.toString();
   }
 

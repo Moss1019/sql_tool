@@ -25,14 +25,13 @@ public class RepositoryGenerator extends Generator {
     Map<String, String> repositories = new HashMap<>();
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
-      StringBuilder b = new StringBuilder();
-      b
-      .append(classTmpl
+      System.out.println(t.getName());
+      System.out.println(currentLoopedOrJoined);
+      repositories.put(String.format("%sRepository", t.getPascalName()), classTmpl
         .replace("{modelimports}", generateImports(t))
         .replace("{methods}", generateMethods(t))
         .replace("{tablenamepascal}", t.getPascalName())
         .replace("{packagename}", db.getPackageName()));
-      repositories.put(String.format("%sRepository", t.getPascalName()), b.toString());
     }
     return repositories;
   }
@@ -53,14 +52,18 @@ public class RepositoryGenerator extends Generator {
   private String generateMethods(Table t) {
     StringBuilder b = new StringBuilder();
     b
-    .append(generateSelectOne(t))
-    .append(generateSelectList(t))
     .append(generateInsert(t))
-    .append(generateUpdate(t));
+    .append("\n");
     if(currentLoopedOrJoined) {
-      b.append(generateDeleteJoined(t));
+      b
+      .append(generateDeleteJoined(t))
+      .append(generateSelectJoined(t));
     } else {
-      b.append(generateDelete(t));
+      b
+      .append(generateDelete(t))
+      .append(generateSelectOne(t))
+      .append(generateSelectList(t))
+      .append(generateUpdate(t));
     }
     return b.toString();
   }
@@ -108,6 +111,23 @@ public class RepositoryGenerator extends Generator {
           .replace("{columnname}", pt.getPrimaryColumn().getName())
           .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName())));
     }
+    return b.toString();
+  }
+
+  private String generateSelectJoined(Table t) {
+    StringBuilder b = new StringBuilder();
+    int index = t.getIsLooped() ? 0 : 1;
+    b
+    .append("\n")
+    .append(selectListTmpl
+      .replace("{tablenamepascal}", t.getParentTables().get(index).getPascalName())
+      .replace("{methodsuffix}", String.format("%ssOf%s", t.getPascalName(), t.getParentTables().get(0).getPascalName()))
+      .replace("{arguments}", argumentTmpl
+        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
+        .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName()))
+      .replace("{setparams}", "\n\t\t" + setParamColTmpl
+        .replace("{columnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
+        .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())));
     return b.toString();
   }
 
@@ -161,12 +181,12 @@ public class RepositoryGenerator extends Generator {
 
   private String generateDeleteJoined(Table t) {
     StringBuilder b = new StringBuilder();
-    b.append(deleteTmpl
+    b.append(deleteJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{key1name}", t.getPrimaryColumn().getName())
-      .replace("{key2name}", t.getPrimaryColumn().getName())
+      .replace("{key2name}", t.getJoinedColumn().getName())
       .replace("{key1namecamel}", t.getPrimaryColumn().getName())
-      .replace("{key2namecamel}", t.getPrimaryColumn().getName()));
+      .replace("{key2namecamel}", t.getJoinedColumn().getName()));
     return b.toString();
   }
 

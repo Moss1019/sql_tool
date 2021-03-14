@@ -1,0 +1,8 @@
+	@RequestMapping(value = "for{parenttablenamepascal}/{{primarycolumnnamecamel}}", method = RequestMethod.GET)
+	public ResponseEntity<?> getOf{parenttablenamepascal}(@PathVariable int {primarycolumnnamecamel}) { 
+		List<{tablenamepascal}View> result = service.selectOf{parenttablenamepascal}({primarycolumnnamecamel});
+		if (result.size() == 0) {
+			return ResponseEntity.status(404).body("No results for {parenttablenamepascal}");
+		}
+		return ResponseEntity.ok(result);
+	}

@@ -1,0 +1,8 @@
+	@RequestMapping(value = "for{primarytablenamepascal}/{{primarycolumnnamelower}}", method = RequestMethod.GET)
+	public ResponseEntity<?> getOf{primarytablenamepascal}(@PathVariable int {primarycolumnnamelower}) { 
+		List<{resulttablenamepascal}View> result = service.select{tablenamepascal}s({primarycolumnnamelower});
+		if (result.size() == 0) {
+			return ResponseEntity.status(404).body("No results found");
+		}
+		return ResponseEntity.ok(result);
+	}

@@ -11,6 +11,7 @@ public class Table {
   private String name;
   private String pascalName;
   private String camelName;
+  private String lowerName;
   private boolean isLooped;
   private boolean isJoined;
   private Column primaryCol;
@@ -90,6 +91,7 @@ public class Table {
       })
       .collect(Collectors.toList()));
     camelName = String.format("%c%s", Character.toLowerCase(camelName.charAt(0)), camelName.substring(1));
+    lowerName = name.replace("_", "");
   }
 
   public String getName() {
@@ -102,6 +104,10 @@ public class Table {
 
   public String getCamelName() {
     return camelName;
+  }
+
+  public String getLowerName() {
+    return lowerName;
   }
 
   public boolean getIsLooped() {

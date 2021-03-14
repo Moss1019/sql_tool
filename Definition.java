@@ -96,6 +96,9 @@ public class Definition {
             MapperGenerator mGen = new MapperGenerator(db);
             writeFiles(mGen.generate(), "java", "mapper");
 
+            ControllerGenerator cGen = new ControllerGenerator(db);
+            writeFiles(cGen.generate(), "java", "controller");
+
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());

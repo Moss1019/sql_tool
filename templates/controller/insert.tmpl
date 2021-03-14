@@ -1,0 +1,8 @@
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	public ResponseEntity<?> insert(@RequestBody {tablenamepascal}View new{tablenamepascal}) { 
+		{tablenamepascal}View result = service.insert(new{tablenamepascal});
+		if (result == null) {
+			return ResponseEntity.status(400).body("Could not create new {tablenamepascal}");
+		}
+		return ResponseEntity.ok(result);
+	}

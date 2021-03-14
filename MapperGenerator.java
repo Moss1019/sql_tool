@@ -23,7 +23,7 @@ public class MapperGenerator extends Generator {
       mappers.put(t.getPascalName() + "Mapper", classTmpl
         .replace("{childviewimports}", generateViewImports(t))
         .replace("{mapentity}", generateMapEntity(t))
-        .replace("{mapentitynulls}", t.getChildTables().size() > 0 ? generateMapEntityNulls(t) : "")
+        .replace("{mapentitynulls}", t.getNonJoinedTables().size() > 0 ? generateMapEntityNulls(t) : "")
         .replace("{mapview}", generateMapView(t))
         .replace("{tablenamecamel}", t.getCamelName())
         .replace("{tablenamepascal}", t.getPascalName())
@@ -34,10 +34,7 @@ public class MapperGenerator extends Generator {
 
   private String generateViewImports(Table t) {
     StringBuilder b = new StringBuilder();
-    for(Table ct: t.getChildTables()) {
-      if(ct.getIsJoined() || ct.getIsLooped()) {
-        continue;
-      }
+    for(Table ct: t.getNonJoinedTables()) {
       b
       .append("import ")
       .append(db.getPackageName())
@@ -56,10 +53,7 @@ public class MapperGenerator extends Generator {
   private String generateMapEntity(Table t) {
     StringBuilder childListsParams = new StringBuilder();
     StringBuilder childListsArgs = new StringBuilder();
-    for(Table ct: t.getChildTables()) {
-      if(ct.getIsJoined() || ct.getIsLooped()) {
-        continue;
-      }
+    for(Table ct: t.getNonJoinedTables()) {
       childListsParams.append(", List<").append(ct.getPascalName()).append("View> ").append(ct.getCamelName()).append("s");
       childListsArgs.append(", ").append(ct.getCamelName()).append("s");
     }
@@ -83,7 +77,7 @@ public class MapperGenerator extends Generator {
 
   private String generateMapEntityNulls(Table t) {
     StringBuilder childListsArgs = new StringBuilder();
-    for(Table ct: t.getChildTables()) {
+    for(Table ct: t.getNonJoinedTables()) {
       childListsArgs.append(", null");
     }
     StringBuilder colGetters = new StringBuilder();

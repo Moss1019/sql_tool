@@ -7,6 +7,7 @@ public class Column {
   private String name;
   private String pascalName;
   private String camelName;
+  private String lowerName;
   private String foreignKeyName;
   private String foreignTableName; 
   private String dataType;
@@ -23,6 +24,13 @@ public class Column {
     isAutoIncrement = options.isAutoIncrement;
     isUnique = options.isUnique;
     isForeign = options.isForeign;
+    setupNames();
+    if(isForeign) {
+      foreignTableName = foreignKeyName.split("_")[0];
+    }
+  }
+
+  private void setupNames() {
     pascalName = String.join("", Arrays.asList(name.split("_"))
       .stream()
       .map(p -> {
@@ -36,9 +44,7 @@ public class Column {
       })
       .collect(Collectors.toList()));
     camelName = String.format("%c%s", Character.toLowerCase(camelName.charAt(0)), camelName.substring(1));
-    if(isForeign) {
-      foreignTableName = foreignKeyName.split("_")[0];
-    }
+    lowerName = name.replace("_", "");
   }
 
   public String getName() {
@@ -51,6 +57,10 @@ public class Column {
 
   public String getCamelName() {
     return camelName;
+  }
+
+  public String getLowerName() {
+    return lowerName;
   }
 
   public String getForeignKeyName() {

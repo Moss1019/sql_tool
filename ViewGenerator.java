@@ -87,7 +87,7 @@ public class ViewGenerator extends Generator {
       if(colIndex++ < t.getColumns().size() - 1) {
         fieldParams.append(", ");
         assignments.append("\n");
-      } else if(colIndex == t.getColumns().size() && t.getChildTables().size() > 0) {
+      } else if(colIndex == t.getColumns().size() && t.getNonJoinedTables().size() > 0) {
         fieldParams.append(", ");
         assignments.append("\n");
       } 
