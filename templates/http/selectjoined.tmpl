@@ -1,5 +1,5 @@
-export function get{tablenamepascal}sFor{parenttablenamepascal}({parentcolcamel}: number, onSuccess: (data: any) => void, onError: (err: any) => void) {
-	const url = `${SERVER_END_POINT}/api/{tablenamelower}s/for{parenttablenamepascal}/${{parentcolcamel}}`;
+export function for{primarytablenamepascal}({primarycolumnnamecamel}: number, onSuccess: (data: any) => void, onError: (err: any) => void) {
+	const url = `${SERVER_END_POINT}/api/{tablenamelower}s/for{primarytablenamepascal}/${{primarycolumnnamecamel}}`;
 	return axios.get(url)
 		.then(result => {
 			onSuccess(result);

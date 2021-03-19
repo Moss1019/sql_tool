@@ -1,0 +1,10 @@
+export function getOf{parenttablenamepascal}({parentcolnamecamel}: number, onSuccess: (data: any) => void, onError: (err: any) => void) {
+	const url = `${SERVER_END_POINT}/api/{tablenamelower}s/${{parentcolnamecamel}}`;
+	axios.get(url)
+		.then(result => {
+			onSuccess(result);
+		})
+		.catch(err => {
+			onError(err);
+		})
+}

@@ -111,7 +111,8 @@ public class ControllerGenerator extends Generator {
       .append(selectOfParentTmpl
         .replace("{parenttablenamepascal}", pt.getPascalName())
         .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getLowerName())
-        .replace("{tablenamepascal}", t.getPascalName()));
+        .replace("{tablenamepascal}", t.getPascalName()))
+      .append("\n");
     }
     return b.toString();
   }
@@ -120,7 +121,7 @@ public class ControllerGenerator extends Generator {
     int index = t.getIsLooped() ? 0 : 1;
     return selectJoinedTmpl
       .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
-      .replace("{primarycolumnnamelower}", t.getParentTables().get(0).getPrimaryColumn().getLowerName())
+      .replace("{primarycolumnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{resulttablenamepascal}", t.getParentTables().get(index).getPascalName());
   }
@@ -132,6 +133,7 @@ public class ControllerGenerator extends Generator {
       .append(selectUniqueTmpl
         .replace("{columnnamepascal}", c.getPascalName())
         .replace("{columnnamecamel}", c.getCamelName())
+        .replace("{tablenamepascal}", t.getPascalName())
         .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType())));
     }
     return b.toString();

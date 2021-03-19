@@ -6,13 +6,14 @@ public class HttpGenerator extends Generator {
   private Database db;
 
   private String deleteTmpl;
-  private String deleteJoinedTmpl;
   private String insertTmpl;
   private String selectTmpl;
+  private String updateTmpl;
   private String selectAllTmpl;
+  private String deleteJoinedTmpl;
   private String selectJoinedTmpl;
   private String selectUniqueTmpl;
-  private String updateTmpl;
+  private String selectOfParentTmpl;
 
   public HttpGenerator(Database db) {
     this.db = db;
@@ -32,6 +33,8 @@ public class HttpGenerator extends Generator {
       if(currentLoopedOrJoined) {
         b
         .append(generateDeleteJoined(t))
+        .append("\n")
+        .append(generateSelectJoined(t))
         .append("\n");
       } else {
         b
@@ -42,6 +45,8 @@ public class HttpGenerator extends Generator {
         .append(generateSelectAll(t))
         .append("\n")
         .append(generateSelectUnqiue(t))
+        .append("\n")
+        .append(generateSelectOfParent(t))
         .append("\n")
         .append(generateUpdate(t));
       };
@@ -60,6 +65,7 @@ public class HttpGenerator extends Generator {
   private String generateDeleteJoined(Table t) {
     return deleteJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{tablenamelower}", t.getLowerName())
       .replace("{pk1namecamel}", t.getPrimaryColumn().getCamelName())
       .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName());
   }
@@ -101,6 +107,29 @@ public class HttpGenerator extends Generator {
     return b.toString();
   }
 
+  public String generateSelectOfParent(Table t) {
+    StringBuilder b = new StringBuilder();
+    for(Table pt: t.getParentTables()) {
+      b
+      .append(selectOfParentTmpl
+        .replace("{parenttablenamepascal}", pt.getPascalName())
+        .replace("{parentcolnamecamel}", pt.getPrimaryColumn().getCamelName())
+        .replace("{tablenamelower}", t.getLowerName()))
+      .append("\n");
+    }
+    return b.toString();
+  }
+
+  public String generateSelectJoined(Table t) {
+    StringBuilder b = new StringBuilder();
+    int index = t.getIsLooped() ? 0 : 1;
+    return selectJoinedTmpl
+      .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
+      .replace("{primarycolumnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())
+      .replace("{tablenamelower}", t.getLowerName())
+      .replace("{resulttablenamepascal}", t.getParentTables().get(index).getPascalName());
+  }
+
   public String generateUpdate(Table t) {
     return updateTmpl 
       .replace("{tablenamepascal}", t.getPascalName())
@@ -110,12 +139,13 @@ public class HttpGenerator extends Generator {
 
   private void loadTemplates() {
     deleteTmpl = loadTemplate("../templates/http", "delete");
-    deleteJoinedTmpl = loadTemplate("../templates/http", "deletejoined");
     insertTmpl = loadTemplate("../templates/http", "insert");
     selectTmpl = loadTemplate("../templates/http", "select");
+    updateTmpl = loadTemplate("../templates/http", "update");
     selectAllTmpl = loadTemplate("../templates/http", "selectall");
+    deleteJoinedTmpl = loadTemplate("../templates/http", "deletejoined");
     selectJoinedTmpl = loadTemplate("../templates/http", "selectjoined");
     selectUniqueTmpl = loadTemplate("../templates/http", "selectunique");
-    updateTmpl = loadTemplate("../templates/http", "update");
+    selectOfParentTmpl = loadTemplate("../templates/http", "selectofparent");
   }
 }

@@ -19,6 +19,7 @@ public class EntityGenerator extends Generator {
   private String namedSelectByPkTmpl;
   private String namedSelectUniqueTmpl;
   private String namedSelectOfParentTmpl;
+  private String namedSelectJoinedTmpl;
   private String namedDeleteJoinedTmpl;
   private String storedProcedureParameterTmpl;
 
@@ -162,10 +163,10 @@ public class EntityGenerator extends Generator {
   private String generateNamedSelectJoined(Table t) {
     StringBuilder b = new StringBuilder();
     int index = t.getIsLooped() ? 0 : 1;
-    b.append(namedSelectOfParentTmpl
+    b.append(namedSelectJoinedTmpl
       .replace("{parenttablenamepascal}", t.getParentTables().get(0).getPascalName())
       .replace("{parentprimarykey}", t.getParentTables().get(0).getPrimaryColumn().getName())
-      .replace("{childtablenamepascal}", t.getParentTables().get(0).getPascalName())
+      .replace("{secondarytablenamepascal}", t.getParentTables().get(index).getPascalName())
       .replace("{tablenamepascal}", t.getPascalName()));
     return b.toString();
   }
@@ -255,6 +256,7 @@ public class EntityGenerator extends Generator {
     namedSelectByPkTmpl = loadTemplate("../templates/entity", "namedselectpk");
     namedSelectUniqueTmpl = loadTemplate("../templates/entity", "namedselectunique");
     namedSelectOfParentTmpl = loadTemplate("../templates/entity", "namedselectofparent");
+    namedSelectJoinedTmpl = loadTemplate("../templates/entity", "namedselectjoined");
     namedDeleteJoinedTmpl = loadTemplate("../templates/entity", "nameddeletejoined");
     storedProcedureParameterTmpl = loadTemplate("../templates/entity", "storedprocedureparamter");
     primaryFieldTmpl = loadTemplate("../templates/entity", "primaryfield");
