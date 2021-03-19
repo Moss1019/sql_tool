@@ -18,6 +18,7 @@ public class SqlGenerator extends Generator {
   private String selectJoinedTmpl;
   private String selectOfParentTmpl;
   private String insertTmpl;
+  private String insertLoopedJoinedTmpl;
   private String updateTmpl;
 
   private String inparamTmpl;
@@ -43,10 +44,11 @@ public class SqlGenerator extends Generator {
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
       b
-      .append(generateCreateTable(t))
-      .append(generateInsert(t));
+      .append(generateCreateTable(t));
       if(currentLoopedOrJoined) {
-        b.append(generateDeleteJoined(t));
+        b
+        .append(generateDeleteJoined(t))
+        .append(generateInsertLoopedJoined(t));
         if(t.getIsLooped()) {
           b.append(generateSelectLooped(t));
         } else {
@@ -54,6 +56,7 @@ public class SqlGenerator extends Generator {
         }
       } else {
         b
+        .append(generateInsert(t))
         .append(generateSelectAll(t))
         .append(generateSelectByPk(t))
         .append(generatorSelectByUnique(t))
@@ -152,6 +155,7 @@ public class SqlGenerator extends Generator {
   }
 
   private String generateSelectLooped(Table t) {
+    procedures.add(String.format("sp_select%ssOf%s", t.getPascalName(), t.getParentTables().get(0).getPascalName()));
     return selectLoopedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{loopedtablenamepascal}", t.getParentTables().get(0).getPascalName())
@@ -162,13 +166,15 @@ public class SqlGenerator extends Generator {
   }
 
   private String generateSelectJoined(Table t) {
+    procedures.add(String.format("sp_select%ssOf%s", t.getPascalName(), t.getParentTables().get(0).getPascalName()));
     return selectJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
-      .replace("{primarycolumnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
-      .replace("{secondarytablename}", t.getParentTables().get(1).getName())
-      .replace("{secondarycolumnname}", t.getParentTables().get(1).getPrimaryColumn().getName())
+      .replace("{secondarycolumnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
+      .replace("{primarytablename}", t.getParentTables().get(1).getName())
+      .replace("{primarycolumnname}", t.getParentTables().get(1).getPrimaryColumn().getName())
       .replace("{tablename}", t.getName());
+      
   }
 
   private String generateSelectOfParents(Table t) {
@@ -180,7 +186,7 @@ public class SqlGenerator extends Generator {
         .replace("{parenttablenamepascal}", pt.getPascalName())
         .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
         .replace("{childtablename}", t.getName()));
-      procedures.add(String.format("sp_selectOf%s", pt.getPascalName()));
+      procedures.add(String.format("sp_select%ssOf%s", t.getPascalName(), pt.getPascalName()));
     }
     return b.toString();
   }
@@ -217,6 +223,34 @@ public class SqlGenerator extends Generator {
       .replace("{setlist}", setList.toString())
       .replace("{primarykey}", t.getPrimaryColumn().getName()));
     procedures.add(String.format("sp_update%s", t.getPascalName()));
+    return b.toString();
+  }
+
+  private String generateInsertLoopedJoined(Table t) {
+    StringBuilder paramList = new StringBuilder();
+    StringBuilder colNames = new StringBuilder();
+    int colIndex = 0;
+    for(Column c: t.getNonPrimaryColumns()) {
+      paramList
+        .append(inparamTmpl
+          .replace("{columnname}", c.getName())
+          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      colNames.append(c.getName());
+      if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
+        paramList.append(", ");
+        colNames.append(", ");
+      }
+    }
+    StringBuilder b = new StringBuilder();
+    b
+    .append(insertLoopedJoinedTmpl
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{paramlist}", paramList.toString())
+      .replace("{tablename}", t.getName())
+      .replace("{colnames}", colNames.toString())
+      .replace("{primarykey}", t.getPrimaryColumn().getName())
+      .replace("{secondarykey}", t.getJoinedColumn().getName()));
+    procedures.add(String.format("sp_insert%s", t.getPascalName()));
     return b.toString();
   }
 
@@ -291,6 +325,7 @@ public class SqlGenerator extends Generator {
     selectJoinedTmpl = loadTemplate("../templates/sql", "selectofjoined");
     selectOfParentTmpl = loadTemplate("../templates/sql", "selectofparent");
     insertTmpl = loadTemplate("../templates/sql", "insert");
+    insertLoopedJoinedTmpl = loadTemplate("../templates/sql", "insertloopedjoined");
     updateTmpl = loadTemplate("../templates/sql", "update");
     inparamTmpl = loadTemplate("../templates/sql", "inparam");
     fieldTmpl = loadTemplate("../templates/sql", "field");

@@ -1,8 +1,10 @@
-	@RequestMapping(value = "for{parenttablenamepascal}/{{primarycolumnnamecamel}}", method = RequestMethod.GET)
-	public ResponseEntity<?> getOf{parenttablenamepascal}(@PathVariable int {primarycolumnnamecamel}) { 
-		List<{tablenamepascal}View> result = service.selectOf{parenttablenamepascal}({primarycolumnnamecamel});
-		if (result.size() == 0) {
-			return ResponseEntity.status(404).body("No results for {parenttablenamepascal}");
-		}
-		return ResponseEntity.ok(result);
-	}
+export function get{childtablepascal}sFor{tablenamepascal}({colnamecamel}, onSuccess, onError) {
+	const url = `${SERVER_END_POINT}/api/{childtablelower}s/for{tablenamepascal}/${{colnamecamel}}`;
+	return axios.get(url)
+		.then(result => {
+			onSuccess(result);
+		})
+		.catch(err => {
+			onError(err);
+		});
+};

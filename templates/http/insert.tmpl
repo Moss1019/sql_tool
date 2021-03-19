@@ -1,0 +1,10 @@
+export function post{tablenamepascal}({tablenamecamel}: any, onSuccess: (data: any) => void, onError: (err: any) => void) {
+	const url = `${SERVER_END_POINT}/api/{tablenamelower}s`;
+	axios.post(url, {tablenamecamel})
+		.then(result => {
+			onSuccess(result);
+		})
+		.catch(err => {
+			onError(err);
+		});
+};

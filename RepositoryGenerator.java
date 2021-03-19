@@ -25,8 +25,6 @@ public class RepositoryGenerator extends Generator {
     Map<String, String> repositories = new HashMap<>();
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
-      System.out.println(t.getName());
-      System.out.println(currentLoopedOrJoined);
       repositories.put(String.format("%sRepository", t.getPascalName()), classTmpl
         .replace("{modelimports}", generateImports(t))
         .replace("{methods}", generateMethods(t))
@@ -185,8 +183,8 @@ public class RepositoryGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{key1name}", t.getPrimaryColumn().getName())
       .replace("{key2name}", t.getJoinedColumn().getName())
-      .replace("{key1namecamel}", t.getPrimaryColumn().getName())
-      .replace("{key2namecamel}", t.getJoinedColumn().getName()));
+      .replace("{key1namecamel}", t.getPrimaryColumn().getCamelName())
+      .replace("{key2namecamel}", t.getJoinedColumn().getCamelName()));
     return b.toString();
   }
 

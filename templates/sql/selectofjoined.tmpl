@@ -1,8 +1,8 @@
 delimiter //
 create procedure sp_select{tablenamepascal}sOf{primarytablenamepascal}
-(in {primarycolumnname} integer)
+(in {primarycolumnname}{primarycolumnname}{primarycolumnname} integer)
 begin
-select * from {secondarytablename} t1 where t1.{secondarycolumnname} in 
-(select {secondarycolumnname} from {tablename} t2.{primarycolumnname} = {primarycolumnname});
+select * from {primarytablename} t1 where t1.{primarycolumnname} in 
+(select {secondarycolumnname} from {tablename} where t2.{primarycolumnname} = {primarycolumnname});
 end //
 delimiter ;

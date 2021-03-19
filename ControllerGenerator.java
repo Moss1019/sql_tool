@@ -85,7 +85,9 @@ public class ControllerGenerator extends Generator {
   }
 
   private String generateDeleteJoined(Table t) {
-    return deleteJoinedTmpl;
+    return deleteJoinedTmpl
+      .replace("{pk1namecamel}", t.getPrimaryColumn().getCamelName())
+      .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName());
   }
 
   private String generateInsert(Table t) {

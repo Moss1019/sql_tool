@@ -161,10 +161,11 @@ public class EntityGenerator extends Generator {
 
   private String generateNamedSelectJoined(Table t) {
     StringBuilder b = new StringBuilder();
+    int index = t.getIsLooped() ? 0 : 1;
     b.append(namedSelectOfParentTmpl
       .replace("{parenttablenamepascal}", t.getParentTables().get(0).getPascalName())
       .replace("{parentprimarykey}", t.getParentTables().get(0).getPrimaryColumn().getName())
-      .replace("{childtablenamepascal}", t.getPascalName())
+      .replace("{childtablenamepascal}", t.getParentTables().get(0).getPascalName())
       .replace("{tablenamepascal}", t.getPascalName()));
     return b.toString();
   }

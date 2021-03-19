@@ -50,4 +50,19 @@ public class DataTypeUtil {
     }
     return "Integer";
   }
+
+  public static String resolveTypeScriptType(String datatype) {
+    if(datatype.equals(intStr)) {
+      return "number";
+    } else if(datatype.equals(stringStr)) {
+      return "string";
+    } else if(datatype.equals(booleanStr)) {
+      return "boolean";
+    } else if(datatype.equals(charStr)) {
+      return "string";
+    } else if(datatype.equals(dateStr)) {
+      return "Date";
+    }
+    return "number";
+  }
 }

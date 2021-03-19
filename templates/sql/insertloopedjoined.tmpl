@@ -1,0 +1,9 @@
+delimiter //
+create procedure sp_insert{tablenamepascal}
+({paramlist})
+begin
+insert into {tablename}({colnames}) values 
+({colnames});
+select * from {tablename} t1 where t1.{primarykey} = {primarykey} and t1.{secondarykey} = {secondarykey};
+end //
+delimiter ;

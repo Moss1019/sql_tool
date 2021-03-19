@@ -99,6 +99,15 @@ public class Definition {
             ControllerGenerator cGen = new ControllerGenerator(db);
             writeFiles(cGen.generate(), "java", "controller");
 
+            ConfigGenerator confGen = new ConfigGenerator(db);
+            writeFiles(confGen.generate(), "java", "");
+
+            TypeScriptGenerator tGen = new TypeScriptGenerator(db);
+            writeFiles(tGen.generate(), "ts", "common");
+
+            HttpGenerator httpGen = new HttpGenerator(db);
+            writeFiles(httpGen.generate(), "ts", "http");
+
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println(ex.getClass().toString());

@@ -185,8 +185,8 @@ public class ServiceGenerator extends Generator {
       StringBuilder childTables = new StringBuilder();
       for(Table ct: t.getNonJoinedTables()) {
         viewLists
-        .append("\n\t\t")
-        .append(viewListUniqueTmpl
+        .append("\n\t\t\t\t")
+        .append(viewListMapTmpl
           .replace("{childtablenamepascal}", ct.getPascalName())
           .replace("{childtablenamecamel}", ct.getCamelName())
           .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
@@ -208,7 +208,7 @@ public class ServiceGenerator extends Generator {
     return selectParentChildren
       .replace("{resulttablenamepascal}", t.getParentTables().get(index).getPascalName())
       .replace("{tablenamespascal}", t.getPascalName())
-      .replace("{pk1namecamel}", t.getPrimaryColumn().getCamelName())
+      .replace("{pk1namecamel}", t.getParentTables().get(index).getPrimaryColumn().getCamelName())
       .replace("{joinednamepascal}", t.getParentTables().get(0).getPascalName());
   }
 

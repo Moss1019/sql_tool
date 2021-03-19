@@ -1,0 +1,10 @@
+export function delete{tablenamepascal}({pk1namecamel}: number, {pk2namecamel}: number, onSuccess: (data: any) => void, onError: (err: any) => void){
+	const url = `${SERVER_END_POINT}/api/{tablenamelower}s/${{pk1namecamel}}/${{pk2namecamel}}`;
+ 	axios.delete(url)
+		.then(result => {
+			onSuccess(result);
+		})
+		.catch(err => {
+			onError(err);
+		});
+};
