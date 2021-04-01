@@ -79,7 +79,6 @@ public class EntityGenerator extends Generator {
       .append(generateNamedUpdate(t))
       .append(generateNamedSelectOfParent(t));
     }
-    
     return b.toString();
   }
 
@@ -192,6 +191,7 @@ public class EntityGenerator extends Generator {
   private String generatePrimaryField(Table t) {
     StringBuilder b = new StringBuilder();
     b.append(primaryFieldTmpl
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
       .replace("{columnname}", t.getPrimaryColumn().getName())
       .replace("{columnnamecamel}", t.getPrimaryColumn().getCamelName()));
     return  b.toString();

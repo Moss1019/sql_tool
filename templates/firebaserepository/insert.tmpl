@@ -1,0 +1,7 @@
+  public {tablenamepascal} insert({tablenamepascal} {tablenamecamel}) {{setprimarykey}
+    FirestoreObj<{tablenamepascal}> obj = FirestoreObj.makeNew({tablenamecamel});
+    objects.put({setmapkey}, obj);
+    sync();
+    return {tablenamecamel};
+  }
+

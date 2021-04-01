@@ -54,13 +54,13 @@ public class RepositoryGenerator extends Generator {
     .append("\n");
     if(currentLoopedOrJoined) {
       b
-      .append(generateDeleteJoined(t))
-      .append(generateSelectJoined(t));
+      .append(generateSelectJoined(t))
+      .append(generateDeleteJoined(t));
     } else {
       b
-      .append(generateDelete(t))
       .append(generateSelectOne(t))
       .append(generateSelectList(t))
+      .append(generateDelete(t))
       .append(generateUpdate(t));
     }
     return b.toString();
@@ -73,7 +73,7 @@ public class RepositoryGenerator extends Generator {
       .replace("{methodname}", "select")
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{methodsuffix}", t.getPascalName())
-      .replace("{javatype}", "int")
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
       .replace("{columnname}", t.getPrimaryColumn().getName()))
     .append("\n");
     for(Column c: t.getUniqueColumns()) {
@@ -133,11 +133,15 @@ public class RepositoryGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     StringBuilder parameters = new StringBuilder();
     int colIndex = 0;
-    for(Column c: t.getNonPrimaryColumns()) {
+    for(Column c: t.getColumns()) {
+      if(c.getIsAutoIncrement()) {
+        ++colIndex;
+        continue;
+      }
       parameters.append(setParamTmpl
         .replace("{columnname}", c.getName())
         .replace("{columnnamepascal}", c.getPascalName()));
-      if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
+      if(colIndex++ < t.getColumns().size() - 1) {
         parameters.append("\n\t\t");
       }
     }
@@ -171,18 +175,25 @@ public class RepositoryGenerator extends Generator {
 
   private String generateDelete(Table t) {
     StringBuilder b = new StringBuilder();
-    b.append(deleteTmpl
+    b
+    .append("\n")
+    .append(deleteTmpl
       .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{primarykeyname}", t.getPrimaryColumn().getName()));
+      .replace("{primarykeyname}", t.getPrimaryColumn().getName())
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType())));
     return b.toString();
   }
 
   private String generateDeleteJoined(Table t) {
     StringBuilder b = new StringBuilder();
-    b.append(deleteJoinedTmpl
+    b
+    .append("\n")
+    .append(deleteJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{key1name}", t.getPrimaryColumn().getName())
       .replace("{key2name}", t.getJoinedColumn().getName())
+      .replace("{key1javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .replace("{key2javatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType()))
       .replace("{key1namecamel}", t.getPrimaryColumn().getCamelName())
       .replace("{key2namecamel}", t.getJoinedColumn().getCamelName()));
     return b.toString();

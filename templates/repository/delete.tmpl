@@ -1,4 +1,4 @@
-	public boolean delete(int value) {
+	public boolean delete({javatype} value) {
 		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("delete{tablenamepascal}");
 		q.setParameter("{primarykeyname}", value);
 		try {

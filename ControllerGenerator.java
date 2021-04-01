@@ -81,12 +81,16 @@ public class ControllerGenerator extends Generator {
   }
 
   private String generateDelete(Table t) {
-    return deleteTmpl.replace("{tablenamepascal}", t.getPascalName());
+    return deleteTmpl
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .replace("{tablenamepascal}", t.getPascalName());
   }
 
   private String generateDeleteJoined(Table t) {
     return deleteJoinedTmpl
+      .replace("{key1javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
       .replace("{pk1namecamel}", t.getPrimaryColumn().getCamelName())
+      .replace("{key2javatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType()))
       .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName());
   }
 
@@ -95,7 +99,9 @@ public class ControllerGenerator extends Generator {
   }
 
   private String generateSelect(Table t) {
-    return selectTmpl.replace("{tablenamepascal}", t.getPascalName());
+    return selectTmpl
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .replace("{tablenamepascal}", t.getPascalName());
   }
 
   private String generateSelectAll(Table t) {
@@ -110,6 +116,7 @@ public class ControllerGenerator extends Generator {
       b
       .append(selectOfParentTmpl
         .replace("{parenttablenamepascal}", pt.getPascalName())
+        .replace("{primarycolumnjavatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
         .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getLowerName())
         .replace("{tablenamepascal}", t.getPascalName()))
       .append("\n");
@@ -121,6 +128,7 @@ public class ControllerGenerator extends Generator {
     int index = t.getIsLooped() ? 0 : 1;
     return selectJoinedTmpl
       .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
+      .replace("{primarycolumnjavatype}", DataTypeUtil.resolvePrimitiveType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
       .replace("{primarycolumnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{resulttablenamepascal}", t.getParentTables().get(index).getPascalName());

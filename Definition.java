@@ -87,8 +87,8 @@ public class Definition {
             ViewGenerator vGen = new ViewGenerator(db);
             writeFiles(vGen.generate(), "java", "view");
 
-            RepositoryGenerator rGen = new RepositoryGenerator(db);
-            writeFiles(rGen.generate(), "java", "repository");
+            // RepositoryGenerator rGen = new RepositoryGenerator(db);
+            // writeFiles(rGen.generate(), "java", "repository");
 
             ServiceGenerator sGen = new ServiceGenerator(db);
             writeFiles(sGen.generate(), "java", "service");
@@ -107,6 +107,9 @@ public class Definition {
 
             HttpGenerator httpGen = new HttpGenerator(db);
             writeFiles(httpGen.generate(), "ts", "http");
+
+            FirebaseRepositoryGenerator fireGen = new FirebaseRepositoryGenerator(db);
+            writeFiles(fireGen.generate(), "java", "repository");
 
         } catch (Exception ex) {
             System.out.println(ex);

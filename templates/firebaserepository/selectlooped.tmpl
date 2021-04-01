@@ -1,0 +1,15 @@
+  public List<{primarytablepascal}> selectCollaboratorsOf{primarytablepascal}({primarycoljavatype} {primarycolcamel}) {
+    List<{primarycoljavatype}> {tablenamecamel}Ids = objects
+        .values()
+        .stream()
+        .filter(x -> !x.isDeleted() && x.getObj().getPrimary().equals({primarycolcamel}))
+        .map(x -> x.getObj().getSecondary())
+        .collect(Collectors.toList());
+    return userRepo
+        .selectAll{primarytablepascal}()
+        .stream()
+        .filter(x -> {tablenamecamel}Ids.contains(x.getPrimary()))
+        .map(x -> x)
+        .collect(Collectors.toList());
+  }
+

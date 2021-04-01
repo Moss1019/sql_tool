@@ -1,6 +1,6 @@
 delimiter //
 create procedure sp_select{tablenamepascal}sOf{primarytablenamepascal}
-(in {secondarycolumnname} integer)
+(in {secondarycolumnname} {secondarysqltype})
 begin
 select * from {primarytablename} t1 where t1.{primarycolumnname} in 
 (select {primarycolumnname} from {tablename} t2 where t2.{secondarycolumnname} = {secondarycolumnname});

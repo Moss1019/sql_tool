@@ -1,6 +1,6 @@
 delimiter //
 create procedure sp_select{tablenamepascal}
-(in {primarykey} integer)
+(in {primarykey} {sqltype})
 begin
 select * from {tablename} t1 where t1.{primarykey} = {primarykey};
 end //

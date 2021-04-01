@@ -5,6 +5,7 @@ public class DataTypeUtil {
   private static String booleanStr = "boolean";
   private static String charStr = "char";
   private static String dateStr = "date";
+  private static String guidStr = "guid";
 
   public static String resolveSqlType(String datatype) {
     if(datatype.equals(intStr)) {
@@ -17,6 +18,8 @@ public class DataTypeUtil {
       return "char(1)";
     } else if (datatype.equals(dateStr)) {
       return "datetime";
+    } else if (datatype.equals(guidStr)) {
+      return "char(36)";
     }
     return "integer";
   }
@@ -32,6 +35,8 @@ public class DataTypeUtil {
       return "char";
     } else if (datatype.equals(dateStr)) {
       return "Date";
+    } else if (datatype.equals(guidStr)) {
+      return "UUID";
     }
     return "int";
   }
@@ -47,6 +52,8 @@ public class DataTypeUtil {
       return "Character";
     } else if (datatype.equals(dateStr)) {
       return "Date";
+    } else if(datatype.equals(guidStr)) {
+      return "UUID";
     }
     return "Integer";
   }
@@ -62,7 +69,40 @@ public class DataTypeUtil {
       return "string";
     } else if(datatype.equals(dateStr)) {
       return "Date";
+    } else if(datatype.equals(guidStr)) {
+      return "string";
     }
     return "number";
+  }
+
+  public static String resolvePrimaryDefault(String datatype) {
+    if(datatype.equals(guidStr)) {
+      return "UUID.randomUUID()";
+    }
+    return "-1";
+  }
+
+  public static String getMapPrimaryKey(Table t) {
+    if(t.getIsLooped() || t.getIsJoined()) {
+      return "UUID.randomUUID()";
+    }
+    return String.format("%s.getPrimary()", t.getCamelName());
+  }
+
+  public static String getObjPrimaryKey(Table t) {
+    if(t.getIsJoined() || t.getIsJoined()) {
+      return "";
+    }
+    return String.format("\n\t\t%s.set%s(%s);",
+      t.getCamelName(),
+      t.getPrimaryColumn().getPascalName(),
+      resolvePrimaryDefault(t.getPrimaryColumn().getDataType()));
+  }
+
+  public static String resolveNewPrimaryKey(Column col) {
+    if(col.getDataType().equals(guidStr)) {
+      return col.getCamelName();
+    }
+    return "last_insert_id()";
   }
 }

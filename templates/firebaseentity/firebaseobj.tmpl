@@ -1,0 +1,54 @@
+package {packagename}.util;
+
+public class FirestoreObj<T> {
+  private boolean isUpdated;
+  private boolean isDeleted;
+  private boolean isNew;
+
+  private T obj;
+
+  public FirestoreObj(T obj) {
+    this.obj = obj;
+    isUpdated = false;
+    isDeleted = false;
+    isNew = false;
+  }
+
+  public T getObj() {
+    return obj;
+  }
+
+  public void setObj(T obj) {
+    this.obj = obj;
+  }
+
+  public boolean isUpdated() {
+    return isUpdated;
+  }
+
+  public void setUpdated(boolean updated) {
+    isUpdated = updated;
+  }
+
+  public boolean isDeleted() {
+    return isDeleted;
+  }
+
+  public void setDeleted(boolean deleted) {
+    isDeleted = deleted;
+  }
+
+  public boolean isNew() {
+    return isNew;
+  }
+
+  public void setNew(boolean aNew) {
+    isNew = aNew;
+  }
+
+  public static <T> FirestoreObj<T> makeNew(T obj) {
+    FirestoreObj<T> newObj = new FirestoreObj<T>(obj);
+    newObj.isNew = true;
+    return newObj;
+  }
+}

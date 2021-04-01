@@ -1,4 +1,4 @@
-  public boolean delete(int {key1namecamel}, int {key2namecamel}) { 
+  public boolean delete({key1javatype} {key1namecamel}, {key2javatype} {key2namecamel}) { 
 		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("delete{tablenamepascal}");
 		q.setParameter("{key1name}", {key1namecamel});
 		q.setParameter("{key2name}", {key2namecamel});

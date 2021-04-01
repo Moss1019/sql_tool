@@ -1,0 +1,11 @@
+  public {tablenamepascal} selectBy{colnamepascal}({coljavatype} value) {
+    sync();
+    Optional<{tablenamepascal}> obj = objects
+        .values()
+        .stream()
+        .filter(x -> !x.isDeleted() && x.getObj().get{colnamepascal}().equals(value))
+        .map(x -> x.getObj())
+        .findFirst();
+    return obj.orElse(null);
+  }
+

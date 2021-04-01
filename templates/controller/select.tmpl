@@ -1,5 +1,5 @@
 	@RequestMapping(value = "{value}", method = RequestMethod.GET)
-	public ResponseEntity<?> getByPk(@PathVariable int value) {
+	public ResponseEntity<?> getByPk(@PathVariable {javatype} value) {
 		{tablenamepascal}View result = service.selectByPk(value);
 		if (result == null) {
 			return ResponseEntity.status(404).body("Could not find {tablenamepascal} with id " + value);

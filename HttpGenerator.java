@@ -50,7 +50,7 @@ public class HttpGenerator extends Generator {
         .append("\n")
         .append(generateUpdate(t));
       };
-      http.put(t.getPascalName(), b.toString());
+      http.put(t.getLowerName(), b.toString());
     }
     return http;
   }

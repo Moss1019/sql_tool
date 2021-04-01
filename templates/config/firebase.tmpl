@@ -1,0 +1,9 @@
+	private static void setupFirebase() throws Exception {
+		FileInputStream credsStream = new FileInputStream("{pathtocredentials}");
+		GoogleCredentials creds = GoogleCredentials.fromStream(credsStream);
+		FirebaseOptions options = FirebaseOptions.builder()
+				.setCredentials(creds)
+				.setDatabaseUrl("{databaseurl}")
+				.build();
+		FirebaseApp.initializeApp(options);
+	}

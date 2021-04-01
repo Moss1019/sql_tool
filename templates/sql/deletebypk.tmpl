@@ -1,5 +1,5 @@
 delimiter //
-create procedure sp_delete{tablenamepascal}(in {primarykey} integer)
+create procedure sp_delete{tablenamepascal}(in {primarykey} {sqltype})
 begin
 delete from {tablename} t1 where t1.{primarykey} = {primarykey};
 end //

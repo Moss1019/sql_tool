@@ -1,8 +1,0 @@
-delimiter //
-create procedure sp_select{tablenamepascal}sOf{loopedtablenamepascal}
-(in {loopedcolumnname} integer)
-begin
-select * from {loopedtablename} t1 where t1.{loopedcolumnname} in
-(select {primarycolumnname} from {tablename} t2 where t2.{loopedcolumnname} = {loopedcolumnname});
-end //
-delimiter ;

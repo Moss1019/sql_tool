@@ -11,6 +11,8 @@ public class ServiceGenerator extends Generator {
   private String classTmpl;
   private String deleteTmpl;
   private String deleteJoinedTmpl;
+  private String deleteChildTmpl;
+  private String deleteJoinedChildTmpl;
   private String insertTmpl;
   private String selectTmpl;
   private String selectAllTmpl;
@@ -21,6 +23,8 @@ public class ServiceGenerator extends Generator {
   private String viewListTmpl;
   private String viewListMapTmpl;
   private String viewListUniqueTmpl;
+  private String insertSetKeyTmpl;
+  private String insertSetKeyRandomUUIDTmpl;
   private String importTmpl;
 
   public ServiceGenerator(Database db) {
@@ -45,7 +49,7 @@ public class ServiceGenerator extends Generator {
 
   private String generateServiceDeps(Table t) {
     StringBuilder b = new StringBuilder();
-    for(Table ct: t.getNonJoinedTables()) {
+    for(Table ct: t.getChildTables()) {
       b.append(depServiceTmpl
           .replace("{tablenamepascal}", ct.getPascalName())
           .replace("{tablenamecamel}", ct.getCamelName()));
@@ -55,7 +59,7 @@ public class ServiceGenerator extends Generator {
 
   private String generateImports(Table t) {
     StringBuilder b = new StringBuilder();
-    List<Table> tables = currentLoopedOrJoined ? t.getParentTables() : t.getNonJoinedTables();
+    List<Table> tables = currentLoopedOrJoined ? t.getParentTables() : t.getChildTables();
     for(Table st: tables) {
       b
       .append(importTmpl
@@ -99,18 +103,43 @@ public class ServiceGenerator extends Generator {
   }
 
   private String generateDelete(Table t) {
-    return deleteTmpl;
+    StringBuilder b = new StringBuilder();
+    for(Table ct: t.getChildTables()) {
+      b
+      .append("\n");
+      if(ct.getIsJoined() || ct.getIsLooped()) {
+        b
+        .append(deleteJoinedChildTmpl
+          .replace("{tablenamepascal}", t.getPascalName())
+          .replace("{childtablecamel}", ct.getCamelName())
+          .replace("{childtablepascal}", ct.getPascalName())
+          .replace("{primarypascal}", t.getPrimaryColumn().getPascalName())
+          .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
+      } else {
+        b
+        .append(deleteChildTmpl
+          .replace("{childnamepascal}", ct.getPascalName())
+          .replace("{childnamecamel}", ct.getCamelName())
+          .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
+      }
+    }
+    return deleteTmpl
+      .replace("{deletechildren}", b.toString())
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()));
   }
 
   private String generateDeleteJoined(Table t) {
     return deleteJoinedTmpl
       .replace("{pk1namecamel}", t.getPrimaryColumn().getCamelName())
-      .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName());
+      .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName())
+      .replace("{key1javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .replace("{key2javatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType()));
   }
 
   private String generateInsert(Table t) {
     return insertTmpl
-      .replace("{tablenamepascal}", t.getPascalName());
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{primarycolpascal}", t.getPrimaryColumn().getPascalName());
   }
 
   private String generateSelectByPk(Table t) {
@@ -127,6 +156,7 @@ public class ServiceGenerator extends Generator {
     }
     return selectTmpl
       .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
       .replace("{viewlists}", viewLists)
       .replace("{childtables}", childTables.toString());
   }
@@ -194,6 +224,7 @@ public class ServiceGenerator extends Generator {
       }
       b.append(selectOfTmpl
         .replace("{tablenamepascal}", t.getPascalName())
+        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
         .replace("{joinednamepascal}", pt.getPascalName())
         .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getCamelName())
         .replace("{joinednamepascal}", pt.getPascalName())
@@ -223,6 +254,8 @@ public class ServiceGenerator extends Generator {
       classTmpl = loadTemplate("../templates/service", "class");
       deleteTmpl = loadTemplate("../templates/service", "delete");
       deleteJoinedTmpl = loadTemplate("../templates/service", "deletejoined");
+      deleteChildTmpl = loadTemplate("../templates/service", "deletechild");
+      deleteJoinedChildTmpl = loadTemplate("../templates/service", "deletejoinedchild");
       insertTmpl = loadTemplate("../templates/service", "insert");
       selectTmpl = loadTemplate("../templates/service", "select");
       selectAllTmpl = loadTemplate("../templates/service", "selectall");

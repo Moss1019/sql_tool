@@ -24,6 +24,7 @@ DATA_TYPE
     | 'string'
     | 'char'
     | 'date'
+    | 'guid'
     ;
 
 NAME: [a-zA-Z0-9_]+;

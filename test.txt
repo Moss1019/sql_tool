@@ -5,13 +5,14 @@ user {
 }
 
 item {
-  item_id int primary auto_increment
+  item_id guid primary
   user_id int foreign
 }
 
 milestone {
   milestone_id int primary auto_increment
-  item_id int foreign
+  title string
+  item_id guid foreign
 }
 
 collaborator {
@@ -21,7 +22,7 @@ collaborator {
 }
 
 item_collaborator {
-  item_id int foreign
+  item_id guid foreign
   user_id int foreign
   joined
 }
