@@ -1,4 +1,4 @@
-	public List<{resulttablenamepascal}View> select{tablenamespascal}s(int {pk1namecamel}) {
+	public List<{resulttablenamepascal}View> select{tablenamespascal}s({pk1javatype} {pk1namecamel}) {
 		List<{resulttablenamepascal}> dbResult = repo.select{tablenamespascal}sOf{joinednamepascal}({pk1namecamel});
 		List<{resulttablenamepascal}View> result = dbResult.stream()
 			.map(x -> {

@@ -7,6 +7,14 @@ public class DataTypeUtil {
   private static String dateStr = "date";
   private static String guidStr = "guid";
 
+  private static String extractGuidTmpl = "UUID.fromString(values.get(\"%s\").toString())";
+  private static String extractStrTmpl = "values.get(\"%s\").toString()";
+  private static String extractIntTmpl = "Integer.parseInt(values.get(\"%s\").toString())";
+
+  private static String insertGuidTmpl = "%s.toString()";
+  private static String insertStrTmpl = "%s";
+  private static String insertIntTmpl = "%s";
+
   public static String resolveSqlType(String datatype) {
     if(datatype.equals(intStr)) {
       return "integer";
@@ -104,5 +112,31 @@ public class DataTypeUtil {
       return col.getCamelName();
     }
     return "last_insert_id()";
+  }
+
+  public static String getExtractLine(Column c) {
+    String d = c.getDataType();
+    String template;
+    if(d.equals(guidStr)) {
+      template = extractGuidTmpl;
+    } else if (d.equals(intStr)) {
+      template = extractIntTmpl;
+    } else {
+      template = extractStrTmpl;
+    }
+    return String.format(template, c.getCamelName());
+  }
+
+  public static String getInsertLine(Column c) {
+    String d = c.getDataType();
+    String template;
+    if(d.equals(guidStr)) {
+      template = insertGuidTmpl;
+    } else if (d.equals(intStr)) {
+      template = insertIntTmpl;
+    } else {
+      template = insertStrTmpl;
+    }
+    return String.format(template, c.getCamelName());
   }
 }

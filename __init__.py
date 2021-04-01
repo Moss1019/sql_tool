@@ -1,6 +1,11 @@
 
 from antlr_setup import download_antlr_jar, run_antlr, compile_java, run_java
 
+default_antlr_file = 'Definition'
+default_file_name = 'test.txt'
+default_package_name = 'com.example'
+default_db_user = 'default_user'
+
 def get_choice():
     print('Select an option to run')
     print('0. exit')
@@ -27,7 +32,7 @@ while is_running:
     elif choice == 2:
         antlr_file = input('enter the name of the file containing the grammar\n => ')
         if len(antlr_file) == 0:
-            antlr_file = "Definition"
+            antlr_file = default_antlr_file
         print('running antlr...')
         run_antlr(antlr_file)
     elif choice == 3:
@@ -36,13 +41,13 @@ while is_running:
     elif choice == 4:
         file_name = input('enter the name of the file containing the definition\n => ')
         if len(file_name) == 0:
-            file_name = 'test.txt'
+            file_name = default_file_name
         package_name = input('enter the root package name\n => ')
         if len(package_name) == 0:
-            package_name = 'com.example'
+            package_name = default_package_name
         db_user = input('enter the app database user name\n => ')
         if len(db_user) == 0:
-            db_user = 'default_user'
+            db_user = default_db_user
         print('running java language app...')
         run_java(file_name, package_name, db_user)
     else:

@@ -239,6 +239,7 @@ public class ServiceGenerator extends Generator {
     return selectParentChildren
       .replace("{resulttablenamepascal}", t.getParentTables().get(index).getPascalName())
       .replace("{tablenamespascal}", t.getPascalName())
+      .replace("{pk1javatype}", DataTypeUtil.resolvePrimitiveType(t.getParentTables().get(index).getPrimaryColumn().getDataType()))
       .replace("{pk1namecamel}", t.getParentTables().get(index).getPrimaryColumn().getCamelName())
       .replace("{joinednamepascal}", t.getParentTables().get(0).getPascalName());
   }

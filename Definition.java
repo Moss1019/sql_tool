@@ -81,8 +81,8 @@ public class Definition {
             SqlGenerator sqlGen = new SqlGenerator(db);
             writeFiles(sqlGen.generate(), "sql", "");
 
-            EntityGenerator eGen = new EntityGenerator(db);
-            writeFiles(eGen.generate(), "java", "entity");
+            // EntityGenerator eGen = new EntityGenerator(db);
+            // writeFiles(eGen.generate(), "java", "entity");
 
             ViewGenerator vGen = new ViewGenerator(db);
             writeFiles(vGen.generate(), "java", "view");
@@ -110,6 +110,12 @@ public class Definition {
 
             FirebaseRepositoryGenerator fireGen = new FirebaseRepositoryGenerator(db);
             writeFiles(fireGen.generate(), "java", "repository");
+
+            FirebaseEntityGenerator fireEGen = new FirebaseEntityGenerator(db);
+            writeFiles(fireEGen.generate(), "java", "entity");
+
+            FirebaseUtilGenerator fireUGen = new FirebaseUtilGenerator(db);
+            writeFiles(fireUGen.generate(), "java", "util");
 
         } catch (Exception ex) {
             System.out.println(ex);

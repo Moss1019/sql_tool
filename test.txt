@@ -1,6 +1,6 @@
 
 user {
-  user_id int primary auto_increment
+  user_id guid primary 
   email string unique
 }
 
@@ -10,19 +10,19 @@ item {
 }
 
 milestone {
-  milestone_id int primary auto_increment
+  milestone_id guid primary 
   title string
   item_id guid foreign
 }
 
 collaborator {
-  collaborator_id int foreign(user_id)
-  user_id int foreign(user_id)
+  collaborator_id guid foreign(user_id)
+  user_id guid foreign(user_id)
   looped
 }
 
 item_collaborator {
   item_id guid foreign
-  user_id int foreign
+  user_id guid foreign
   joined
 }
