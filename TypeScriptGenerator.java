@@ -22,7 +22,7 @@ public class TypeScriptGenerator extends Generator {
       types.put(t.getPascalName(), generateType(t));
       b
       .append(exportTmpl
-        .replace("{tablenamepascal}", t.getPascalName()))
+      .replace("{tablenamepascal}", t.getPascalName()))
       .append("\n");
     }
     types.put("index", b.toString());
@@ -36,11 +36,11 @@ public class TypeScriptGenerator extends Generator {
       b
       .append("\t")
       .append(propertyTmpl
-        .replace("{colnamecamel}", c.getCamelName())
-        .replace("{typescripttype}", DataTypeUtil.resolveTypeScriptType(c.getDataType())));
+      .replace("{colnamecamel}", c.getCamelName())
+      .replace("{typescripttype}", DataTypeUtil.resolveTypeScriptType(c.getDataType())));
       if(colIndex++ < t.getColumns().size() - 1) {
-        b
-        .append("\n");
+      b
+      .append("\n");
       }
     }
     int tabIndex = 0;
@@ -48,8 +48,8 @@ public class TypeScriptGenerator extends Generator {
       b
       .append("\n\t")
       .append(propertyTmpl
-        .replace("{colnamecamel}", ch.getCamelName() + "s")
-        .replace("{typescripttype}", ch.getPascalName() + "[]"));
+      .replace("{colnamecamel}", ch.getCamelName() + "s")
+      .replace("{typescripttype}", ch.getPascalName() + "[]"));
     }
     return interfaceTmpl
       .replace("{tablenamepascal}", t.getPascalName())

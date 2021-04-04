@@ -1,0 +1,17 @@
+package {packagename}.entity;
+
+import {packagename}.util.RepoObj;
+
+import java.util.UUID;
+
+public class {tablename} implements RepoObj {
+{fields}
+
+{getters}
+{setters}
+
+  @Override
+  public UUID getPrimary() {
+    return itemId;
+  }
+}

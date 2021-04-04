@@ -34,13 +34,13 @@ public class Column {
     pascalName = String.join("", Arrays.asList(name.split("_"))
       .stream()
       .map(p -> {
-        return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
+      return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
       })
       .collect(Collectors.toList()));
     camelName = String.join("", Arrays.asList(name.split("_"))
       .stream()
       .map(p -> {
-        return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
+      return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
       })
       .collect(Collectors.toList()));
     camelName = String.format("%c%s", Character.toLowerCase(camelName.charAt(0)), camelName.substring(1));
@@ -107,16 +107,19 @@ public class Column {
         isPrimary = value;
       }
     }
+
     public void setIsAutoIncrement(boolean value) {
       if(!isAutoIncrement && value) {
         isAutoIncrement = value;
       }
     }
+
     public void setIsUnique(boolean value) {
       if(!isUnique && value) {
         isUnique = value;
       }
     }
+
     public void setIsForeign(boolean value) {
       if(!isForeign && value) {
         isForeign = value;

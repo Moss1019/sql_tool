@@ -1,20 +1,20 @@
-  public boolean delete({secondaryjavatype} {secondarycamel}, {primaryjavatype} {primarycamel}) {
-    {javatype} key = objects
-        .keySet()
-        .stream()
-        .filter(x -> objects.get(x).getObj().getPrimary().equals({primarycamel}) &&
-            objects.get(x).getObj().getSecondary().equals({secondarycamel}))
-        .findFirst().orElse(null);
-    if(key == null) {
-      return false;
+  public boolean delete({primaryjavatype} {primarycamel}, {secondaryjavatype} {secondarycamel}) {
+  {javatype} key = objects
+    .keySet()
+    .stream()
+    .filter(x -> objects.get(x).getObj().getPrimary().equals({primarycamel}) &&
+      objects.get(x).getObj().getSecondary().equals({secondarycamel}))
+    .findFirst().orElse(null);
+  if(key == null) {
+    return false;
+  } else {
+    FirestoreObj<Collaborator> obj = objects.get(key);
+    if(obj.isNew()) {
+    objects.remove(key);
     } else {
-      FirestoreObj<Collaborator> obj = objects.get(key);
-      if(obj.isNew()) {
-        objects.remove(key);
-      } else {
-        obj.setDeleted(true);
-      }
-      return true;
+    obj.setDeleted(true);
     }
+    return true;
+  }
   }
 

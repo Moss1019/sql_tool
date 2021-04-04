@@ -83,6 +83,13 @@ public class DataTypeUtil {
     return "number";
   }
 
+  public static String resolveSqlInsertSelectPK(Column col) {
+    if(col.getDataType().equals(guidStr)) {
+      return col.getCamelName();
+    }
+    return "last_insert_id()";
+  }
+
   public static String resolvePrimaryDefault(String datatype) {
     if(datatype.equals(guidStr)) {
       return "UUID.randomUUID()";
@@ -90,15 +97,8 @@ public class DataTypeUtil {
     return "-1";
   }
 
-  public static String getMapPrimaryKey(Table t) {
-    if(t.getIsLooped() || t.getIsJoined()) {
-      return "UUID.randomUUID()";
-    }
-    return String.format("%s.getPrimary()", t.getCamelName());
-  }
-
   public static String getObjPrimaryKey(Table t) {
-    if(t.getIsJoined() || t.getIsJoined()) {
+    if(t.getIsLooped() || t.getIsJoined()) {
       return "";
     }
     return String.format("\n\t\t%s.set%s(%s);",
@@ -107,11 +107,11 @@ public class DataTypeUtil {
       resolvePrimaryDefault(t.getPrimaryColumn().getDataType()));
   }
 
-  public static String resolveNewPrimaryKey(Column col) {
-    if(col.getDataType().equals(guidStr)) {
-      return col.getCamelName();
+  public static String getMapPrimaryKey(Table t) {
+    if(t.getIsLooped() || t.getIsJoined()) {
+      return "UUID.randomUUID()";
     }
-    return "last_insert_id()";
+    return String.format("%s.getPrimary()", t.getCamelName());
   }
 
   public static String getExtractLine(Column c) {

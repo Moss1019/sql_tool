@@ -1,0 +1,9 @@
+  public List<{tablenamepascal}> selectOf{parenttablenamepascal}({parentkeyjavatype} {parentkeynamecamel}) {
+    return collections.get(collectionName)
+        .values()
+        .stream()
+        .map(x -> ({tablenamepascal})x)
+        .filter(x -> x.get{parentkeynamepascal}().equals({parentkeynamecamel}))
+        .collect(Collectors.toList());
+  }
+

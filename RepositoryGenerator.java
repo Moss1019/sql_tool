@@ -17,8 +17,8 @@ public class RepositoryGenerator extends Generator {
   private String deleteJoinedTmpl;
 
   public RepositoryGenerator(Database db) {
-    this.db = db;
-    loadTemplates();
+  this.db = db;
+  loadTemplates();
   }
 
   public Map<String, String> generate() {
@@ -26,10 +26,10 @@ public class RepositoryGenerator extends Generator {
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
       repositories.put(String.format("%sRepository", t.getPascalName()), classTmpl
-        .replace("{modelimports}", generateImports(t))
-        .replace("{methods}", generateMethods(t))
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{packagename}", db.getPackageName()));
+      .replace("{modelimports}", generateImports(t))
+      .replace("{methods}", generateMethods(t))
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{packagename}", db.getPackageName()));
     }
     return repositories;
   }
@@ -79,10 +79,10 @@ public class RepositoryGenerator extends Generator {
     for(Column c: t.getUniqueColumns()) {
       b
       .append(selectOneTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{methodsuffix}", String.format("%ssBy%s", t.getPascalName(), c.getPascalName()))
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-        .replace("{columnname}", c.getName()))
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{methodsuffix}", String.format("%ssBy%s", t.getPascalName(), c.getPascalName()))
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+      .replace("{columnname}", c.getName()))
       .append("\n");
     }
     return b.toString();
@@ -100,14 +100,14 @@ public class RepositoryGenerator extends Generator {
       b
       .append("\n\n")
       .append(selectListTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{methodsuffix}", String.format("%ssOf%s", t.getPascalName(), pt.getPascalName()))
-        .replace("{arguments}", argumentTmpl
-          .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
-          .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName()))  
-        .replace("{setparams}", "\n\t\t" + setParamColTmpl
-          .replace("{columnname}", pt.getPrimaryColumn().getName())
-          .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName())));
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{methodsuffix}", String.format("%ssOf%s", t.getPascalName(), pt.getPascalName()))
+      .replace("{arguments}", argumentTmpl
+        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
+        .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName()))  
+      .replace("{setparams}", "\n\t\t" + setParamColTmpl
+        .replace("{columnname}", pt.getPrimaryColumn().getName())
+        .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName())));
     }
     return b.toString();
   }
@@ -121,11 +121,11 @@ public class RepositoryGenerator extends Generator {
       .replace("{tablenamepascal}", t.getParentTables().get(index).getPascalName())
       .replace("{methodsuffix}", String.format("%ssOf%s", t.getPascalName(), t.getParentTables().get(0).getPascalName()))
       .replace("{arguments}", argumentTmpl
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
-        .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName()))
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
+      .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName()))
       .replace("{setparams}", "\n\t\t" + setParamColTmpl
-        .replace("{columnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
-        .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())));
+      .replace("{columnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
+      .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())));
     return b.toString();
   }
 
@@ -135,14 +135,14 @@ public class RepositoryGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       if(c.getIsAutoIncrement()) {
-        ++colIndex;
-        continue;
+      ++colIndex;
+      continue;
       }
       parameters.append(setParamTmpl
-        .replace("{columnname}", c.getName())
-        .replace("{columnnamepascal}", c.getPascalName()));
+      .replace("{columnname}", c.getName())
+      .replace("{columnnamepascal}", c.getPascalName()));
       if(colIndex++ < t.getColumns().size() - 1) {
-        parameters.append("\n\t\t");
+      parameters.append("\n\t\t");
       }
     }
     b
@@ -158,10 +158,10 @@ public class RepositoryGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       parameters.append(setParamTmpl
-        .replace("{columnname}", c.getName())
-        .replace("{columnnamepascal}", c.getPascalName()));
+      .replace("{columnname}", c.getName())
+      .replace("{columnnamepascal}", c.getPascalName()));
       if(colIndex++ < t.getColumns().size() - 1) {
-        parameters.append("\n\t\t");
+      parameters.append("\n\t\t");
       }
     }
     StringBuilder b = new StringBuilder();

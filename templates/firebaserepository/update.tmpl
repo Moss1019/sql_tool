@@ -1,12 +1,12 @@
   public boolean update({tablenamepascal} value) {
-    FirestoreObj<{tablenamepascal}> obj = objects.get(value.getPrimary());
-    if(obj != null) {
-      obj.setObj(value);
-      obj.setUpdated(true);
-      sync();
-      return true;
-    } else {
-      return false;
-    }
+  FirestoreObj<{tablenamepascal}> obj = objects.get(value.getPrimary());
+  if(obj != null) {
+    obj.setObj(value);
+    obj.setUpdated(true);
+    sync();
+    return true;
+  } else {
+    return false;
+  }
   }
 

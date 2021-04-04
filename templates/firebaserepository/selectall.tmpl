@@ -1,10 +1,10 @@
   public List<{tablenamepascal}> selectAll{tablenamepascal}() {
-    sync();
-    return objects
-        .values()
-        .stream()
-        .filter(x -> !x.isDeleted())
-        .map(x -> x.getObj())
-        .collect(Collectors.toList());
+  sync();
+  return objects
+    .values()
+    .stream()
+    .filter(x -> !x.isDeleted())
+    .map(x -> x.getObj())
+    .collect(Collectors.toList());
   }
 

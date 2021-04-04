@@ -27,11 +27,11 @@ public class ControllerGenerator extends Generator {
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
       controllers.put(t.getPascalName() + "Controller", classTmpl 
-        .replace("{packagename}", db.getPackageName())
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{tablenamelower}", t.getLowerName())
-        .replace("{methods}", generateMethods(t))
-        .replace("{imports}", generateImports(t)));
+      .replace("{packagename}", db.getPackageName())
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{tablenamelower}", t.getLowerName())
+      .replace("{methods}", generateMethods(t))
+      .replace("{imports}", generateImports(t)));
     }
     return controllers;
   }
@@ -115,10 +115,10 @@ public class ControllerGenerator extends Generator {
     for(Table pt: t.getParentTables()) {
       b
       .append(selectOfParentTmpl
-        .replace("{parenttablenamepascal}", pt.getPascalName())
-        .replace("{primarycolumnjavatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
-        .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getLowerName())
-        .replace("{tablenamepascal}", t.getPascalName()))
+      .replace("{parenttablenamepascal}", pt.getPascalName())
+      .replace("{primarycolumnjavatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
+      .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getLowerName())
+      .replace("{tablenamepascal}", t.getPascalName()))
       .append("\n");
     }
     return b.toString();
@@ -139,10 +139,10 @@ public class ControllerGenerator extends Generator {
     for(Column c: t.getUniqueColumns()) {
       b
       .append(selectUniqueTmpl
-        .replace("{columnnamepascal}", c.getPascalName())
-        .replace("{columnnamecamel}", c.getCamelName())
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType())));
+      .replace("{columnnamepascal}", c.getPascalName())
+      .replace("{columnnamecamel}", c.getCamelName())
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType())));
     }
     return b.toString();
   }

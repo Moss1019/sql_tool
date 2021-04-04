@@ -1,0 +1,18 @@
+package {packagename}.repository;
+
+import {packagename}.util.RepoObj;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class BaseRepository<T extends RepoObj> {
+  protected static Map<String, Map<UUID, RepoObj>> collections = new HashMap<>();
+  protected String collectionName;
+
+  public BaseRepository(String collectionName) {
+  this.collectionName = collectionName;
+  collections.put(collectionName, new HashMap<>());
+  }
+}
+

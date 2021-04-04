@@ -29,10 +29,10 @@ public class FileHandler {
       inError = true;
     } finally {
       try {
-        bufStream.close();
+      bufStream.close();
       } catch (Exception ex) {}
       try {
-        fiStream.close();
+      fiStream.close();
       } catch (Exception ex){}
     }
     return fileContent;

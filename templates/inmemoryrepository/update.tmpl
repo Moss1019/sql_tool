@@ -1,0 +1,14 @@
+  public boolean update({tablenamepascal} updated) {
+    Optional<{tablenamepascal}> {tablenamecamel} = collections.get(collectionName)
+        .values()
+        .stream()
+        .filter(x -> x.getPrimary().equals(updated.getPrimary()))
+        .map(x -> ({tablenamepascal})x)
+        .findFirst();
+    if({tablenamecamel}.isPresent()) {
+      collections.get(collectionName).put(updated.getPrimary(), updated);
+      return true;
+    }
+    return false;
+  }
+

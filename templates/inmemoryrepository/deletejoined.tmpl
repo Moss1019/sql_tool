@@ -1,0 +1,14 @@
+  public boolean delete({key1javatype} {key1namecamel}, {key2javatype} {key2namecamel}) {
+    Optional<UUID> key = collections.get(collectionName)
+        .keySet()
+        .stream()
+        .filter(x -> collections.get(collectionName).get(x).getPrimary().equals({key1namecamel}) &&
+            ((JoinedRepoObj)collections.get(collectionName).get(x)).getSecondary().equals({key2namecamel}))
+        .findFirst();
+    if(key.isPresent()) {
+      collections.get(collectionName).remove(key.get());
+      return true;
+    }
+    return false;
+  }
+  

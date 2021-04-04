@@ -1,0 +1,15 @@
+  public List<{secondarytablenamepascal}> select{tablenamepascal}sOf{primarytablenamepascal}({primarkeyjavatype} {primarytablenamecamel}) {
+    List<UUID> ids = collections.get(collectionName)
+        .values()
+        .stream()
+        .filter(x -> x.getPrimary().equals({primarytablenamecamel}))
+        .map(x -> (({tablenamepascal})x).getSecondary())
+        .collect(Collectors.toList());
+    return collections.get(secondaryCollectionName)
+        .values()
+        .stream()
+        .filter(x -> ids.contains(x.getPrimary()))
+        .map(x -> ({secondarytablenamepascal})x)
+        .collect(Collectors.toList());
+  }
+

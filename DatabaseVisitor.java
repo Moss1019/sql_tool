@@ -31,7 +31,7 @@ public class DatabaseVisitor extends DefinitionBaseVisitor<Object> {
       options.setIsUnique(oc.getText().equals("unique"));
       options.setIsForeign(oc.getText().contains("foreign"));
       if(oc.NAME() != null) {
-        options.foreignKeyName = oc.NAME().getText();
+      options.foreignKeyName = oc.NAME().getText();
       }
     }
     return new Column(ctx.NAME().getText(), ctx.DATA_TYPE().getText(), options);

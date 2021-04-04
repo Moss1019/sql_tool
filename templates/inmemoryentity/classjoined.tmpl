@@ -1,0 +1,22 @@
+package {packagename}.entity;
+
+import {packagename}.util.JoinedRepoObj;
+
+import java.util.UUID;
+
+public class {tablenamepascal} implements JoinedRepoObj {
+{fields}
+
+{getters}
+{setters}
+
+  @Override
+  public UUID getSecondary() {
+      return userId;
+  }
+
+  @Override
+  public UUID getPrimary() {
+      return itemId;
+  }
+}

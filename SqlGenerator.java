@@ -32,10 +32,10 @@ public class SqlGenerator extends Generator {
   private List<String> tables;
 
   public SqlGenerator(Database db) {
-    this.db = db;
-    loadTemplates();
-    procedures = new ArrayList<>();
-    tables = new ArrayList<>();
+  this.db = db;
+  loadTemplates();
+  procedures = new ArrayList<>();
+  tables = new ArrayList<>();
   }
 
   public Map<String, String> generate() {
@@ -45,23 +45,23 @@ public class SqlGenerator extends Generator {
       b
       .append(generateCreateTable(t));
       if(currentLoopedOrJoined) {
-        b
-        .append(generateDeleteJoined(t))
-        .append(generateInsertLoopedJoined(t));
-        if(t.getIsLooped()) {
-          b.append(generateSelectLooped(t));
-        } else {
-          b.append(generateSelectJoined(t));
-        }
+      b
+      .append(generateDeleteJoined(t))
+      .append(generateInsertLoopedJoined(t));
+      if(t.getIsLooped()) {
+        b.append(generateSelectLooped(t));
       } else {
-        b
-        .append(generateInsert(t))
-        .append(generateSelectAll(t))
-        .append(generateSelectByPk(t))
-        .append(generatorSelectByUnique(t))
-        .append(generateUpdate(t))
-        .append(generateDeleteByPk(t))
-        .append(generateSelectOfParents(t));
+        b.append(generateSelectJoined(t));
+      }
+      } else {
+      b
+      .append(generateInsert(t))
+      .append(generateSelectAll(t))
+      .append(generateSelectByPk(t))
+      .append(generatorSelectByUnique(t))
+      .append(generateUpdate(t))
+      .append(generateDeleteByPk(t))
+      .append(generateSelectOfParents(t));
       }
       b.append("\n");
     }
@@ -88,28 +88,28 @@ public class SqlGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       if(c.getIsPrimary()) {
-        tableFields
-        .append(primaryKeyTmpl
-          .replace("{primarykey}", c.getName())
-          .replace("{sqltype}", DataTypeUtil.resolveSqlType(c.getDataType()))
-          .replace("{auto}", c.getIsAutoIncrement() ? " auto_increment" : ""));
+      tableFields
+      .append(primaryKeyTmpl
+        .replace("{primarykey}", c.getName())
+        .replace("{sqltype}", DataTypeUtil.resolveSqlType(c.getDataType()))
+        .replace("{auto}", c.getIsAutoIncrement() ? " auto_increment" : ""));
       } else if(c.getIsUnique()) {
-        tableFields.append(uniqueFieldTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      tableFields.append(uniqueFieldTmpl
+        .replace("{columnname}", c.getName())
+        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
       } else if (c.getIsForeign()) {
-        tableFields.append(foreignKeyTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{foreigntablename}", c.getForeignKeyTable())
-          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType()))
-          .replace("{foreigncolumnname}", c.getForeignKeyName()));
+      tableFields.append(foreignKeyTmpl
+        .replace("{columnname}", c.getName())
+        .replace("{foreigntablename}", c.getForeignKeyTable())
+        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType()))
+        .replace("{foreigncolumnname}", c.getForeignKeyName()));
       } else {
-        tableFields.append(fieldTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      tableFields.append(fieldTmpl
+        .replace("{columnname}", c.getName())
+        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
       }
       if(colIndex++ < t.getNumColumns() - 1) {
-        tableFields.append(",\n\t");
+      tableFields.append(",\n\t");
       }
     }
     StringBuilder b = new StringBuilder();
@@ -149,11 +149,11 @@ public class SqlGenerator extends Generator {
     for(Column c: t.getUniqueColumns()) {
       b
       .append(selectByUniqueTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{colnamepascal}", c.getPascalName())
-        .replace("{colname}", c.getName())
-        .replace("{coldatatype}", DataTypeUtil.resolveSqlType(c.getDataType()))
-        .replace("{tablename}", t.getName()));
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{colnamepascal}", c.getPascalName())
+      .replace("{colname}", c.getName())
+      .replace("{coldatatype}", DataTypeUtil.resolveSqlType(c.getDataType()))
+      .replace("{tablename}", t.getName()));
       procedures.add(String.format("sp_select%ssBy%s", t.getPascalName(), c.getPascalName()));
     }
     return b.toString();
@@ -181,7 +181,7 @@ public class SqlGenerator extends Generator {
       .replace("{primarycolumnname}", t.getParentTables().get(1).getPrimaryColumn().getName())
       .replace("{secondarysqltype}", DataTypeUtil.resolveSqlType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
       .replace("{tablename}", t.getName());
-      
+    
   }
 
   private String generateSelectOfParents(Table t) {
@@ -189,11 +189,11 @@ public class SqlGenerator extends Generator {
     for(Table pt: t.getParentTables()) {
       b
       .append(selectOfParentTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{parenttablenamepascal}", pt.getPascalName())
-        .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
-        .replace("{childtablename}", t.getName())
-        .replace("{sqltype}", DataTypeUtil.resolveSqlType(pt.getPrimaryColumn().getDataType())));
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{parenttablenamepascal}", pt.getPascalName())
+      .replace("{parentprimarykey}", pt.getPrimaryColumn().getName())
+      .replace("{childtablename}", t.getName())
+      .replace("{sqltype}", DataTypeUtil.resolveSqlType(pt.getPrimaryColumn().getDataType())));
       procedures.add(String.format("sp_select%ssOf%s", t.getPascalName(), pt.getPascalName()));
     }
     return b.toString();
@@ -205,21 +205,21 @@ public class SqlGenerator extends Generator {
     paramList
       .append("\n\t")
       .append(inparamTmpl
-        .replace("{columnname}", t.getPrimaryColumn().getName())
-        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(t.getPrimaryColumn().getDataType())))
+      .replace("{columnname}", t.getPrimaryColumn().getName())
+      .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(t.getPrimaryColumn().getDataType())))
       .append(",\n\t");
     int colIndex = 0;
     for(Column c: t.getNonPrimaryColumns()) {
       paramList
-        .append(inparamTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      .append(inparamTmpl
+        .replace("{columnname}", c.getName())
+        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
       setList
-        .append(setValueTmpl
-          .replace("{columnname}", c.getName()));
+      .append(setValueTmpl
+        .replace("{columnname}", c.getName()));
       if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
-        paramList.append(",\n\t");
-        setList.append(", ");
+      paramList.append(",\n\t");
+      setList.append(", ");
       }
     }
     StringBuilder b = new StringBuilder();
@@ -240,13 +240,13 @@ public class SqlGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getNonPrimaryColumns()) {
       paramList
-        .append(inparamTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      .append(inparamTmpl
+        .replace("{columnname}", c.getName())
+        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
       colNames.append(c.getName());
       if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
-        paramList.append(", ");
-        colNames.append(", ");
+      paramList.append(", ");
+      colNames.append(", ");
       }
     }
     StringBuilder b = new StringBuilder();
@@ -268,17 +268,17 @@ public class SqlGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       if(c.getIsAutoIncrement()) {
-        ++colIndex;
-        continue;
+      ++colIndex;
+      continue;
       }
       paramList
-        .append(inparamTmpl
-          .replace("{columnname}", c.getName())
-          .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
+      .append(inparamTmpl
+        .replace("{columnname}", c.getName())
+        .replace("{sqldatatype}", DataTypeUtil.resolveSqlType(c.getDataType())));
       colNames.append(c.getName());
       if(colIndex++ < t.getColumns().size() - 1) {
-        paramList.append(", ");
-        colNames.append(", ");
+      paramList.append(", ");
+      colNames.append(", ");
       }
     }
     StringBuilder b = new StringBuilder();
@@ -289,7 +289,7 @@ public class SqlGenerator extends Generator {
       .replace("{tablename}", t.getName())
       .replace("{colnames}", colNames.toString())
       .replace("{primarykey}", t.getPrimaryColumn().getName())
-      .replace("{newprimarykey}", DataTypeUtil.resolveNewPrimaryKey(t.getPrimaryColumn())));
+      .replace("{newprimarykey}", DataTypeUtil.resolveSqlInsertSelectPK(t.getPrimaryColumn())));
     procedures.add(String.format("sp_insert%s", t.getPascalName()));
     return b.toString();
   }
@@ -324,8 +324,8 @@ public class SqlGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     for(String p : procedures) {
       b.append(grantExecTmpl
-        .replace("{procedure}", p)
-        .replace("{dbuser}", db.getUser()));
+      .replace("{procedure}", p)
+      .replace("{dbuser}", db.getUser()));
     }
     return b.toString();
   } 

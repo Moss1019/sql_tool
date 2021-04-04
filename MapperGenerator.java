@@ -21,13 +21,13 @@ public class MapperGenerator extends Generator {
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
       mappers.put(t.getPascalName() + "Mapper", classTmpl
-        .replace("{childviewimports}", generateViewImports(t))
-        .replace("{mapentity}", generateMapEntity(t))
-        .replace("{mapentitynulls}", t.getNonJoinedTables().size() > 0 ? generateMapEntityNulls(t) : "")
-        .replace("{mapview}", generateMapView(t))
-        .replace("{tablenamecamel}", t.getCamelName())
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{packagename}", db.getPackageName()));
+      .replace("{childviewimports}", generateViewImports(t))
+      .replace("{mapentity}", generateMapEntity(t))
+      .replace("{mapentitynulls}", t.getNonJoinedTables().size() > 0 ? generateMapEntityNulls(t) : "")
+      .replace("{mapview}", generateMapView(t))
+      .replace("{tablenamecamel}", t.getCamelName())
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{packagename}", db.getPackageName()));
     }
     return mappers;
   }
@@ -62,7 +62,7 @@ public class MapperGenerator extends Generator {
     for(Column c: t.getColumns()) {
       colGetters.append(colGetterTmpl.replace("{columnnamepascal}", c.getPascalName()));
       if(colIndex++ < t.getColumns().size() - 1) {
-        colGetters.append(", ");
+      colGetters.append(", ");
       }
     }
     StringBuilder b = new StringBuilder();
@@ -85,7 +85,7 @@ public class MapperGenerator extends Generator {
     for(Column c: t.getColumns()) {
       colGetters.append(colGetterTmpl.replace("{columnnamepascal}", c.getPascalName()));
       if(colIndex++ < t.getColumns().size() - 1) {
-        colGetters.append(", ");
+      colGetters.append(", ");
       }
     }
     StringBuilder b = new StringBuilder();
@@ -105,7 +105,7 @@ public class MapperGenerator extends Generator {
     for(Column c: t.getColumns()) {
       colSetters.append("\t\t").append(colSetterTmpl.replace("{columnnamepascal}", c.getPascalName()));
       if(colIndex++ < t.getColumns().size() - 1) {
-        colSetters.append("\n");
+      colSetters.append("\n");
       }
     }
     return mapViewTmpl

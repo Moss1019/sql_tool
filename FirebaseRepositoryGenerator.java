@@ -19,8 +19,8 @@ public class FirebaseRepositoryGenerator extends Generator {
   private String repoDepTmpl;
 
   public FirebaseRepositoryGenerator(Database db) {
-    this.db = db;
-    loadTemplates();
+  this.db = db;
+  loadTemplates();
   }
 
   public Map<String, String> generate() {
@@ -30,13 +30,13 @@ public class FirebaseRepositoryGenerator extends Generator {
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsLooped() || t.getIsJoined();
       repos.put(String.format("%sRepository", t.getPascalName()), 
-        classTmpl
-          .replace("{repodeps}", generateRepoDeps(t))
-          .replace("{packagename}", db.getPackageName())
-          .replace("{methods}", generateMethods(t))
-          .replace("{imports}", generateImports(t))
-          .replace("{tablenamepascal}", t.getPascalName())
-          .replace("{tablenamecamel}", t.getCamelName()));
+      classTmpl
+        .replace("{repodeps}", generateRepoDeps(t))
+        .replace("{packagename}", db.getPackageName())
+        .replace("{methods}", generateMethods(t))
+        .replace("{imports}", generateImports(t))
+        .replace("{tablenamepascal}", t.getPascalName())
+        .replace("{tablenamecamel}", t.getCamelName()));
     }
     return repos;
   }
@@ -44,10 +44,10 @@ public class FirebaseRepositoryGenerator extends Generator {
   private String generateRepoDeps(Table t) {
     StringBuilder b = new StringBuilder();
     for(Table pt: t.getParentTables()) {
-        b.append("\n")
-        .append(repoDepTmpl
-          .replace("{parenttablepascal}", pt.getPascalName())
-          .replace("{parenttablecamel}", pt.getCamelName()));
+      b.append("\n")
+      .append(repoDepTmpl
+        .replace("{parenttablepascal}", pt.getPascalName())
+        .replace("{parenttablecamel}", pt.getCamelName()));
     }
     b.append("\n");
     return b.toString();
@@ -120,10 +120,10 @@ public class FirebaseRepositoryGenerator extends Generator {
     for(Column c: t.getUniqueColumns()) {
       b
       .append(selectByUniqueTmpl
-        .replace("{colnamepascal}", c.getPascalName())
-        .replace("{coljavatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType())));
+      .replace("{colnamepascal}", c.getPascalName())
+      .replace("{coljavatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType())));
       if(colIndex++ < t.getUniqueColumns().size() - 1) {
-        b.append("\n");
+      b.append("\n");
       }
     }
     return b.toString();
@@ -135,11 +135,11 @@ public class FirebaseRepositoryGenerator extends Generator {
     for(Table pt: t.getParentTables()) {
       b
       .append(selectOfParentTmpl
-        .replace("{parenttablepascal}", pt.getPascalName())
-        .replace("{parentcoljavatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
-        .replace("{parentprimarycamel}", pt.getPrimaryColumn().getCamelName()));
+      .replace("{parenttablepascal}", pt.getPascalName())
+      .replace("{parentcoljavatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
+      .replace("{parentprimarycamel}", pt.getPrimaryColumn().getCamelName()));
       if(tabIndex++ < t.getParentTables().size() - 1) {
-        b.append("\n");
+      b.append("\n");
       }
     }
     return b.toString();

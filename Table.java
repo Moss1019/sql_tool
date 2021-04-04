@@ -42,17 +42,17 @@ public class Table {
     nonPrimaryColumns = new ArrayList<>();
     for(Column c: this.columns) {
       if(c.getIsUnique()) {
-        uniqueColumns.add(c);
+      uniqueColumns.add(c);
       }
       if(!c.getIsPrimary()) {
-        nonPrimaryColumns.add(c);
+      nonPrimaryColumns.add(c);
       }
       if(c.getIsForeign()) {
-        Table parentTable = tableRegistry.get(c.getForeignKeyTable());
-        if(!parentTables.contains(parentTable)) {
-          parentTables.add(parentTable);
-          parentTable.childTables.add(this);
-        }
+      Table parentTable = tableRegistry.get(c.getForeignKeyTable());
+      if(!parentTables.contains(parentTable)) {
+        parentTables.add(parentTable);
+        parentTable.childTables.add(this);
+      }
       }
     }
   }
@@ -61,18 +61,18 @@ public class Table {
     primaryCol = null;
     for(Column c: this.columns) {
       if(c.getIsPrimary()) {
-        primaryCol = c;
-        break;
+      primaryCol = c;
+      break;
       }
     }
     if(primaryCol == null) {
       if(isLooped || isJoined) {
-        for(Column c: this.columns) {
-          if(c.getName().equals(c.getForeignKeyName())) {
-            primaryCol = c;
-            break;
-          }
+      for(Column c: this.columns) {
+        if(c.getName().equals(c.getForeignKeyName())) {
+        primaryCol = c;
+        break;
         }
+      }
       }
     }
   }
@@ -81,13 +81,13 @@ public class Table {
     pascalName = String.join("", Arrays.asList(name.split("_"))
       .stream()
       .map(p -> {
-        return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
+      return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
       })
       .collect(Collectors.toList()));
     camelName = String.join("", Arrays.asList(name.split("_"))
       .stream()
       .map(p -> {
-        return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
+      return String.format("%c%s", Character.toUpperCase(p.charAt(0)), p.substring(1));
       })
       .collect(Collectors.toList()));
     camelName = String.format("%c%s", Character.toLowerCase(camelName.charAt(0)), camelName.substring(1));
@@ -150,9 +150,9 @@ public class Table {
     if(nonJoinedTables == null) {
       nonJoinedTables = new ArrayList<>();
       for(Table ct: childTables) {
-        if(!ct.isJoined && !ct.isLooped) {
-          nonJoinedTables.add(ct);
-        }
+      if(!ct.isJoined && !ct.isLooped) {
+        nonJoinedTables.add(ct);
+      }
       }
     }
     return nonJoinedTables;

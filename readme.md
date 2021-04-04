@@ -13,9 +13,9 @@ A tool used to generate MySQL code and Java spring classes that form the foundat
 ## Using the code
 First, define the objects in the application using the following syntax <br />
 <entity_name> { <br />
-    \<col_name\> \<data_type\> \<options zero or more\> <br />
-    ... <br />
-    ...
+  \<col_name\> \<data_type\> \<options zero or more\> <br />
+  ... <br />
+  ...
 <br />} <br />
 For example <br />
 user { <br />

@@ -31,24 +31,24 @@ public class HttpGenerator extends Generator {
       .append(generateInsert(t))
       .append("\n");
       if(currentLoopedOrJoined) {
-        b
-        .append(generateDeleteJoined(t))
-        .append("\n")
-        .append(generateSelectJoined(t))
-        .append("\n");
+      b
+      .append(generateDeleteJoined(t))
+      .append("\n")
+      .append(generateSelectJoined(t))
+      .append("\n");
       } else {
-        b
-        .append(generateDelete(t))
-        .append("\n")
-        .append(generateSelect(t))
-        .append("\n")
-        .append(generateSelectAll(t))
-        .append("\n")
-        .append(generateSelectUnqiue(t))
-        .append("\n")
-        .append(generateSelectOfParent(t))
-        .append("\n")
-        .append(generateUpdate(t));
+      b
+      .append(generateDelete(t))
+      .append("\n")
+      .append(generateSelect(t))
+      .append("\n")
+      .append(generateSelectAll(t))
+      .append("\n")
+      .append(generateSelectUnqiue(t))
+      .append("\n")
+      .append(generateSelectOfParent(t))
+      .append("\n")
+      .append(generateUpdate(t));
       };
       http.put(t.getLowerName(), b.toString());
     }
@@ -96,12 +96,12 @@ public class HttpGenerator extends Generator {
     for(Column c: t.getUniqueColumns()) {
       b
       .append(selectUniqueTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{colnamepascal}", c.getPascalName())
-        .replace("{colnamecamel}", c.getCamelName())
-        .replace("{tablenamelower}", t.getLowerName()));
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{colnamepascal}", c.getPascalName())
+      .replace("{colnamecamel}", c.getCamelName())
+      .replace("{tablenamelower}", t.getLowerName()));
       if(colIndex++ < t.getUniqueColumns().size() - 1) {
-        b.append("\n");
+      b.append("\n");
       }
     }
     return b.toString();
@@ -112,9 +112,9 @@ public class HttpGenerator extends Generator {
     for(Table pt: t.getParentTables()) {
       b
       .append(selectOfParentTmpl
-        .replace("{parenttablenamepascal}", pt.getPascalName())
-        .replace("{parentcolnamecamel}", pt.getPrimaryColumn().getCamelName())
-        .replace("{tablenamelower}", t.getLowerName()))
+      .replace("{parenttablenamepascal}", pt.getPascalName())
+      .replace("{parentcolnamecamel}", pt.getPrimaryColumn().getCamelName())
+      .replace("{tablenamelower}", t.getLowerName()))
       .append("\n");
     }
     return b.toString();

@@ -1,0 +1,7 @@
+  public List<{tablenamepascal}> selectAll() {
+    return collections.get(collectionName).values()
+        .stream()
+        .map(x -> ({tablenamepascal})x)
+        .collect(Collectors.toList());
+  }
+

@@ -24,17 +24,17 @@ public class FirebaseEntityGenerator extends Generator {
       currentLoopedOrJoined = t.getIsLooped() || t.getIsJoined();
       String template = currentLoopedOrJoined ? entityJoinedTmpl : entityTmpl;
       entities.put(t.getPascalName(), template
-        .replace("{packagename}", db.getPackageName())
-        .replace("{getters}", generateGetters(t))
-        .replace("{setters}", generateSetters(t))
-        .replace("{serializetomap}", generateSerializeToMap(t))
-        .replace("{deserializefrommap}", generateDeserializeFromMap(t))
-        .replace("{fields}", generateFields(t))
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{primarycoljavatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
-        .replace("{primarycolcamel}", t.getPrimaryColumn().getCamelName())
-        .replace("{secondarycoljavatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType()))
-        .replace("{secondarycolcamel}", t.getJoinedColumn().getCamelName()));
+      .replace("{packagename}", db.getPackageName())
+      .replace("{getters}", generateGetters(t))
+      .replace("{setters}", generateSetters(t))
+      .replace("{serializetomap}", generateSerializeToMap(t))
+      .replace("{deserializefrommap}", generateDeserializeFromMap(t))
+      .replace("{fields}", generateFields(t))
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{primarycoljavatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .replace("{primarycolcamel}", t.getPrimaryColumn().getCamelName())
+      .replace("{secondarycoljavatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType()))
+      .replace("{secondarycolcamel}", t.getJoinedColumn().getCamelName()));
     }
     return entities; 
   }
@@ -44,13 +44,13 @@ public class FirebaseEntityGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       if(colIndex++ != 0) {
-        b.append("\n");
+      b.append("\n");
       }
       b
       .append(getterTmpl
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-        .replace("{columnnamepascal}", c.getPascalName())
-        .replace("{columnnamecamel}", c.getCamelName()));
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+      .replace("{columnnamepascal}", c.getPascalName())
+      .replace("{columnnamecamel}", c.getCamelName()));
     }
     return b.toString();
   }
@@ -60,13 +60,13 @@ public class FirebaseEntityGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       if(colIndex++ != 0) {
-        b.append("\n");
+      b.append("\n");
       }
       b
       .append(setterTmpl
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-        .replace("{columnnamepascal}", c.getPascalName())
-        .replace("{columnnamecamel}", c.getCamelName()));
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+      .replace("{columnnamepascal}", c.getPascalName())
+      .replace("{columnnamecamel}", c.getCamelName()));
     }
     return b.toString();
   }
@@ -78,8 +78,8 @@ public class FirebaseEntityGenerator extends Generator {
       b
       .append("\n\t\t")
       .append(setToMapTmpl
-        .replace("{colnamecamel}", c.getCamelName())
-        .replace("{insertvalue}", DataTypeUtil.getInsertLine(c)));
+      .replace("{colnamecamel}", c.getCamelName())
+      .replace("{insertvalue}", DataTypeUtil.getInsertLine(c)));
     }
     return b.toString();
   }
@@ -90,8 +90,8 @@ public class FirebaseEntityGenerator extends Generator {
       b
       .append("\n\t\t")
       .append(getFromMapTmpl
-        .replace("{colnamecamel}", c.getCamelName())
-        .replace("{extractvalue}", DataTypeUtil.getExtractLine(c)));
+      .replace("{colnamecamel}", c.getCamelName())
+      .replace("{extractvalue}", DataTypeUtil.getExtractLine(c)));
     }
     return b.toString();
   }
@@ -102,8 +102,8 @@ public class FirebaseEntityGenerator extends Generator {
       b
       .append("\n\t")
       .append(fieldTmpl
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-        .replace("{colnamecamel}", c.getCamelName()));
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+      .replace("{colnamecamel}", c.getCamelName()));
     }
     return b.toString();
   }

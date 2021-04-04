@@ -1,0 +1,8 @@
+  public {tablenamepascal} selectByPk({keyjavatype} {keynamecamel}) {
+    return collections.get(collectionName).values()
+        .stream()
+        .filter(x -> x.getPrimary().equals({keynamecamel}))
+        .map(x -> ({tablenamepascal})x)
+        .findFirst().orElse(null);
+  }
+

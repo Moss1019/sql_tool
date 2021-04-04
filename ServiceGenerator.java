@@ -37,12 +37,12 @@ public class ServiceGenerator extends Generator {
     for(Table t: db.getTables()) {
       currentLoopedOrJoined = t.getIsJoined() || t.getIsLooped();
       services.put(t.getPascalName() + "Service", classTmpl
-        .replace("{imports}", generateImports(t))
-        .replace("{packagename}", db.getPackageName())
-        .replace("{methods}", generateMethods(t))
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{repodep}", depRepoTmpl.replace("{tablenamepascal}", t.getPascalName()))
-        .replace("{servicedeps}", generateServiceDeps(t)));
+      .replace("{imports}", generateImports(t))
+      .replace("{packagename}", db.getPackageName())
+      .replace("{methods}", generateMethods(t))
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{repodep}", depRepoTmpl.replace("{tablenamepascal}", t.getPascalName()))
+      .replace("{servicedeps}", generateServiceDeps(t)));
     }
     return services;
   }
@@ -51,8 +51,8 @@ public class ServiceGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     for(Table ct: t.getChildTables()) {
       b.append(depServiceTmpl
-          .replace("{tablenamepascal}", ct.getPascalName())
-          .replace("{tablenamecamel}", ct.getCamelName()));
+        .replace("{tablenamepascal}", ct.getPascalName())
+        .replace("{tablenamecamel}", ct.getCamelName()));
     }
     return b.toString();
   }
@@ -63,14 +63,14 @@ public class ServiceGenerator extends Generator {
     for(Table st: tables) {
       b
       .append(importTmpl
-        .replace("{subpackage}", "view")
-        .replace("{classname}", st.getPascalName() + "View"))
+      .replace("{subpackage}", "view")
+      .replace("{classname}", st.getPascalName() + "View"))
       .append(importTmpl
-        .replace("{subpackage}", "entity")
-        .replace("{classname}", st.getPascalName()))
+      .replace("{subpackage}", "entity")
+      .replace("{classname}", st.getPascalName()))
       .append(importTmpl
-        .replace("{subpackage}", "mapper")
-        .replace("{classname}", st.getPascalName() + "Mapper"));
+      .replace("{subpackage}", "mapper")
+      .replace("{classname}", st.getPascalName() + "Mapper"));
     }
     return b.toString();
   }
@@ -108,19 +108,19 @@ public class ServiceGenerator extends Generator {
       b
       .append("\n");
       if(ct.getIsJoined() || ct.getIsLooped()) {
-        b
-        .append(deleteJoinedChildTmpl
-          .replace("{tablenamepascal}", t.getPascalName())
-          .replace("{childtablecamel}", ct.getCamelName())
-          .replace("{childtablepascal}", ct.getPascalName())
-          .replace("{primarypascal}", t.getPrimaryColumn().getPascalName())
-          .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
+      b
+      .append(deleteJoinedChildTmpl
+        .replace("{tablenamepascal}", t.getPascalName())
+        .replace("{childtablecamel}", ct.getCamelName())
+        .replace("{childtablepascal}", ct.getPascalName())
+        .replace("{primarypascal}", t.getPrimaryColumn().getPascalName())
+        .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
       } else {
-        b
-        .append(deleteChildTmpl
-          .replace("{childnamepascal}", ct.getPascalName())
-          .replace("{childnamecamel}", ct.getCamelName())
-          .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
+      b
+      .append(deleteChildTmpl
+        .replace("{childnamepascal}", ct.getPascalName())
+        .replace("{childnamecamel}", ct.getCamelName())
+        .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
       }
     }
     return deleteTmpl
@@ -147,11 +147,11 @@ public class ServiceGenerator extends Generator {
     StringBuilder childTables = new StringBuilder();
     for(Table ct: t.getNonJoinedTables()) {
       viewLists 
-        .append("\n\t\t")
-        .append(viewListTmpl
-          .replace("{childtablenamepascal}", ct.getPascalName())
-          .replace("{childtablenamecamel}", ct.getCamelName())
-          .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+      .append("\n\t\t")
+      .append(viewListTmpl
+        .replace("{childtablenamepascal}", ct.getPascalName())
+        .replace("{childtablenamecamel}", ct.getCamelName())
+        .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
       childTables.append(", ").append(ct.getCamelName()).append("Views");
     }
     return selectTmpl
@@ -167,12 +167,12 @@ public class ServiceGenerator extends Generator {
     int tableIndex = 0;
     for(Table ct: t.getNonJoinedTables()) {
       viewLists
-        .append("\n\t\t\t\t")
-        .append(viewListMapTmpl
-          .replace("{childtablenamecamel}", ct.getCamelName())
-          .replace("{childtablenamepascal}", ct.getPascalName())
-          .replace("{tablenamepascal}", t.getPascalName())
-          .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+      .append("\n\t\t\t\t")
+      .append(viewListMapTmpl
+        .replace("{childtablenamecamel}", ct.getCamelName())
+        .replace("{childtablenamepascal}", ct.getPascalName())
+        .replace("{tablenamepascal}", t.getPascalName())
+        .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
       childTables.append(", ").append(ct.getCamelName()).append("Views");
     }
     return selectAllTmpl
@@ -187,22 +187,22 @@ public class ServiceGenerator extends Generator {
       StringBuilder viewLists = new StringBuilder();
       StringBuilder childTables = new StringBuilder();
       for(Table ct: t.getNonJoinedTables()) {
-        viewLists
-          .append("\n\t\t")
-          .append(viewListUniqueTmpl
-            .replace("{childtablenamepascal}", ct.getPascalName())
-            .replace("{childtablenamecamel}", ct.getCamelName())
-            .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
-        childTables.append(", ").append(ct.getCamelName()).append("Views");
+      viewLists
+        .append("\n\t\t")
+        .append(viewListUniqueTmpl
+        .replace("{childtablenamepascal}", ct.getPascalName())
+        .replace("{childtablenamecamel}", ct.getCamelName())
+        .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+      childTables.append(", ").append(ct.getCamelName()).append("Views");
       }
       b.append(selectByUniqueTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{columnnamepascal}", c.getPascalName())
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-        .replace("{viewlists}", viewLists.toString())
-        .replace("{childtables}", childTables.toString()));
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{columnnamepascal}", c.getPascalName())
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+      .replace("{viewlists}", viewLists.toString())
+      .replace("{childtables}", childTables.toString()));
       if(colIndex++ < t.getUniqueColumns().size() - 1) {
-        b.append("\n");
+      b.append("\n");
       }
     }
     return b.toString();
@@ -214,22 +214,22 @@ public class ServiceGenerator extends Generator {
       StringBuilder viewLists = new StringBuilder();
       StringBuilder childTables = new StringBuilder();
       for(Table ct: t.getNonJoinedTables()) {
-        viewLists
-        .append("\n\t\t\t\t")
-        .append(viewListMapTmpl
-          .replace("{childtablenamepascal}", ct.getPascalName())
-          .replace("{childtablenamecamel}", ct.getCamelName())
-          .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
-        childTables.append(", ").append(ct.getCamelName()).append("Views");
+      viewLists
+      .append("\n\t\t\t\t")
+      .append(viewListMapTmpl
+        .replace("{childtablenamepascal}", ct.getPascalName())
+        .replace("{childtablenamecamel}", ct.getCamelName())
+        .replace("{primarycolumnnamepascal}", t.getPrimaryColumn().getPascalName()));
+      childTables.append(", ").append(ct.getCamelName()).append("Views");
       }
       b.append(selectOfTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
-        .replace("{joinednamepascal}", pt.getPascalName())
-        .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getCamelName())
-        .replace("{joinednamepascal}", pt.getPascalName())
-        .replace("{viewlists}", viewLists.toString())
-        .replace("{childtables}", childTables.toString()));
+      .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
+      .replace("{joinednamepascal}", pt.getPascalName())
+      .replace("{primarycolumnnamecamel}", pt.getPrimaryColumn().getCamelName())
+      .replace("{joinednamepascal}", pt.getPascalName())
+      .replace("{viewlists}", viewLists.toString())
+      .replace("{childtables}", childTables.toString()));
     }
     return b.toString();
   }
@@ -250,24 +250,24 @@ public class ServiceGenerator extends Generator {
   }
 
   private void loadTemplates() {
-      depRepoTmpl = loadTemplate("../templates/service", "deprepo");
-      depServiceTmpl = loadTemplate("../templates/service", "depservice");
-      classTmpl = loadTemplate("../templates/service", "class");
-      deleteTmpl = loadTemplate("../templates/service", "delete");
-      deleteJoinedTmpl = loadTemplate("../templates/service", "deletejoined");
-      deleteChildTmpl = loadTemplate("../templates/service", "deletechild");
-      deleteJoinedChildTmpl = loadTemplate("../templates/service", "deletejoinedchild");
-      insertTmpl = loadTemplate("../templates/service", "insert");
-      selectTmpl = loadTemplate("../templates/service", "select");
-      selectAllTmpl = loadTemplate("../templates/service", "selectall");
-      selectByUniqueTmpl = loadTemplate("../templates/service", "selectbyunique");
-      selectOfTmpl = loadTemplate("../templates/service", "selectof");
-      selectParentChildren = loadTemplate("../templates/service", "selectparentchildren");
-      updateTmpl = loadTemplate("../templates/service", "update");
-      viewListTmpl = loadTemplate("../templates/service", "viewlist");
-      viewListUniqueTmpl = loadTemplate("../templates/service", "viewlistunique");
-      viewListMapTmpl = loadTemplate("../templates/service", "viewlistmap");
-      importTmpl = loadTemplate("../templates/service", "import");
+    depRepoTmpl = loadTemplate("../templates/service", "deprepo");
+    depServiceTmpl = loadTemplate("../templates/service", "depservice");
+    classTmpl = loadTemplate("../templates/service", "class");
+    deleteTmpl = loadTemplate("../templates/service", "delete");
+    deleteJoinedTmpl = loadTemplate("../templates/service", "deletejoined");
+    deleteChildTmpl = loadTemplate("../templates/service", "deletechild");
+    deleteJoinedChildTmpl = loadTemplate("../templates/service", "deletejoinedchild");
+    insertTmpl = loadTemplate("../templates/service", "insert");
+    selectTmpl = loadTemplate("../templates/service", "select");
+    selectAllTmpl = loadTemplate("../templates/service", "selectall");
+    selectByUniqueTmpl = loadTemplate("../templates/service", "selectbyunique");
+    selectOfTmpl = loadTemplate("../templates/service", "selectof");
+    selectParentChildren = loadTemplate("../templates/service", "selectparentchildren");
+    updateTmpl = loadTemplate("../templates/service", "update");
+    viewListTmpl = loadTemplate("../templates/service", "viewlist");
+    viewListUniqueTmpl = loadTemplate("../templates/service", "viewlistunique");
+    viewListMapTmpl = loadTemplate("../templates/service", "viewlistmap");
+    importTmpl = loadTemplate("../templates/service", "import");
   }
 }
 
