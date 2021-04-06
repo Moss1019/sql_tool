@@ -1,0 +1,10 @@
+	public List<{tablenamepascal}> selectOf{parenttablenamepascal}({primarycoljavatype} {primarycolnamecamel}) {
+  	StoredProcedureQuery q = em.createNamedStoredProcedureQuery("select{tablenamepascal}sOf{parenttablenamepascal}");
+  	q.setParameter("{primarycolname}", {primarycolsetvalue});
+  	try {
+  		return (List<{tablenamepascal}>)q.getResultList();
+		} catch (Exception ex) {
+  		return new ArrayList<>();
+		}
+	}
+

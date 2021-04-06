@@ -4,11 +4,11 @@
 	parameters = {
 	@StoredProcedureParameter(
 		mode = ParameterMode.IN,
-		type = Integer.class,
+		type = {primarykeywrapper}.class,
 		name = "{primarykeyname}"),
 	@StoredProcedureParameter(
 		mode = ParameterMode.IN,
-		type = Integer.class,
+		type = {joinedkeywrapper}.class,
 		name = "{joinedkeyname}")
 	}
 ),

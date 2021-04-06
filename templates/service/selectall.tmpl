@@ -1,5 +1,5 @@
 	public List<{tablenamepascal}View> selectAll() {
-		List<{tablenamepascal}> dbResult = repo.selectAll{tablenamepascal}s();
+		List<{tablenamepascal}> dbResult = repo.selectAll();
 		List<{tablenamepascal}View> result = dbResult
 			.stream()
 			.map(x -> {{viewlists}

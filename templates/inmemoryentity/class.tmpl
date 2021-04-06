@@ -4,14 +4,12 @@ import {packagename}.util.RepoObj;
 
 import java.util.UUID;
 
-public class {tablename} implements RepoObj {
+public class {tablenamepascal} implements RepoObj {
 {fields}
-
 {getters}
 {setters}
-
   @Override
   public UUID getPrimary() {
-    return itemId;
+      return {key1namecamel};
   }
 }

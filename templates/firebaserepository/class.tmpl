@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 @Repository
 public class {tablenamepascal}Repository extends BaseRepository<{tablenamepascal}> {{repodeps}
   public {tablenamepascal}Repository() {
-  super("{tablenamecamel}s");
+    super("{tablenamecamel}s");
   }  
 
 {methods}
   @Override
   protected {tablenamepascal} createObj(Map<String, Object> values) {
-  return new {tablenamepascal}(values);
+    return new {tablenamepascal}(values);
   }
 }

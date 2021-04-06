@@ -1,4 +1,4 @@
-  public {tablenamepascal} insert({tablenamepascal} value) {
+  public {tablenamepascal} insert({tablenamepascal} {tablenamecamel}) {{setprimarykey}
 		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("insert{tablenamepascal}");
 		{parameters}
 		try {

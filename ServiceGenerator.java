@@ -2,6 +2,8 @@
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class ServiceGenerator extends Generator {
   private Database db;
@@ -59,7 +61,7 @@ public class ServiceGenerator extends Generator {
 
   private String generateImports(Table t) {
     StringBuilder b = new StringBuilder();
-    List<Table> tables = currentLoopedOrJoined ? t.getParentTables() : t.getChildTables();
+    List<Table> tables = Stream.concat(t.getParentTables().stream(), t.getChildTables().stream()).collect(Collectors.toList());
     for(Table st: tables) {
       b
       .append(importTmpl
@@ -105,22 +107,25 @@ public class ServiceGenerator extends Generator {
   private String generateDelete(Table t) {
     StringBuilder b = new StringBuilder();
     for(Table ct: t.getChildTables()) {
-      b
-      .append("\n");
-      if(ct.getIsJoined() || ct.getIsLooped()) {
-      b
-      .append(deleteJoinedChildTmpl
-        .replace("{tablenamepascal}", t.getPascalName())
-        .replace("{childtablecamel}", ct.getCamelName())
-        .replace("{childtablepascal}", ct.getPascalName())
-        .replace("{primarypascal}", t.getPrimaryColumn().getPascalName())
-        .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
-      } else {
-      b
-      .append(deleteChildTmpl
-        .replace("{childnamepascal}", ct.getPascalName())
-        .replace("{childnamecamel}", ct.getCamelName())
-        .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName()));
+      if((ct.getIsJoined() || ct.getIsLooped()) && 
+        t.getPrimaryColumn().getName().equals(ct.getParentTables().get(0).getPrimaryColumn().getName())) {
+          int index = ct.getIsJoined() ? 1 : 0;
+        b
+        .append("\n")
+        .append(deleteJoinedChildTmpl
+          .replace("{joinedtablenamepascal}", ct.getParentTables().get(index).getPascalName())
+          .replace("{childtablenamecamel}", ct.getCamelName())
+          .replace("{childtablenamepascal}", ct.getPascalName())
+          .replace("{primarykeypascal}", ct.getParentTables().get(0).getPrimaryColumn().getPascalName())
+          .replace("{joinedkeypascal}", ct.getParentTables().get(index).getPrimaryColumn().getPascalName()));
+      } else if(!(ct.getIsJoined() || ct.getIsLooped())){
+        b
+        .append("\n")
+        .append(deleteChildTmpl
+          .replace("{childnamepascal}", ct.getPascalName())
+          .replace("{childnamecamel}", ct.getCamelName())
+          .replace("{childprimarypascal}", ct.getPrimaryColumn().getPascalName())
+          .replace("{primarykeypascal}", t.getPrimaryColumn().getPascalName()));
       }
     }
     return deleteTmpl

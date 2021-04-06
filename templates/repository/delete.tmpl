@@ -1,6 +1,6 @@
-	public boolean delete({javatype} value) {
+	public boolean delete({javatype} {primarykeynamecamel}) {
 		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("delete{tablenamepascal}");
-		q.setParameter("{primarykeyname}", value);
+		q.setParameter("{primarykeyname}", {primarykeysetparam});
 		try {
 			q.execute();
 			return true;
@@ -8,3 +8,4 @@
 			return false;
 		}
 	}
+

@@ -41,21 +41,25 @@ public class EntityGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{tablename}", t.getName());
       if(currentLoopedOrJoined) {
-      b
-      .append(cls
-        .replace("{primaryfield1}", primaryFieldTmpl
-        .replace("{columnname}", t.getPrimaryColumn().getName())
-        .replace("{columnnamecamel}", t.getPrimaryColumn().getCamelName()))
-        .replace("{primaryfield2}", primaryFieldTmpl
-        .replace("{columnname}", t.getJoinedColumn().getName())
-        .replace("{columnnamecamel}", t.getJoinedColumn().getCamelName()))
-        .replace("{primarykey1camel}", t.getPrimaryColumn().getCamelName())
-        .replace("{primarykey2camel}", t.getJoinedColumn().getCamelName()));
+        b
+        .append(cls
+          .replace("{primaryfield1}", primaryFieldTmpl
+            .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+            .replace("{columnname}", t.getPrimaryColumn().getName())
+            .replace("{columnnamecamel}", t.getPrimaryColumn().getCamelName()))
+          .replace("{primaryfield2}", primaryFieldTmpl
+            .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType()))
+            .replace("{columnname}", t.getJoinedColumn().getName())
+            .replace("{columnnamecamel}", t.getJoinedColumn().getCamelName()))
+          .replace("{key1camel}", t.getPrimaryColumn().getCamelName())
+          .replace("{key1javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+          .replace("{key2camel}", t.getJoinedColumn().getCamelName())
+          .replace("{key2javatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType())));
       } else {
-      b
-      .append(cls
-        .replace("{primaryfield}", generatePrimaryField(t))
-        .replace("{fields}", generateFields(t)));
+        b
+        .append(cls
+          .replace("{primaryfield}", generatePrimaryField(t))
+          .replace("{fields}", generateFields(t)));
       }
       entities.put(t.getPascalName(), b.toString());
     }
@@ -86,7 +90,8 @@ public class EntityGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     b.append(namedDeleteTmpl
       .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{primarykeyname}", t.getPrimaryColumn().getName()));
+      .replace("{primarykeyname}", t.getPrimaryColumn().getName())
+      .replace("{primarykeywrapper}", DataTypeUtil.resolveWrapperType(t.getPrimaryColumn().getDataType())));
     return b.toString();
   }
 
@@ -96,7 +101,9 @@ public class EntityGenerator extends Generator {
     .append(namedDeleteJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{joinedkeyname}", t.getJoinedColumn().getName())
-      .replace("{primarykeyname}", t.getPrimaryColumn().getName()));
+      .replace("{joinedkeywrapper}", DataTypeUtil.resolveWrapperType(t.getJoinedColumn().getDataType()))
+      .replace("{primarykeyname}", t.getPrimaryColumn().getName())
+      .replace("{primarykeywrapper}", DataTypeUtil.resolveWrapperType(t.getPrimaryColumn().getDataType())));
     return b.toString();
   }
 
@@ -104,13 +111,17 @@ public class EntityGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     StringBuilder parameters = new StringBuilder();
     int colIndex = 0;
-    for(Column c: t.getNonPrimaryColumns()) {
+    for(Column c: t.getColumns()) {
+      if(c.getIsAutoIncrement()) {
+        ++colIndex;
+        continue;
+      }
       parameters
       .append(storedProcedureParameterTmpl
-      .replace("{javawrappertype}", DataTypeUtil.resolveWrapperType(c.getDataType()))
-      .replace("{columnname}", c.getName()));
-      if(colIndex++ < t.getNonPrimaryColumns().size() - 1) {
-      parameters.append(",\n");
+        .replace("{javawrappertype}", DataTypeUtil.resolveWrapperType(c.getDataType()))
+        .replace("{columnname}", c.getName()));
+      if(colIndex++ < t.getColumns().size() - 1) {
+        parameters.append(",\n");
       }
     }
     b
@@ -130,7 +141,8 @@ public class EntityGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     b.append(namedSelectByPkTmpl
       .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{primarykeyname}", t.getPrimaryColumn().getName()));
+      .replace("{primarykeyname}", t.getPrimaryColumn().getName())
+      .replace("{primarykeywrapper}", DataTypeUtil.resolveWrapperType(t.getJoinedColumn().getDataType())));
     return b.toString();
   }
 
@@ -164,7 +176,7 @@ public class EntityGenerator extends Generator {
     int index = t.getIsLooped() ? 0 : 1;
     b.append(namedSelectJoinedTmpl
       .replace("{parenttablenamepascal}", t.getParentTables().get(0).getPascalName())
-      .replace("{parentprimarykey}", t.getParentTables().get(0).getPrimaryColumn().getName())
+      .replace("{parentprimarykey}", t.getPrimaryColumn().getName())
       .replace("{secondarytablenamepascal}", t.getParentTables().get(index).getPascalName())
       .replace("{tablenamepascal}", t.getPascalName()));
     return b.toString();

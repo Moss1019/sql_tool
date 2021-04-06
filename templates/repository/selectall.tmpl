@@ -1,0 +1,9 @@
+	public List<{tablenamepascal}> selectAll() {
+  	StoredProcedureQuery q = em.createNamedStoredProcedureQuery("selectAll{tablenamepascal}s");
+  	try {
+  		return (List<{tablenamepascal}>)q.getResultList();
+		} catch (Exception ex) {
+  		return new ArrayList<>();
+		}
+	}
+

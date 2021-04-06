@@ -1,6 +1,6 @@
   public {tablenamepascal} select{tablenamepascal}({primarycoljavatype} {primarycolcamel}) {
-  sync();
-  FirestoreObj<{tablenamepascal}> obj = objects.get({primarycolcamel});
-  return obj != null && !obj.isDeleted() ? obj.getObj() : null;
+    sync();
+    FirestoreObj<{tablenamepascal}> obj = objects.get({primarycolcamel});
+    return obj != null && !obj.isDeleted() ? obj.getObj() : null;
   }
 

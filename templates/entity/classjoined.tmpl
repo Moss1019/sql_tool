@@ -3,6 +3,7 @@ package {packagename}.entity;
 import javax.persistence.*;
 
 import java.util.Date;
+import java.util.UUID;
 
 import java.io.Serializable;
 
@@ -18,15 +19,15 @@ public class {tablenamepascal} {
 {getters}
 {setters}
 	public static class {tablenamepascal}PK implements Serializable {
-		protected {key1javatype} {primarykey1camel};
-		protected {key2javatype} {primarykey2camel};
+		protected {key1javatype} {key1camel};
+		protected {key2javatype} {key2camel};
 
 		public {tablenamepascal}PK() {
 		}
 
-		public {tablenamepascal}PK({key1javatype} {primarykey1camel}, {key2javatype} {primarykey2camel}) {
-			this.{primarykey1camel} = {primarykey1camel};
-			this.{primarykey2camel} = {primarykey2camel};
+		public {tablenamepascal}PK({key1javatype} {key1camel}, {key2javatype} {key2camel}) {
+			this.{key1camel} = {key1camel};
+			this.{key2camel} = {key2camel};
 		}
 	}
 }

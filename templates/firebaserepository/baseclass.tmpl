@@ -21,59 +21,59 @@ public abstract class BaseRepository<T extends Mappable> {
   private LocalDateTime lastUpdated = null;
 
   public BaseRepository(String collectionName) {
-  this.collectionName = collectionName;
-  firestore = FirestoreClient.getFirestore();
-  objects = new HashMap<>();
-  lastUpdated = LocalDateTime.now();
-  performSync();
+    this.collectionName = collectionName;
+    firestore = FirestoreClient.getFirestore();
+    objects = new HashMap<>();
+    lastUpdated = LocalDateTime.now();
+    performSync();
   }
 
   protected abstract T createObj(Map<String, Object> values);
 
   protected void sync() {
-  LocalDateTime now = LocalDateTime.now();
-  if(now.minusSeconds(20).isAfter(lastUpdated)) {
-    performSync();
-    lastUpdated = now;
-  }
+    LocalDateTime now = LocalDateTime.now();
+    if(now.minusSeconds(20).isAfter(lastUpdated)) {
+      performSync();
+      lastUpdated = now;
+    }
   }
 
   private void performSync() {
-  ApiFuture<QuerySnapshot> snapshot = firestore.collection(collectionName).get();
-  try {
-    WriteBatch batch = firestore.batch();
-    List<QueryDocumentSnapshot> docSnapshots = snapshot.get().getDocuments();
-    Map<UUID, FirestoreObj<T>> firestoreObjs = new HashMap<>();
-    Map<UUID, DocumentReference> docRefs = new HashMap<>();
-    for(QueryDocumentSnapshot docSnapshot: docSnapshots) {
-    T obj = createObj(docSnapshot.getData());
-    firestoreObjs.put(obj.getPrimary(), new FirestoreObj<T>(obj));
-    docRefs.put(obj.getPrimary(), docSnapshot.getReference());
+    ApiFuture<QuerySnapshot> snapshot = firestore.collection(collectionName).get();
+    try {
+      WriteBatch batch = firestore.batch();
+      List<QueryDocumentSnapshot> docSnapshots = snapshot.get().getDocuments();
+      Map<UUID, FirestoreObj<T>> firestoreObjs = new HashMap<>();
+      Map<UUID, DocumentReference> docRefs = new HashMap<>();
+      for(QueryDocumentSnapshot docSnapshot: docSnapshots) {
+      T obj = createObj(docSnapshot.getData());
+      firestoreObjs.put(obj.getPrimary(), new FirestoreObj<T>(obj));
+      docRefs.put(obj.getPrimary(), docSnapshot.getReference());
+      }
+      for(UUID key: objects.keySet()) {
+      FirestoreObj<T> obj = objects.get(key);
+      if(obj.isNew() && !obj.isDeleted()) {
+        ApiFuture<DocumentReference> ref = firestore.collection(collectionName)
+          .add(obj.getObj().toMap());
+        DocumentReference docRef = ref.get();
+        obj.setNew(false);
+      }
+      if(obj.isDeleted() && !obj.isNew()) {
+        batch.delete(docRefs.get(key));
+        firestoreObjs.remove(key);
+      }
+      if(obj.isUpdated() && !obj.isNew() && !obj.isDeleted()) {
+        batch.update(docRefs.get(key), objects.get(key).getObj().toMap());
+      }
+      }
+      for(UUID key: firestoreObjs.keySet()) {
+      if(!objects.containsKey(key)) {
+        objects.put(key, firestoreObjs.get(key));
+      }
+      }
+      batch.commit();
+    } catch (Exception ex) {
+      ex.printStackTrace();
     }
-    for(UUID key: objects.keySet()) {
-    FirestoreObj<T> obj = objects.get(key);
-    if(obj.isNew() && !obj.isDeleted()) {
-      ApiFuture<DocumentReference> ref = firestore.collection(collectionName)
-        .add(obj.getObj().toMap());
-      DocumentReference docRef = ref.get();
-      obj.setNew(false);
-    }
-    if(obj.isDeleted() && !obj.isNew()) {
-      batch.delete(docRefs.get(key));
-      firestoreObjs.remove(key);
-    }
-    if(obj.isUpdated() && !obj.isNew() && !obj.isDeleted()) {
-      batch.update(docRefs.get(key), objects.get(key).getObj().toMap());
-    }
-    }
-    for(UUID key: firestoreObjs.keySet()) {
-    if(!objects.containsKey(key)) {
-      objects.put(key, firestoreObjs.get(key));
-    }
-    }
-    batch.commit();
-  } catch (Exception ex) {
-    ex.printStackTrace();
-  }
   }
 }

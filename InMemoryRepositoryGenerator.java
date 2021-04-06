@@ -33,10 +33,26 @@ public class InMemoryRepositoryGenerator extends Generator {
       .replace("{methods}", generateMethods(t))
       .replace("{tablenamelower}", t.getLowerName())
       .replace("{tablenamepascal}", t.getPascalName())
+      .replace("{imports}", generateImports(t))
       .replace("{packagename}", db.getPackageName())
       .replace("{additionalcollections}", generateAdditionalCollections(t)));
     }
     return repos;
+  }
+
+  private String generateImports(Table t) {
+    if(!currentLoopedOrJoined) {
+      return "\n";
+    }
+    StringBuilder b = new StringBuilder();
+    b.append("\nimport {packagename}.util.JoinedRepoObj;\n");
+    for(Table pt: t.getParentTables()) {
+      b
+      .append("import {packagename}.entity.")
+      .append(pt.getPascalName())
+      .append(";\n");
+    }
+    return b.toString();
   }
 
   private String generateAdditionalCollections(Table t) {
@@ -125,7 +141,6 @@ public class InMemoryRepositoryGenerator extends Generator {
         .replace("{colnamepascal}", c.getPascalName())
         .replace("{coljavatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType())));
     }
-		System.out.println(b.toString());
     return b.toString();
   }
 

@@ -154,7 +154,7 @@ public class SqlGenerator extends Generator {
       .replace("{colname}", c.getName())
       .replace("{coldatatype}", DataTypeUtil.resolveSqlType(c.getDataType()))
       .replace("{tablename}", t.getName()));
-      procedures.add(String.format("sp_select%ssBy%s", t.getPascalName(), c.getPascalName()));
+      procedures.add(String.format("sp_select%sBy%s", t.getPascalName(), c.getPascalName()));
     }
     return b.toString();
   }
@@ -164,10 +164,11 @@ public class SqlGenerator extends Generator {
     return selectJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
+      .replace("{secondarytablename}", t.getParentTables().get(0).getName())
       .replace("{secondarycolumnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
       .replace("{primarytablename}", t.getParentTables().get(0).getName())
       .replace("{primarycolumnname}", t.getPrimaryColumn().getName())
-      .replace("{secondarysqltype}", DataTypeUtil.resolveSqlType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
+      .replace("{primarysqltype}", DataTypeUtil.resolveSqlType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
       .replace("{tablename}", t.getName());
   }
 
@@ -176,10 +177,11 @@ public class SqlGenerator extends Generator {
     return selectJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
-      .replace("{secondarycolumnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
-      .replace("{primarytablename}", t.getParentTables().get(1).getName())
-      .replace("{primarycolumnname}", t.getParentTables().get(1).getPrimaryColumn().getName())
-      .replace("{secondarysqltype}", DataTypeUtil.resolveSqlType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
+      .replace("{secondarytablename}", t.getParentTables().get(1).getName())
+      .replace("{secondarycolumnname}", t.getParentTables().get(1).getPrimaryColumn().getName())
+      .replace("{primarytablename}", t.getParentTables().get(0).getName())
+      .replace("{primarycolumnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
+      .replace("{primarysqltype}", DataTypeUtil.resolveSqlType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
       .replace("{tablename}", t.getName());
     
   }
@@ -268,8 +270,8 @@ public class SqlGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       if(c.getIsAutoIncrement()) {
-      ++colIndex;
-      continue;
+        ++colIndex;
+        continue;
       }
       paramList
       .append(inparamTmpl

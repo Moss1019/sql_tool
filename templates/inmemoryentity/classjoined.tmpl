@@ -6,17 +6,15 @@ import java.util.UUID;
 
 public class {tablenamepascal} implements JoinedRepoObj {
 {fields}
-
 {getters}
 {setters}
-
   @Override
   public UUID getSecondary() {
-      return userId;
+      return {key2namecamel};
   }
 
   @Override
   public UUID getPrimary() {
-      return itemId;
+      return {key1namecamel};
   }
 }

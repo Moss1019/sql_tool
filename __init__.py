@@ -12,7 +12,9 @@ def get_choice():
   print('1. download antlr4 jar file')
   print('2. run antlr on a specified g4 grammar file')
   print('3. compile all java file in the root and ./parser directories')
-  print('4. run java language application')
+  print('4. generate spring boot with mysql support')
+  print('5. generate spring boot with firestore support')
+  print('6. generate spring boot with in memory data storage')
   choice = -1
   try:
     choice = int(input())
@@ -38,17 +40,21 @@ while is_running:
   elif choice == 3:
     print('compiling antlr and application .java files...')
     compile_java()
-  elif choice == 4:
+  elif choice >= 4:
+    data_option = choice - 4
     file_name = input('enter the name of the file containing the definition\n => ')
     if len(file_name) == 0:
       file_name = default_file_name
     package_name = input('enter the root package name\n => ')
     if len(package_name) == 0:
       package_name = default_package_name
-    db_user = input('enter the app database user name\n => ')
-    if len(db_user) == 0:
+    if choice == 4:
+      db_user = input('enter the app database user name\n => ')
+      if len(db_user) == 0:
+        db_user = default_db_user
+    else:
       db_user = default_db_user
     print('running java language app...')
-    run_java(file_name, package_name, db_user)
+    run_java(data_option, file_name, package_name, db_user)
   else:
     continue

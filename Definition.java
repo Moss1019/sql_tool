@@ -51,6 +51,8 @@ public class Definition {
         argMapping.put("package_name", args[i + 1]);
       } else if(args[i].equals("-u")) {
         argMapping.put("db_user", args[i + 1]);
+      } else if(args[i].equals("-o")) {
+        argMapping.put("storage_option", args[i + 1]);
       }
     }
     return argMapping;
@@ -78,17 +80,8 @@ public class Definition {
 
       Database db = new Database(dbUser, packageName, (List<Table>)visitor.visit(tree));
 
-      SqlGenerator sqlGen = new SqlGenerator(db);
-      writeFiles(sqlGen.generate(), "sql", "");
-
-      // EntityGenerator eGen = new EntityGenerator(db);
-      // writeFiles(eGen.generate(), "java", "entity");
-
       ViewGenerator vGen = new ViewGenerator(db);
       writeFiles(vGen.generate(), "java", "view");
-
-      // RepositoryGenerator rGen = new RepositoryGenerator(db);
-      // writeFiles(rGen.generate(), "java", "repository");
 
       ServiceGenerator sGen = new ServiceGenerator(db);
       writeFiles(sGen.generate(), "java", "service");
@@ -108,18 +101,36 @@ public class Definition {
       HttpGenerator httpGen = new HttpGenerator(db);
       writeFiles(httpGen.generate(), "ts", "http");
 
-      // FirebaseRepositoryGenerator fireGen = new FirebaseRepositoryGenerator(db);
-      // writeFiles(fireGen.generate(), "java", "repository");
+		  int storageOption = Integer.parseInt(argMapping.get("storage_option"));  
+      switch(storageOption) {
+        case 0: // MySql
+          SqlGenerator sqlGen = new SqlGenerator(db);
+          writeFiles(sqlGen.generate(), "sql", "");      
+          EntityGenerator eGen = new EntityGenerator(db);
+          writeFiles(eGen.generate(), "java", "entity");
+          RepositoryGenerator rGen = new RepositoryGenerator(db);
+          writeFiles(rGen.generate(), "java", "repository");
+          break;
+        case 1: // Firestore
+          FirebaseRepositoryGenerator fireGen = new FirebaseRepositoryGenerator(db);
+          writeFiles(fireGen.generate(), "java", "repository");
+          FirebaseEntityGenerator fireEGen = new FirebaseEntityGenerator(db);
+          writeFiles(fireEGen.generate(), "java", "entity");
+          FirebaseUtilGenerator fireUGen = new FirebaseUtilGenerator(db);
+          writeFiles(fireUGen.generate(), "java", "util");
+          break;
+        case 2: // In memory
+          InMemoryRepositoryGenerator inMemGen = new InMemoryRepositoryGenerator(db);
+          writeFiles(inMemGen.generate(), "java", "repository");
+          InMemoryEntityGenerator inMemEGen = new InMemoryEntityGenerator(db);
+          writeFiles(inMemEGen.generate(), "java", "entity");
+          InMemoryUtilGenerator inMemUGen = new InMemoryUtilGenerator(db);
+          writeFiles(inMemUGen.generate(), "java", "util");
+          break;
+        default:
+          System.out.println("Unknown storage option selected");
 
-      FirebaseEntityGenerator fireEGen = new FirebaseEntityGenerator(db);
-      writeFiles(fireEGen.generate(), "java", "entity");
-
-      FirebaseUtilGenerator fireUGen = new FirebaseUtilGenerator(db);
-      writeFiles(fireUGen.generate(), "java", "util");
-
-      InMemoryRepositoryGenerator inMemGen = new InMemoryRepositoryGenerator(db);
-      writeFiles(inMemGen.generate(), "java", "repository");
-
+      }
     } catch (Exception ex) {
       System.out.println(ex);
       System.out.println(ex.getClass().toString());

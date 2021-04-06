@@ -5,7 +5,7 @@
 	parameters = {
 	@StoredProcedureParameter(
 		mode = ParameterMode.IN,
-		type = Integer.class,
+		type = {primarykeywrapper}.class,
 		name = "{primarykeyname}")
 	}
 ),

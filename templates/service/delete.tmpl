@@ -1,8 +1,7 @@
 	public boolean delete({javatype} id) {
-  {tablenamepascal}View object = repo.selectByPk(id);
-  boolean result = false;
-  if(object != null) {
-		  result = repo.delete(id);{deletechildren}
-  }
-		return result;
+    {tablenamepascal} object = repo.selectByPk(id);
+    if(object != null) {{deletechildren}
+    }
+		return repo.delete(id);
 	}
+

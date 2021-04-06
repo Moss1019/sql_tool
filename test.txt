@@ -1,28 +1,24 @@
 
 user {
-  user_id guid primary 
+  user_id int primary auto_increment
+  name string
   email string unique
 }
 
 item {
-  item_id guid primary
+  item_id int primary auto_increment
+  title string unique
   user_id int foreign
 }
 
-milestone {
-  milestone_id guid primary 
-  title string
-  item_id guid foreign
-}
-
 collaborator {
-  collaborator_id guid foreign(user_id)
-  user_id guid foreign(user_id)
+  collaborator_id int foreign(user_id)
+  user_id int foreign(user_id)
   looped
 }
 
 item_collaborator {
-  item_id guid foreign
-  user_id guid foreign
+  item_id int foreign(item_id)
+  user_id int foreign(user_id)
   joined
 }

@@ -1,0 +1,10 @@
+	public {tablenamepascal} selectByPk({javatype} {primarycolnamecamel}) {
+  	StoredProcedureQuery q = em.createNamedStoredProcedureQuery("select{tablenamepascal}");
+  	q.setParameter("{primaryname}", {primarycolsetvalue});
+  	try {
+  		return ({tablenamepascal})q.getSingleResult();
+		} catch (Exception ex) {
+  		return null;
+		}
+	}
+

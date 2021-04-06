@@ -1,0 +1,10 @@
+	public List<{secondarytablenamepascal}> select{tablenamepascal}sOf{primarytablenamepascal}({primarykeyjavatype} {primarykeynamecamel}) {
+		StoredProcedureQuery q = em.createNamedStoredProcedureQuery("select{tablenamepascal}sOf{primarytablenamepascal}");
+		q.setParameter("{primarykeyname}", {primarykeysetparam});
+		try {
+			return (List<{secondarytablenamepascal}>)q.getResultList();
+		} catch (Exception ex) {
+			return new ArrayList<>();
+		}
+	}
+

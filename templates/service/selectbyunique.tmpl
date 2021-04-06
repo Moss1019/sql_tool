@@ -1,5 +1,9 @@
 	public {tablenamepascal}View selectBy{columnnamepascal}({javatype} value) {
-		{tablenamepascal} dbResult = repo.select{tablenamepascal}sBy{columnnamepascal}(value);{viewlists}
+		{tablenamepascal} dbResult = repo.selectBy{columnnamepascal}(value);
+		if(dbResult == null) {
+			return null;
+		}{viewlists}
 		{tablenamepascal}View result = {tablenamepascal}Mapper.map{tablenamepascal}(dbResult{childtables});
 		return result;
 	}
+

@@ -9,16 +9,19 @@ public class RepositoryGenerator extends Generator {
   private String setParamTmpl;
   private String setParamColTmpl;
   private String argumentTmpl;
-  private String selectOneTmpl;
-  private String selectListTmpl;
   private String insertTmpl;
+  private String selectTmpl;
+  private String selectAllTmpl;
+  private String selectByUnqiueTmpl;
+  private String selectOfParentTmpl;
+  private String selectJoinedTmpl;
   private String updateTmpl;
   private String deleteTmpl;
   private String deleteJoinedTmpl;
 
   public RepositoryGenerator(Database db) {
-  this.db = db;
-  loadTemplates();
+    this.db = db;
+    loadTemplates();
   }
 
   public Map<String, String> generate() {
@@ -58,99 +61,96 @@ public class RepositoryGenerator extends Generator {
       .append(generateDeleteJoined(t));
     } else {
       b
-      .append(generateSelectOne(t))
-      .append(generateSelectList(t))
+      .append(generateSelect(t))
+      .append(generateSelectAll(t))
+      .append(generateSelectByUnique(t))
+      .append(generateSelectOfParent(t))
       .append(generateDelete(t))
       .append(generateUpdate(t));
     }
     return b.toString();
   }
 
-  private String generateSelectOne(Table t) {
-    StringBuilder b = new StringBuilder();
-    b
-    .append(selectOneTmpl
-      .replace("{methodname}", "select")
-      .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{methodsuffix}", t.getPascalName())
+  private String generateSelectJoined(Table t) {
+    int index = t.getIsJoined() ? 1 : 0;
+    return selectJoinedTmpl
+      .replace("{secondarytablenamepascal}", t.getParentTables().get(index).getPascalName())
+      .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
+      .replace("{primarykeyjavatype}", DataTypeUtil.resolvePrimitiveType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
+      .replace("{primarykeynamecamel}", t.getPrimaryColumn().getCamelName())
+      .replace("{primarykeyname}", t.getPrimaryColumn().getName())
+      .replace("{primarykeysetparam}", DataTypeUtil.resolveSetParam(t.getPrimaryColumn().getCamelName(), 
+        t.getPrimaryColumn(), false));
+  }
+
+  private String generateSelect(Table t) {
+    return selectTmpl
       .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
-      .replace("{columnname}", t.getPrimaryColumn().getName()))
-    .append("\n");
+      .replace("{primarycolnamecamel}", t.getPrimaryColumn().getCamelName())
+      .replace("{primaryname}", t.getPrimaryColumn().getName())
+      .replace("{primarycolsetvalue}", DataTypeUtil.resolveSetParam(t.getPrimaryColumn().getCamelName(), t.getPrimaryColumn(), false));
+  }
+
+  private String generateSelectAll(Table t) {
+    return selectAllTmpl
+      .replace("{tablenamepascal}", t.getPascalName());
+  }
+
+  private String generateSelectByUnique(Table t) {
+    StringBuilder b = new StringBuilder();
+    int colIndex = 0;
     for(Column c: t.getUniqueColumns()) {
       b
-      .append(selectOneTmpl
-      .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{methodsuffix}", String.format("%ssBy%s", t.getPascalName(), c.getPascalName()))
-      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-      .replace("{columnname}", c.getName()))
-      .append("\n");
-    }
-    return b.toString();
-  }
-  
-  private String generateSelectList(Table t) {
-    StringBuilder b = new StringBuilder();
-    b
-    .append(selectListTmpl
-      .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{methodsuffix}", "All" + t.getPascalName() + "s")
-      .replace("{arguments}", "")
-      .replace("{setparams}", ""));
-    for(Table pt: t.getParentTables()) {
-      b
-      .append("\n\n")
-      .append(selectListTmpl
-      .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{methodsuffix}", String.format("%ssOf%s", t.getPascalName(), pt.getPascalName()))
-      .replace("{arguments}", argumentTmpl
-        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
-        .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName()))  
-      .replace("{setparams}", "\n\t\t" + setParamColTmpl
-        .replace("{columnname}", pt.getPrimaryColumn().getName())
-        .replace("{columnnamecamel}", pt.getPrimaryColumn().getCamelName())));
+      .append(selectByUnqiueTmpl
+        .replace("{colnamepascal}", c.getPascalName())
+        .replace("{coljavatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+        .replace("{colnamecamel}", c.getCamelName())
+        .replace("{colsetparam}", DataTypeUtil.resolveSetParam(c.getCamelName(), c, false)));
+      if(colIndex++ < t.getUniqueColumns().size() - 1) {
+        b.append("\n");
+      }
     }
     return b.toString();
   }
 
-  private String generateSelectJoined(Table t) {
+  private String generateSelectOfParent(Table t) {
     StringBuilder b = new StringBuilder();
-    int index = t.getIsLooped() ? 0 : 1;
-    b
-    .append("\n")
-    .append(selectListTmpl
-      .replace("{tablenamepascal}", t.getParentTables().get(index).getPascalName())
-      .replace("{methodsuffix}", String.format("%ssOf%s", t.getPascalName(), t.getParentTables().get(0).getPascalName()))
-      .replace("{arguments}", argumentTmpl
-      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getParentTables().get(0).getPrimaryColumn().getDataType()))
-      .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName()))
-      .replace("{setparams}", "\n\t\t" + setParamColTmpl
-      .replace("{columnname}", t.getParentTables().get(0).getPrimaryColumn().getName())
-      .replace("{columnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())));
+    int tabIndex = 0;
+    for(Table pt: t.getParentTables()) {
+      b
+      .append(selectOfParentTmpl
+        .replace("{parenttablenamepascal}", pt.getPascalName())
+        .replace("{primarycoljavatype}", DataTypeUtil.resolvePrimitiveType(pt.getPrimaryColumn().getDataType()))
+        .replace("{primarycolnamecamel}", pt.getPrimaryColumn().getCamelName())
+        .replace("{primarycolname}", pt.getPrimaryColumn().getName())
+        .replace("{primarycolsetvalue}", DataTypeUtil.resolveSetParam(pt.getPrimaryColumn().getCamelName(), pt.getPrimaryColumn(), false)));
+      if(tabIndex++ < t.getParentTables().size() - 1) {
+        b.append("\n");
+      }
+    }
     return b.toString();
   }
 
   private String generateInsert(Table t) {
-    StringBuilder b = new StringBuilder();
     StringBuilder parameters = new StringBuilder();
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       if(c.getIsAutoIncrement()) {
-      ++colIndex;
-      continue;
+        ++colIndex;
+        continue;
       }
       parameters.append(setParamTmpl
-      .replace("{columnname}", c.getName())
-      .replace("{columnnamepascal}", c.getPascalName()));
+        .replace("{columnname}", c.getName())
+        .replace("{columnsetparam}", DataTypeUtil.resolveSetParam(c.getPascalName(), c, true)));
       if(colIndex++ < t.getColumns().size() - 1) {
-      parameters.append("\n\t\t");
+        parameters.append("\n\t\t");
       }
     }
-    b
-    .append("\n\n")
-    .append(insertTmpl
+    return insertTmpl
       .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{parameters}", parameters.toString()));
-    return b.toString();
+      .replace("{parameters}", parameters.toString())
+      .replace("{setprimarykey}", DataTypeUtil.getObjPrimaryKey(t))
+      .replace("{tablenamecamel}", t.getCamelName());
   }
 
   private String generateUpdate(Table t) {
@@ -158,45 +158,37 @@ public class RepositoryGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       parameters.append(setParamTmpl
-      .replace("{columnname}", c.getName())
-      .replace("{columnnamepascal}", c.getPascalName()));
+        .replace("{columnname}", c.getName())
+        .replace("{columnsetparam}", DataTypeUtil.resolveSetParam(c.getPascalName(), c, true)));
       if(colIndex++ < t.getColumns().size() - 1) {
-      parameters.append("\n\t\t");
+        parameters.append("\n\t\t");
       }
     }
-    StringBuilder b = new StringBuilder();
-    b
-    .append("\n")
-    .append(updateTmpl
+    return updateTmpl
       .replace("{tablenamepascal}", t.getPascalName())
-      .replace("{parameters}", parameters.toString()));
-    return b.toString();
+      .replace("{parameters}", parameters.toString())
+      .replace("{tablenamecamel}", t.getCamelName());
   }
 
   private String generateDelete(Table t) {
-    StringBuilder b = new StringBuilder();
-    b
-    .append("\n")
-    .append(deleteTmpl
-      .replace("{tablenamepascal}", t.getPascalName())
+    return deleteTmpl
+      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
+      .replace("{primarykeynamecamel}", t.getPrimaryColumn().getCamelName())
       .replace("{primarykeyname}", t.getPrimaryColumn().getName())
-      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType())));
-    return b.toString();
+      .replace("{primarykeysetparam}", DataTypeUtil.resolveSetParam(t.getPrimaryColumn().getCamelName(), t.getPrimaryColumn(), false));
   }
 
   private String generateDeleteJoined(Table t) {
-    StringBuilder b = new StringBuilder();
-    b
-    .append("\n")
-    .append(deleteJoinedTmpl
+    return deleteJoinedTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{key1name}", t.getPrimaryColumn().getName())
       .replace("{key2name}", t.getJoinedColumn().getName())
       .replace("{key1javatype}", DataTypeUtil.resolvePrimitiveType(t.getPrimaryColumn().getDataType()))
       .replace("{key2javatype}", DataTypeUtil.resolvePrimitiveType(t.getJoinedColumn().getDataType()))
       .replace("{key1namecamel}", t.getPrimaryColumn().getCamelName())
-      .replace("{key2namecamel}", t.getJoinedColumn().getCamelName()));
-    return b.toString();
+      .replace("{key2namecamel}", t.getJoinedColumn().getCamelName())
+      .replace("{key1setparam}", DataTypeUtil.resolveSetParam(t.getPrimaryColumn().getCamelName(), t.getPrimaryColumn(), false))
+      .replace("{key2setparam}", DataTypeUtil.resolveSetParam(t.getJoinedColumn().getCamelName(), t.getJoinedColumn(), false));
   }
 
   private void loadTemplates() {
@@ -204,9 +196,13 @@ public class RepositoryGenerator extends Generator {
     argumentTmpl = loadTemplate("../templates/repository", "argument");
     setParamTmpl = loadTemplate("../templates/repository", "setparameter");
     setParamColTmpl = loadTemplate("../templates/repository", "setparametercol");
-    selectListTmpl = loadTemplate("../templates/repository", "selectlist");
-    selectOneTmpl = loadTemplate("../templates/repository", "selectone");
     insertTmpl = loadTemplate("../templates/repository", "insert");
+    insertTmpl = loadTemplate("../templates/repository", "insert");
+    selectTmpl = loadTemplate("../templates/repository", "select");
+    selectAllTmpl = loadTemplate("../templates/repository", "selectall");
+    selectByUnqiueTmpl = loadTemplate("../templates/repository", "selectbyunique");
+    selectOfParentTmpl = loadTemplate("../templates/repository", "selectofparent");
+    selectJoinedTmpl = loadTemplate("../templates/repository", "selectjoined");
     updateTmpl = loadTemplate("../templates/repository", "update");
     deleteTmpl = loadTemplate("../templates/repository", "delete");
     deleteJoinedTmpl = loadTemplate("../templates/repository", "deletejoined");

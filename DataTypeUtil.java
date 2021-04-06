@@ -61,9 +61,17 @@ public class DataTypeUtil {
     } else if (datatype.equals(dateStr)) {
       return "Date";
     } else if(datatype.equals(guidStr)) {
-      return "UUID";
+      return "String";
     }
     return "Integer";
+  }
+
+  public static String resolveSetParam(String name, Column c, boolean isGetter) {
+    String temp = isGetter ? "get" + name + "()" : name;
+    if(c.getDataType().equals(guidStr)) {
+      return String.format("%s.toString()", temp);
+    }
+    return temp;
   }
 
   public static String resolveTypeScriptType(String datatype) {
@@ -85,7 +93,7 @@ public class DataTypeUtil {
 
   public static String resolveSqlInsertSelectPK(Column col) {
     if(col.getDataType().equals(guidStr)) {
-      return col.getCamelName();
+      return col.getName();
     }
     return "last_insert_id()";
   }
