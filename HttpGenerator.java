@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 public class HttpGenerator extends Generator {
   private Database db;
+  private String endPoint;
 
   private String deleteTmpl;
   private String insertTmpl;
@@ -15,8 +16,9 @@ public class HttpGenerator extends Generator {
   private String selectUniqueTmpl;
   private String selectOfParentTmpl;
 
-  public HttpGenerator(Database db) {
+  public HttpGenerator(Database db, String endPoint) {
     this.db = db;
+    this.endPoint = endPoint;
     loadTemplates();
   }
 
@@ -27,7 +29,9 @@ public class HttpGenerator extends Generator {
       currentLoopedOrJoined = t.getIsLooped() || t.getIsJoined();
       b
       .append("import axios from 'axios';\n\n")
-      .append("const SERVER_END_POINT = 'http://localhost:8080';\n\n")
+      .append("const SERVER_END_POINT = '")
+      .append(endPoint)
+      .append("';\n\n")
       .append(generateInsert(t))
       .append("\n");
       if(currentLoopedOrJoined) {
@@ -59,7 +63,8 @@ public class HttpGenerator extends Generator {
     return deleteTmpl
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{primarycolnamecamel}", t.getPrimaryColumn().getCamelName())
-      .replace("{tablenamelower}", t.getLowerName());
+      .replace("{tablenamelower}", t.getLowerName())
+      .replace("{tstype}", DataTypeUtil.resolveTypeScriptType(t.getPrimaryColumn().getDataType()));
   }
 
   private String generateDeleteJoined(Table t) {
@@ -67,7 +72,9 @@ public class HttpGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{tablenamelower}", t.getLowerName())
       .replace("{pk1namecamel}", t.getPrimaryColumn().getCamelName())
-      .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName());
+      .replace("{pk2namecamel}", t.getJoinedColumn().getCamelName())
+      .replace("{pk1tstype}", DataTypeUtil.resolveTypeScriptType(t.getPrimaryColumn().getDataType()))
+      .replace("{pk2tstype}", DataTypeUtil.resolveTypeScriptType(t.getJoinedColumn().getDataType()));
   }
 
   private String generateInsert(Table t) {
@@ -99,7 +106,8 @@ public class HttpGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName())
       .replace("{colnamepascal}", c.getPascalName())
       .replace("{colnamecamel}", c.getCamelName())
-      .replace("{tablenamelower}", t.getLowerName()));
+      .replace("{tablenamelower}", t.getLowerName())
+      .replace("{tstype}", DataTypeUtil.resolveTypeScriptType(c.getDataType())));
       if(colIndex++ < t.getUniqueColumns().size() - 1) {
       b.append("\n");
       }
@@ -114,7 +122,8 @@ public class HttpGenerator extends Generator {
       .append(selectOfParentTmpl
       .replace("{parenttablenamepascal}", pt.getPascalName())
       .replace("{parentcolnamecamel}", pt.getPrimaryColumn().getCamelName())
-      .replace("{tablenamelower}", t.getLowerName()))
+      .replace("{tablenamelower}", t.getLowerName())
+      .replace("{tstype}", DataTypeUtil.resolveTypeScriptType(pt.getPrimaryColumn().getDataType())))
       .append("\n");
     }
     return b.toString();

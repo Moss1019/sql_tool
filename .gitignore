@@ -118,3 +118,5 @@ run.sh
 /parser/.antlr/
 
 .vs/
+
+config.props

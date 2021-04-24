@@ -1,10 +1,15 @@
 
+import os
+
 from antlr_setup import download_antlr_jar, run_antlr, compile_java, run_java
 
 default_antlr_file = 'Definition'
 default_file_name = 'test.txt'
 default_package_name = 'com.example'
 default_db_user = 'default_user'
+default_backend_folder = './backend'
+default_frontend_folder = './frontend'
+default_end_point = 'http://localhost:8080'
 
 def get_choice():
   print('Select an option to run')
@@ -21,6 +26,29 @@ def get_choice():
   except:
     pass
   return choice
+
+
+def get_args():
+  args = [default_package_name, default_db_user, default_backend_folder, default_frontend_folder, default_end_point]
+  if not os.path.exists('./config.props'):
+    print('config.props not found')
+    return args
+  f = open('./config.props', 'rt')
+  for line in f.readlines():
+    parts = line.split(' ')
+    if parts[0] == '-pack':
+      args[0] = parts[1].strip()
+    if parts[0] == '-dbuser':
+      args[1] = parts[1].strip()
+    if parts[0] == '-bend':
+      args[2] = parts[1].strip()
+    if parts[0] == '-fend':
+      args[3] = parts[1].strip()
+    if parts[0] == '-endp':
+      args[4] = parts[1].strip()
+  f.close()
+  return args
+
 
 is_running = True
 while is_running:
@@ -45,16 +73,8 @@ while is_running:
     file_name = input('enter the name of the file containing the definition\n => ')
     if len(file_name) == 0:
       file_name = default_file_name
-    package_name = input('enter the root package name\n => ')
-    if len(package_name) == 0:
-      package_name = default_package_name
-    if choice == 4:
-      db_user = input('enter the app database user name\n => ')
-      if len(db_user) == 0:
-        db_user = default_db_user
-    else:
-      db_user = default_db_user
     print('running java language app...')
-    run_java(data_option, file_name, package_name, db_user)
+    package_name, db_user, be, fe, endp = get_args()
+    run_java(data_option, file_name, package_name, db_user, be, fe, endp)
   else:
     continue

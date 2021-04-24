@@ -2,7 +2,7 @@ export function for{primarytablenamepascal}({primarycolumnnamecamel}: number, on
 	const url = `${SERVER_END_POINT}/api/{tablenamelower}s/for{primarytablenamepascal}/${{primarycolumnnamecamel}}`;
 	return axios.get(url)
 		.then(result => {
-			onSuccess(result);
+			onSuccess(result.data);
 		})
 		.catch(err => {
 			onError(err);

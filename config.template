@@ -1,0 +1,5 @@
+-bend ./backend
+-fend ./frontend
+-endp https://gcptestapp-309608.ew.r.appspot.com
+-dbuser default_iser
+-pack com.example.app

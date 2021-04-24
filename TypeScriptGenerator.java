@@ -25,7 +25,6 @@ public class TypeScriptGenerator extends Generator {
       .replace("{tablenamepascal}", t.getPascalName()))
       .append("\n");
     }
-    types.put("index", b.toString());
     return types;
   }
 

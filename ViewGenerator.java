@@ -43,11 +43,11 @@ public class ViewGenerator extends Generator {
       b
       .append("\tprivate ")
       .append(fieldTmpl
-      .replace("{javattype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-      .replace("{columnnamecamel}", c.getCamelName()))
+        .replace("{javattype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+        .replace("{columnnamecamel}", c.getCamelName()))
       .append(";");
       if(colIndex++ < t.getColumns().size() - 1) {
-      b.append("\n\n");
+        b.append("\n\n");
       }
     }
     return b.toString();
@@ -61,11 +61,11 @@ public class ViewGenerator extends Generator {
       b
       .append("\tprivate ")
       .append(fieldListTmpl
-      .replace("{tablenamepascal}", ct.getPascalName() + "View")
-      .replace("{tablenamecamel}", ct.getCamelName()))
-      .append(";");
+        .replace("{tablenamepascal}", ct.getPascalName() + "View")
+        .replace("{tablenamecamel}", ct.getCamelName()))
+      .append(";\n");
       if(tableIndex++ < t.getNonJoinedTables().size() - 1) {
-      b.append("\n\n");
+        b.append("\n");
       }
     }
     return b.toString();
@@ -77,19 +77,19 @@ public class ViewGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       fieldParams.append(fieldTmpl
-      .replace("{javattype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-      .replace("{columnnamecamel}", c.getCamelName()));
+        .replace("{javattype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+        .replace("{columnnamecamel}", c.getCamelName()));
       assignments
       .append("\t\t")
       .append(assignmentTmpl
-      .replace("{columnnamecamel}", c.getCamelName()))
+        .replace("{columnnamecamel}", c.getCamelName()))
       .append(";");
       if(colIndex++ < t.getColumns().size() - 1) {
-      fieldParams.append(", ");
-      assignments.append("\n");
+        fieldParams.append(", ");
+        assignments.append("\n");
       } else if(colIndex == t.getColumns().size() && t.getNonJoinedTables().size() > 0) {
-      fieldParams.append(", ");
-      assignments.append("\n");
+        fieldParams.append(", ");
+        assignments.append("\n");
       } 
     }
     StringBuilder childTableListParams = new StringBuilder();
@@ -123,23 +123,23 @@ public class ViewGenerator extends Generator {
     int colIndex = 0;
     for(Column c: t.getColumns()) {
       b.append(getterTmpl
-      .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
-      .replace("{columnnamepascal}", c.getPascalName())
-      .replace("{columnnamecamel}", c.getCamelName()));
+        .replace("{javatype}", DataTypeUtil.resolvePrimitiveType(c.getDataType()))
+        .replace("{columnnamepascal}", c.getPascalName())
+        .replace("{columnnamecamel}", c.getCamelName()));
       if(colIndex++ < t.getColumns().size() - 1) {
-      b.append("\n");
+        b.append("\n");
       } else if(colIndex == t.getColumns().size() && t.getNonJoinedTables().size() > 0) {
-      b.append("\n");
+        b.append("\n");
       }
     }
     int tableIndex = 0;
     for(Table ct: t.getNonJoinedTables()) {
       b.append(getterTmpl
-      .replace("{javatype}", "List<" + ct.getPascalName() + "View>")
-      .replace("{columnnamepascal}", ct.getPascalName() + "s")
-      .replace("{columnnamecamel}", ct.getCamelName() + "s"));
+        .replace("{javatype}", "List<" + ct.getPascalName() + "View>")
+        .replace("{columnnamepascal}", ct.getPascalName() + "s")
+        .replace("{columnnamecamel}", ct.getCamelName() + "s"));
       if(colIndex++ < t.getColumns().size() - 1) {
-      b.append("\n");
+        b.append("\n");
       }
     }
     return b.toString();

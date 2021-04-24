@@ -1,3 +1,3 @@
       for({childnamepascal}View x: {childnamecamel}Service.selectOf{tablenamepascal}(object.get{primarykeypascal}())) {
-        itemService.delete(x.get{childprimarypascal}());
+        {childnamecamel}Service.delete(x.get{childprimarypascal}());
       }
