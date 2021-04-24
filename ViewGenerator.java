@@ -63,7 +63,7 @@ public class ViewGenerator extends Generator {
       .append(fieldListTmpl
         .replace("{tablenamepascal}", ct.getPascalName() + "View")
         .replace("{tablenamecamel}", ct.getCamelName()))
-      .append(";\n");
+      .append(" = new ArrayList<>();\n");
       if(tableIndex++ < t.getNonJoinedTables().size() - 1) {
         b.append("\n");
       }
