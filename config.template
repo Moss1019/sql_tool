@@ -1,5 +1,5 @@
 -bend ./backend
 -fend ./frontend
--endp https://gcptestapp-309608.ew.r.appspot.com
+-endp http://localhost:8080
 -dbuser default_iser
 -pack com.example.app

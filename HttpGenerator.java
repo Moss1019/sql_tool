@@ -120,10 +120,11 @@ public class HttpGenerator extends Generator {
     for(Table pt: t.getParentTables()) {
       b
       .append(selectOfParentTmpl
-      .replace("{parenttablenamepascal}", pt.getPascalName())
-      .replace("{parentcolnamecamel}", pt.getPrimaryColumn().getCamelName())
-      .replace("{tablenamelower}", t.getLowerName())
-      .replace("{tstype}", DataTypeUtil.resolveTypeScriptType(pt.getPrimaryColumn().getDataType())))
+        .replace("{tablenamepascal}", t.getPascalName())
+        .replace("{parenttablenamepascal}", pt.getPascalName())
+        .replace("{parentcolnamecamel}", pt.getPrimaryColumn().getCamelName())
+        .replace("{tablenamelower}", t.getLowerName())
+        .replace("{tstype}", DataTypeUtil.resolveTypeScriptType(pt.getPrimaryColumn().getDataType())))
       .append("\n");
     }
     return b.toString();

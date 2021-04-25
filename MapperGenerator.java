@@ -23,7 +23,7 @@ public class MapperGenerator extends Generator {
       mappers.put(t.getPascalName() + "Mapper", classTmpl
       .replace("{childviewimports}", generateViewImports(t))
       .replace("{mapentity}", generateMapEntity(t))
-      .replace("{mapentitynulls}", t.getNonJoinedTables().size() > 0 ? generateMapEntityNulls(t) : "")
+      .replace("{mapentityempties}", t.getNonJoinedTables().size() > 0 ? generateEmptyMapEntity(t) : "")
       .replace("{mapview}", generateMapView(t))
       .replace("{tablenamecamel}", t.getCamelName())
       .replace("{tablenamepascal}", t.getPascalName())
@@ -75,10 +75,10 @@ public class MapperGenerator extends Generator {
     return b.toString();
   }
 
-  private String generateMapEntityNulls(Table t) {
+  private String generateEmptyMapEntity(Table t) {
     StringBuilder childListsArgs = new StringBuilder();
     for(Table ct: t.getNonJoinedTables()) {
-      childListsArgs.append(", null");
+      childListsArgs.append(", new ArrayList<>()");
     }
     StringBuilder colGetters = new StringBuilder();
     int colIndex = 0;
