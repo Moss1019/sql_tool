@@ -1,6 +1,6 @@
 export function get{tablenamepascal}By{colnamepascal}({colnamecamel}: {tstype}, onSuccess: (data: any) => void, onError: (err: any) => any) {
 	const url = `${SERVER_END_POINT}/api/{tablenamelower}s/by{colnamepascal}/${{colnamecamel}}`;
-	return axios.get(url)
+	axios.get(url)
 		.then(result => {
 			onSuccess(result.data);
 		})

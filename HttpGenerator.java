@@ -134,10 +134,12 @@ public class HttpGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     int index = t.getIsLooped() ? 0 : 1;
     return selectJoinedTmpl
+      .replace("{tablenamepascal}", t.getPascalName())
       .replace("{primarytablenamepascal}", t.getParentTables().get(0).getPascalName())
       .replace("{primarycolumnnamecamel}", t.getParentTables().get(0).getPrimaryColumn().getCamelName())
       .replace("{tablenamelower}", t.getLowerName())
-      .replace("{resulttablenamepascal}", t.getParentTables().get(index).getPascalName());
+      .replace("{resulttablenamepascal}", t.getParentTables().get(index).getPascalName())
+      .replace("{tstype}", DataTypeUtil.resolveTypeScriptType(t.getParentTables().get(0).getPrimaryColumn().getDataType()));
   }
 
   public String generateUpdate(Table t) {

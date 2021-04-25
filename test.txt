@@ -20,3 +20,8 @@ milestone {
   item_id guid foreign
 }
 
+collaborator {
+  collaborator_id guid foreign(user_id)
+  user_id guid foreign(user_id)
+  looped
+}
