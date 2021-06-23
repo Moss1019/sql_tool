@@ -1,8 +1,0 @@
-	@RequestMapping(value = "{{pk1namecamel}}/{{pk2namecamel}}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> delete(@PathVariable {key1javatype} {pk1namecamel}, @PathVariable {key1javatype} {pk2namecamel}) {
-		boolean result = service.delete({pk1namecamel}, {pk2namecamel});
-		if (!result) {
-			return ResponseEntity.status(400).body("Could not delete {tablenamepascal}");
-		}
-		return ResponseEntity.ok(result);
-	}

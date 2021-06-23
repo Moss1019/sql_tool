@@ -1,8 +1,0 @@
-  @RequestMapping(value = "", method = RequestMethod.GET)
-	public ResponseEntity<?> selectAll() {
-		List<{tablenamepascal}View> result = service.selectAll();
-		if (result.size() == 0) {
-			return ResponseEntity.status(404).body("No results");
-		}
-		return ResponseEntity.ok(result);
-	}

@@ -1,8 +1,0 @@
-delimiter //
-create procedure sp_select{tablenamepascal}sOf{primarytablenamepascal}
-(in {primarycolumnname} {primarysqltype})
-begin
-select * from {secondarytablename} t1 where t1.{secondarycolumnname} in 
-(select t2.{secondarycolumnname} from {tablename} t2 where t2.{primarycolumnname} = {primarycolumnname});
-end //
-delimiter ;

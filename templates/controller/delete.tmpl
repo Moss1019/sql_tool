@@ -1,8 +1,0 @@
-	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> delete(@PathVariable {javatype} id) {
-		boolean result = service.delete(id);
-		if (!result) {
-			return ResponseEntity.status(400).body("Could not delete {tablenamepascal}");
-		}
-		return ResponseEntity.ok(result);
-	}

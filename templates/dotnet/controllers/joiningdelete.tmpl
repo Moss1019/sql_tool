@@ -1,0 +1,19 @@
+        [HttpDelete("{{primarylower}}/{{secondarylower}}")]
+        public ActionResult<string> Delete{tablepascal}([FromRoute] string {primarylower}, [FromRoute] string {secondarylower})
+        {
+            Guid {primarycamel};
+            if(Guid.TryParse({primarylower}, out {primarycamel}))
+            {
+                Guid {secondarycamel};
+                if(Guid.TryParse({secondarycamel}, out {secondarycamel}))
+                {
+                    if(service.Delete({primarycamel}, {secondarycamel}))
+                    {
+                        return Ok("{tablepascal} unlinked");
+                    }
+                    return NotFound("Link does not exist");
+                }
+                return BadRequest("Malformed collaborator id");
+            }
+            return BadRequest("Malformed item id");
+        }

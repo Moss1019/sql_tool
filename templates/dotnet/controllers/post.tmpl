@@ -1,0 +1,5 @@
+        [HttpPost("")]
+        public ActionResult<{tablepascal}View> Post{tablepascal}([FromBody] {tablepascal}View view)
+        {
+            return Ok(service.Insert(view));
+        }

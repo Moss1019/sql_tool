@@ -1,0 +1,12 @@
+        [HttpGet("by-{columnlower}/{{columnlower}}")]
+        public ActionResult<{tablepascal}View> Get{tablepascal}By{columnpascal}([FromRoute] string {columnlower})
+        {
+            try
+            {
+                return Ok(service.SelectBy{tablepascal}({columnlower}));
+            }
+            catch(InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }

@@ -1,9 +1,0 @@
-  public {tablenamepascal} selectBy{colnamepascal}({coljavatype} value) {
-    return collections.get(collectionName)
-        .values()
-        .stream()
-        .map(x -> ({tablenamepascal})x)
-        .filter(x -> x.get{colnamepascal}().equals(value))
-        .findFirst().orElse(null);
-  }
-

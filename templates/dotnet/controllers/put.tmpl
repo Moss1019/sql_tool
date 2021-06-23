@@ -1,0 +1,9 @@
+        [HttpPut("")]
+        public ActionResult<string> Update{tablepascal}([FromBody] {tablepascal}View view)
+        {
+            if (service.Update(view))
+            {
+                return Ok("{tablepascal} updated");
+            }
+            return NotFound("{tablepascal} not found");
+        }

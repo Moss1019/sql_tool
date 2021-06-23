@@ -1,0 +1,14 @@
+        [HttpDelete("{id}")]
+        public ActionResult<string> Delete{tablepascal}([FromRoute] string id)
+        {
+            Guid {primarypascal};
+            if(Guid.TryParse(id, out {primarypascal}))
+            {
+                if(service.Delete({primarypascal}))
+                {
+                    return Ok("{tablepascal} removed");
+                }
+                return NotFound("{tablepascal} does not exist");
+            }
+            return BadRequest("Malformed id");
+        }

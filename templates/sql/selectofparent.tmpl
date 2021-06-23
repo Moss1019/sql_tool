@@ -1,7 +1,0 @@
-delimiter //
-create procedure sp_select{tablenamepascal}sOf{parenttablenamepascal}
-(in {parentprimarykey} {sqltype})
-begin
-select * from {childtablename} t1 where t1.{parentprimarykey} = {parentprimarykey};
-end //
-delimiter ;

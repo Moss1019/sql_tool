@@ -1,0 +1,10 @@
+        [HttpGet("")]
+        public ActionResult<IEnumerable<{tablepascal}View>> Get{tablepascal}s()
+        {
+            var result = service.SelectAll();
+            if(result.Count() == 0)
+            {
+                return NotFound("No {tablelower}s");
+            }
+            return Ok(result);
+        }

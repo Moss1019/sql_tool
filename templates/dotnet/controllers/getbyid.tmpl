@@ -1,0 +1,17 @@
+        [HttpGet("{id}")]
+        public ActionResult<{tablepascal}View> Get{tablepascal}ById([FromRoute] string id)
+        {
+            Guid {primarypascal};
+            if(Guid.TryParse(id, out {primarypascal}))
+            {
+                try
+                {
+                    return Ok(service.SelectById({primarypascal}));
+                }
+                catch(InvalidOperationException ex)
+                {
+                    return NotFound(ex.Message);
+                }
+            }
+            return BadRequest("Malformed id provided");
+        }
