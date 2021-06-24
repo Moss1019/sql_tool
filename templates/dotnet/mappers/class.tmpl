@@ -1,0 +1,24 @@
+using {rootname}.Entities;
+using {rootname}.Views;
+
+namespace {rootname}.Mappers
+{
+    public static class {tablepascal}Mapper
+    {
+        public static {tablepascal} ToEntity(this {tablepascal}View view)
+        {
+            return new {tablepascal}()
+            {
+{viewassigns}
+            };
+        }
+
+        public static {tablepascal}View ToView(this {tablepascal} entity)
+        {
+            return new {tablepascal}View()
+            {
+{entityassigns}
+            };
+        }
+    }
+}

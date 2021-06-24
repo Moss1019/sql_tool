@@ -2,6 +2,8 @@
 import java.util.*;
 
 public class Table {
+  private static Map<String, Table> tableMapping = new HashMap<>();
+
   private String name;
   private List<Column> columns;
   private boolean joined;
@@ -12,13 +14,18 @@ public class Table {
   private List<Column> nonPrimaryColumns;
   private List<Table> parentTables;
   private List<Table> childTables;
+  private String pascalName;
+  private String camelName;
+  private boolean lists;
 
   public Table(String name, boolean joined, boolean looped, List<Column> columns) {
     this.name = name;
     this.joined = joined;
     this.looped = looped;
     this.columns = columns;
+    setupNames();
     setupColumns();
+    tableMapping.put(name, this);
   }
 
   @Override
@@ -76,17 +83,34 @@ public class Table {
     return childTables;
   }
 
+  public String getPascalName() {
+    return pascalName;
+  }
+
+  public String getCamelName() {
+    return camelName;
+  }
+
+  public String getLowerName() {
+    return pascalName.toLowerCase();
+  }
+
+  public boolean hasLists() {
+    return lists;
+  }
+
   private void setupColumns() {
-    this.uniqueColumns = new ArrayList<>();
-    this.nonPrimaryColumns = new ArrayList<>();
-    this.parentTables = new ArrayList<>();
-    this.childTables = new ArrayList<>();
+    uniqueColumns = new ArrayList<>();
+    nonPrimaryColumns = new ArrayList<>();
+    parentTables = new ArrayList<>();
+    childTables = new ArrayList<>();
+    lists = false;
     for(Column col: columns) {
       col.setOwnerTable(this);
       if(col.isPrimary()) {
-        this.primaryColumn = col;
+        primaryColumn = col;
       } else if (col.isSecondary()) {
-        this.secondaryColumn = col;
+        secondaryColumn = col;
       } else {
         nonPrimaryColumns.add(col);
       }
@@ -94,10 +118,32 @@ public class Table {
         uniqueColumns.add(col);
       }
       if(col.isForeign()) {
-        parentTables.add(col.getOwnerTable());
-        col.getOwnerTable().childTables.add(this);
+        Table foreignTable = tableMapping.get(col.getForeignTableName());
+        parentTables.add(foreignTable);
+        foreignTable.lists = true;
+        if(!foreignTable.getChildTables().contains(this)) {
+          foreignTable.getChildTables().add(this);
+        }
       }
     }
   }
 
+  private void setupNames() {
+    String[] parts = name.split("_");
+    StringBuilder c = new StringBuilder();
+    StringBuilder p = new StringBuilder();
+    for(int i = 0; i < parts.length; ++i) {
+      String part = parts[i];
+      p.append(part.toUpperCase().charAt(0));
+      p.append(part.substring(1).toLowerCase());
+      if(i == 0) {
+        c.append(part.toLowerCase().charAt(0));
+      } else {
+        c.append(part.toUpperCase().charAt(0));
+      }
+      c.append(part.substring(1).toLowerCase());
+    }
+    pascalName = p.toString();
+    camelName = c.toString();
+  } 
 }

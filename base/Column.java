@@ -9,6 +9,8 @@ public class Column {
   private boolean foreign;
   private boolean unique;
   private Table ownerTable;
+  private String pascalName;
+  private String camelName;
 
   public Column(String name,
     String dataType,
@@ -26,6 +28,7 @@ public class Column {
       this.autoIncrement = autoIncrement;
       this.foreign = foreign;
       this.unique = unique;
+      setupNames();
   }
 
   @Override
@@ -77,7 +80,38 @@ public class Column {
     return ownerTable;
   }
 
+  public String getPascalName() {
+    return pascalName;
+  }
+
+  public String getCamelName() {
+    return camelName;
+  }
+
+  public String getLowerName() {
+    return pascalName.toLowerCase();
+  }
+
   public void setOwnerTable(Table ownerTable) {
     this.ownerTable = ownerTable;
   }
+
+  private void setupNames() {
+    String[] parts = name.split("_");
+    StringBuilder c = new StringBuilder();
+    StringBuilder p = new StringBuilder();
+    for(int i = 0; i < parts.length; ++i) {
+      String part = parts[i];
+      p.append(part.toUpperCase().charAt(0));
+      p.append(part.substring(1).toLowerCase());
+      if(i == 0) {
+        c.append(part.toLowerCase().charAt(0));
+      } else {
+        c.append(part.toUpperCase().charAt(0));
+      }
+      c.append(part.substring(1).toLowerCase());
+    }
+    pascalName = p.toString();
+    camelName = c.toString();
+  } 
 }

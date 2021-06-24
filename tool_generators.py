@@ -1,4 +1,6 @@
 
+import json
+
 from os import path, mkdir, chdir, system, environ, getcwd
 from platform import system as platform_os
 
@@ -26,6 +28,9 @@ def generate_spring():
 
 
 def generator_asp():
+  f = open('settings.config')
+  config = json.load(f)
+  f.close()
   db_choice = get_data_option()
   if not path.exists('./build'):
     mkdir('./build')
@@ -34,5 +39,5 @@ def generator_asp():
     environ['CLASSPATH'] = cp_string % current_dir
   system('javac -d ./build ./parser/*.java ./base/*.java ./dotnet/*.java')
   chdir('./build')
-  system('java Program -f app.txt')
+  system('java Program -f app.txt -rn %s -db %d' % (config['root'], int(config['db'])))
   chdir('..')

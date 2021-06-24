@@ -14,6 +14,23 @@ public class Program {
       if(args[i].equals("-f")) {
         arguments.put("file", args[i + 1]);
       }
+      if(args[i].equals("-rn")) {
+        arguments.put("rootname", args[i + 1]);
+      }
+      if(args[i].equals("-db")) {
+        arguments.put("databasetype", args[i + 1]);
+      }
+    }
+  }
+
+  public static void writeFiles(Map<String, String> files, String dir) {
+    for(String key: files.keySet()) {
+      String outputDir = String.format("../output/%s/%s", dir, key);
+      FileHandler fh = new FileHandler(outputDir);
+      fh.writeFile(files.get(key));
+      if(fh.isInError()) {
+        System.out.println("Error while writing file");
+      }
     }
   }
 
@@ -29,8 +46,19 @@ public class Program {
       ParseTree tree = parser.database();
       DatabaseVisitor visitor = new DatabaseVisitor();
 
-      Database db = new Database((List<Table>)visitor.visit(tree));
-      System.out.println(db.toString());
+      Database db = new Database(arguments.get("rootname"), 
+        arguments.get("databasetype"), 
+        (List<Table>)visitor.visit(tree));
+      
+      EntityGenerator entityGenerator = new EntityGenerator(db);
+      writeFiles(entityGenerator.generate(), "Entities");
+
+      ViewGenerator viewGenerator = new ViewGenerator(db);
+      writeFiles(viewGenerator.generate(), "Views");
+
+      MapperGenerator mapperGenerator = new MapperGenerator(db);
+      writeFiles(mapperGenerator.generate(), "Mappers");
+
     } catch (Exception ex) {
       System.out.println(ex.getMessage());
     }
