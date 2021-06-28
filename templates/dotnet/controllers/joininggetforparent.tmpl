@@ -1,10 +1,10 @@
         [HttpGet("{id}")]
-        public ActionResult<UserView> GetCollaboratorsForItem([FromRoute] string id)
+        public ActionResult<UserView> Get{tablepascal}sFor{primarytablepascal}([FromRoute] string id)
         {
-            Guid itemId;
-            if (Guid.TryParse(id, out itemId))
+            Guid {primarycamel};
+            if (Guid.TryParse(id, out {primarycamel}))
             {
-                return Ok(service.Select{tablepascal}s(itemId));
+                return Ok(service.Select{tablepascal}s({primarycamel}));
             }
             return BadRequest("Malformed id");
         }

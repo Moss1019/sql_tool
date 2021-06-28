@@ -9,6 +9,7 @@ public class Column {
   private boolean foreign;
   private boolean unique;
   private Table ownerTable;
+  private Table foreignTable;
   private String pascalName;
   private String camelName;
 
@@ -80,6 +81,10 @@ public class Column {
     return ownerTable;
   }
 
+  public Table getForeignTable() {
+    return foreignTable;
+  }
+
   public String getPascalName() {
     return pascalName;
   }
@@ -94,6 +99,10 @@ public class Column {
 
   public void setOwnerTable(Table ownerTable) {
     this.ownerTable = ownerTable;
+  }
+
+  public void setForeignTable(Table foreignTable) {
+    this.foreignTable = foreignTable;
   }
 
   private void setupNames() {

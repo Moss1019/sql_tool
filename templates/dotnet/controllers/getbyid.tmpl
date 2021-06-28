@@ -1,12 +1,12 @@
         [HttpGet("{id}")]
         public ActionResult<{tablepascal}View> Get{tablepascal}ById([FromRoute] string id)
         {
-            Guid {primarypascal};
-            if(Guid.TryParse(id, out {primarypascal}))
+            Guid {primarycamel};
+            if(Guid.TryParse(id, out {primarycamel}))
             {
                 try
                 {
-                    return Ok(service.SelectById({primarypascal}));
+                    return Ok(service.SelectById({primarycamel}));
                 }
                 catch(InvalidOperationException ex)
                 {

@@ -120,6 +120,7 @@ public class Table {
       if(col.isForeign()) {
         Table foreignTable = tableMapping.get(col.getForeignTableName());
         parentTables.add(foreignTable);
+        col.setForeignTable(foreignTable);
         foreignTable.lists = true;
         if(!foreignTable.getChildTables().contains(this)) {
           foreignTable.getChildTables().add(this);

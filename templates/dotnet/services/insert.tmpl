@@ -1,0 +1,5 @@
+        public {tablepascal}View Insert({tablepascal}View view)
+        {
+            view.{tablepascal}Id = Guid.NewGuid();
+            return repo.Insert(view.ToEntity()).ToView();
+        }

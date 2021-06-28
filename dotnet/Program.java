@@ -59,6 +59,12 @@ public class Program {
       MapperGenerator mapperGenerator = new MapperGenerator(db);
       writeFiles(mapperGenerator.generate(), "Mappers");
 
+      ControllerGenerator controllerGenerator = new ControllerGenerator(db);
+      writeFiles(controllerGenerator.generate(), "Controllers");
+
+      ServiceGenerator serviceGenerator = new ServiceGenerator(db);
+      writeFiles(serviceGenerator.generate(), "Services");
+
     } catch (Exception ex) {
       System.out.println(ex.getMessage());
     }
