@@ -1,10 +1,10 @@
         [HttpDelete("{id}")]
         public ActionResult<string> Delete{tablepascal}([FromRoute] string id)
         {
-            Guid {primarypascal};
-            if(Guid.TryParse(id, out {primarypascal}))
+            Guid {primarycamel};
+            if(Guid.TryParse(id, out {primarycamel}))
             {
-                if(service.Delete({primarypascal}))
+                if(service.Delete({primarycamel}))
                 {
                     return Ok("{tablepascal} removed");
                 }

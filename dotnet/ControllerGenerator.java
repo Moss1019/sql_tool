@@ -76,6 +76,7 @@ public class ControllerGenerator extends Generator {
       b
       .append(getForParentTmpl
         .replace("{primarytablelower}", pt.getLowerName())
+        .replace("{parenttablepascal}", pt.getPascalName())
         .replace("{primarycamel}", pt.getPrimaryColumn().getCamelName()));
       if(++i < t.getParentTables().size()) {
         b.append("\n\n");
@@ -108,7 +109,8 @@ public class ControllerGenerator extends Generator {
   }
 
   private String genrateDelete(Table t) {
-    return deleteOneTmpl;
+    return deleteOneTmpl
+      .replace("{primarycamel}", t.getPrimaryColumn().getCamelName());
   }
 
   private String generatePut(Table t) {

@@ -1,10 +1,10 @@
         [HttpGet("for-{primarytablelower}/{id}")]
-        public ActionResult<IEnumerable<{tablepascal}View>> GetForUser([FromRoute] string id)
+        public ActionResult<IEnumerable<{tablepascal}View>> GetFor{parenttablepascal}([FromRoute] string id)
         {
             Guid {primarycamel};
             if(Guid.TryParse(id, out {primarycamel}))
             {
-                return Ok(service.SelectForUser({primarycamel}));
+                return Ok(service.SelectFor{parenttablepascal}({primarycamel}));
             }
             return BadRequest("Malformed id");
         }
