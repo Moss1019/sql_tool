@@ -1,0 +1,11 @@
+        public bool Update({tablepascal} entity)
+        {
+            var entityToUpdate = Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} == entity.{primarycolumnpascal}).FirstOrDefault();
+            if(entityToUpdate == null)
+            {
+                return false;
+            }
+            Set(Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} != entityToUpdate.{primarycolumnpascal}).ToList());
+            Get<{tablepascal}>(collectionName).Add(entity);
+            return true;
+        }

@@ -1,0 +1,10 @@
+        public bool Delete(Guid {primarycolumncamel})
+        {
+            var entityToRemove = Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} == {primarycolumncamel}).FirstOrDefault();
+            if(entityToRemove == null)
+            {
+                return false;
+            }
+            Set(Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} != {primarycolumncamel}).ToList());
+            return true;
+        }

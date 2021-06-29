@@ -1,0 +1,48 @@
+using {rootname}.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace {rootname}.Repositories.InMemory
+{
+    public class {tablepascal}Repository : BaseRepository<{tablepascal}>, I{tablepascal}Repository
+    {
+        private string secondaryTable = "{secondarytablelower}";
+
+        public {tablepascal}Repository(DbContext context)
+            : base(context)
+        {
+            collectionName = "{tablepascal}";
+            if (!collections.ContainsKey(collectionName))
+            {
+                collections[collectionName] = new List<{tablepascal}>();
+            }
+        }
+
+        public bool Delete(Guid {primarycolumncamel}, Guid {secondarycolumncamel})
+        {
+            var entityToDelete = Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} == {primarycolumncamel} && e.{secondarycolumnpascal} == {secondarycolumncamel}).FirstOrDefault();
+            if(entityToDelete == null)
+            {
+                return false;
+            }
+            Set(Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} != {primarycolumncamel} && e.{secondarycolumnpascal} != {secondarycolumncamel}).ToList());
+            return true;
+        }
+
+        public {tablepascal} Insert({tablepascal} entity)
+        {
+            Get<{tablepascal}>(collectionName).Add(entity);
+            return entity;
+        }
+
+        public IEnumerable<User> Select{tablepascal}s(Guid {primarycolumncamel})
+        {
+            var ids = Get<{tablepascal}>(collectionName)
+                .Where(e => e.{primarycolumnpascal} == {primarycolumncamel})
+                .Select(e => e.CollaboratorId);
+            return Get<User>(secondaryTable)
+                .Where(e => ids.Contains(e.Id));
+        }
+    }
+}

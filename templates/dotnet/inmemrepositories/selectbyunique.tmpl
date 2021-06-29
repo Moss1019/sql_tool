@@ -1,0 +1,9 @@
+        public {tablepascal} SelectBy{columnpascal}(string {columncamel})
+        {
+            var result = Get<{tablepascal}>(collectionName).Where(e => e.{columncamel} == {columncamel}).FirstOrDefault();
+            if(result == null)
+            {
+                throw new InvalidOperationException("{tablepascal} not found");
+            }{childlists}
+            return result;
+        }

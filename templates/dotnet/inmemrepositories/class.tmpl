@@ -1,0 +1,35 @@
+using {rootname}.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace {rootname}.Repositories.InMemory
+{
+    public class {tablepascal}Repository : BaseRepository<{tablepascal}>, I{tablepascal}Repository
+    {
+        public {tablepascal}Repository(DbContext context)
+            : base(context)
+        {
+            collectionName = "{tablelower}";
+            if (!collections.ContainsKey(collectionName))
+            {
+                collections[collectionName] = new List<{tablepascal}>();
+            }
+        }
+
+{selectbyid}
+
+{selectbyunique}
+
+{insert}
+
+{selectall}
+
+{selectforparent}
+
+{update}
+
+{delete}
+
+    }
+}

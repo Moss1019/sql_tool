@@ -65,6 +65,12 @@ public class Program {
       ServiceGenerator serviceGenerator = new ServiceGenerator(db);
       writeFiles(serviceGenerator.generate(), "Services");
 
+      RepositoryGenerator repositoryGenerator = new RepositoryGenerator(db);
+      writeFiles(repositoryGenerator.generate(), "Repository");
+
+      ConfigGenerator configGenerator = new ConfigGenerator(db);
+      writeFiles(configGenerator.generate(), "");
+
     } catch (Exception ex) {
       System.out.println(ex.getMessage());
     }

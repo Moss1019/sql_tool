@@ -1,0 +1,25 @@
+using {rootname}.Repositories;
+using {rootname}.Repositories.InMemory;
+using {rootname}.Services;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace {rootname}
+{
+    public static class DIConfiguration
+    {
+        public static void Add{rootname}Configuration(this IServiceCollection services)
+        {
+            ConfigureRepositories(services);
+            ConfigureServices(services);
+        }
+
+        private static void ConfigureRepositories(IServiceCollection services)
+        { {repositories}
+            services.AddSingleton<DbContext>();
+        }
+
+        public static void ConfigureServices(IServiceCollection services)
+        { {services}
+        }
+    }
+}
