@@ -66,7 +66,7 @@ public class Program {
       writeFiles(serviceGenerator.generate(), "Services");
 
       RepositoryGenerator repositoryGenerator = new RepositoryGenerator(db);
-      writeFiles(repositoryGenerator.generate(), "Repository");
+      writeFiles(repositoryGenerator.generate(), "Repositories");
 
       ConfigGenerator configGenerator = new ConfigGenerator(db);
       writeFiles(configGenerator.generate(), "");
