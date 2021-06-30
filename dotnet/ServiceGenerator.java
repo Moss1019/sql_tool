@@ -41,6 +41,7 @@ public class ServiceGenerator extends Generator {
       return joinedInterfaceTmpl
         .replace("{primarycamel}", t.getPrimaryColumn().getCamelName())
         .replace("{secondarycamel}", t.getSecondaryColumn().getCamelName())
+        .replace("{secondarytablepascal}", t.getSecondaryColumn().getForeignTable().GetPascalName())
         .replace("{rootname}", db.getRootName())
         .replace("{tablepascal}", t.getPascalName());
     } else {
