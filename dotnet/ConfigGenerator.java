@@ -25,7 +25,7 @@ public class ConfigGenerator extends Generator {
           .replace("{tablepascal}", t.getPascalName())
           .replace("{type}", "Repository"));
     }
-    files.put("DiConfiguration.cs", inMemDiConfig
+    files.put("DIConfiguration.cs", inMemDiConfig
       .replace("{services}", bs.toString())
       .replace("{repositories}", br.toString())
       .replace("{rootname}", db.getRootName()));

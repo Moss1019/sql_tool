@@ -53,7 +53,8 @@ public class ControllerGenerator extends Generator {
   private String generateJoiningGetForParent(Table t) {
     return joiningGetForParentTmpl
       .replace("{primarycamel}", t.getPrimaryColumn().getCamelName())
-      .replace("{primarytablepascal}", t.getPrimaryColumn().getForeignTable().getPascalName());
+      .replace("{primarytablepascal}", t.getPrimaryColumn().getForeignTable().getPascalName())
+      .replace("{secondarytablepascal}", t.getSecondaryColumn().getForeignTable().getPascalName());
   }
 
   private String generateJoiningDelete(Table t) {
@@ -61,7 +62,7 @@ public class ControllerGenerator extends Generator {
       .replace("{primarylower}", t.getPrimaryColumn().getLowerName())
       .replace("{secondarylower}", t.getSecondaryColumn().getLowerName())
       .replace("{primarycamel}", t.getPrimaryColumn().getCamelName())
-      .replace("{secondarycamel}", t.getSecondaryColumn().getLowerName());
+      .replace("{secondarycamel}", t.getSecondaryColumn().getCamelName());
   }
 
   private String generateGetById(Table t) {
