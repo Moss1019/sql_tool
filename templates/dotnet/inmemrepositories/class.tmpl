@@ -7,10 +7,11 @@ namespace {rootname}.Repositories.InMemory
 {
     public class {tablepascal}Repository : BaseRepository<{tablepascal}>, I{tablepascal}Repository
     {
-        public {tablepascal}Repository(DbContext context)
+{childrepos}
+        public {tablepascal}Repository({childrepoargs}DbContext context)
             : base(context)
         {
-            collectionName = "{tablelower}";
+            collectionName = "{tablelower}";{childrepoassigns}
             if (!collections.ContainsKey(collectionName))
             {
                 collections[collectionName] = new List<{tablepascal}>();

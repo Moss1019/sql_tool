@@ -65,14 +65,26 @@ public class Program {
       ServiceGenerator serviceGenerator = new ServiceGenerator(db);
       writeFiles(serviceGenerator.generate(), "Services");
 
-      RepositoryGenerator repositoryGenerator = new RepositoryGenerator(db);
-      writeFiles(repositoryGenerator.generate(), "Repositories");
+      switch (db.getDatabaseType()) {
+        case InMemory: {
+          InMemoryRepositoryGenerator repositoryGenerator = new InMemoryRepositoryGenerator(db);
+          writeFiles(repositoryGenerator.generate(), "Repositories");
+          break;
+        }
+        case Sql: {
+          SqlRepositoryGenerator repositoryGenerator = new SqlRepositoryGenerator(db);
+          writeFiles(repositoryGenerator.generate(), "Repositories");
+          break;
+        }
+        default:
+          System.out.println("Unknown database type");
+      }
 
       ConfigGenerator configGenerator = new ConfigGenerator(db);
       writeFiles(configGenerator.generate(), "");
 
     } catch (Exception ex) {
-      System.out.println(ex.getMessage());
+      ex.printStackTrace();
     }
 
     // generate sql    

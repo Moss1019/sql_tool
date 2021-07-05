@@ -8,8 +8,8 @@ namespace {rootname}.Repositories.InMemory
 {
     public abstract class BaseRepository<T>
     {
-        protected readonly string collectionName;
-        protected readonly Dictionary<string, IList> collections;
+        protected string collectionName;
+        protected Dictionary<string, IList> collections;
 
         public BaseRepository(DbContext context)
         {

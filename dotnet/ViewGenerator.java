@@ -31,7 +31,7 @@ public class ViewGenerator extends Generator {
     int i = 0;
     for(Column c: t.getColumns()) {
       b
-      .append("\t\t\t\t")
+      .append("\t\t")
       .append(fieldTmpl
         .replace("{datatype}", DataTypeUtil.resolvePrimitive(c))
         .replace("{columnpascal}", c.getPascalName())
@@ -50,8 +50,12 @@ public class ViewGenerator extends Generator {
     StringBuilder b = new StringBuilder();
     int i = 0;
     for(Table ct: t.getChildTables()) {
+      if(ct.isLooped() || ct.isJoined()) {
+        ++i;
+        continue;
+      }
       b
-      .append("\t\t\t\t")
+      .append("\t\t")
       .append(childListTmpl
         .replace("{childpascal}", ct.getPascalName()));
       if(++i < t.getChildTables().size()) {

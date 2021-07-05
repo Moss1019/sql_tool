@@ -14,13 +14,14 @@ public class DatabaseVisitor extends GeneratorBaseVisitor<Object> {
   
   public Table visitTable(GeneratorParser.TableContext ctx) {
     String name = ctx.NAME().getText();
-    boolean joined = ctx.JOINED() != null;
-    boolean looped = ctx.LOOPED() != null;
+    boolean joined = ctx.joined() != null;
+    boolean looped = ctx.looped() != null;
+    String loopedJoinedName = joined ? ctx.joined().NAME().getText() : looped ? ctx.looped().NAME().getText() : "";
     List<Column> columns = new ArrayList<>();
     for(GeneratorParser.ColumnContext cCtx: ctx.column()) {
       columns.add(visitColumn(cCtx));
     }
-    return new Table(name, joined, looped, columns);
+    return new Table(name, joined, looped, loopedJoinedName, columns);
   }
 
   public Column visitColumn(GeneratorParser.ColumnContext ctx) {

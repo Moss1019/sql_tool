@@ -36,13 +36,13 @@ namespace {rootname}.Repositories.InMemory
             return entity;
         }
 
-        public IEnumerable<User> Select{tablepascal}s(Guid {primarycolumncamel})
+        public IEnumerable<{secondarytablepascal}> Select{tablepascal}s(Guid {primarycolumncamel})
         {
             var ids = Get<{tablepascal}>(collectionName)
                 .Where(e => e.{primarycolumnpascal} == {primarycolumncamel})
-                .Select(e => e.CollaboratorId);
-            return Get<User>(secondaryTable)
-                .Where(e => ids.Contains(e.Id));
+                .Select(e => e.{secondarycolumnpascal});
+            return Get<{secondarytablepascal}>(secondaryTable)
+                .Where(e => ids.Contains(e.{joinedcolumnpascal}));
         }
     }
 }

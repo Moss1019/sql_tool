@@ -3,6 +3,7 @@ public class Column {
   private String name;
   private String dataType;
   private String foreignTableName;
+  private String parentHandleName;
   private boolean primary;
   private boolean secondary;
   private boolean autoIncrement;

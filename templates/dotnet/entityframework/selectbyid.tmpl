@@ -1,0 +1,12 @@
+        public {tablepascal} SelectById(Guid {primarycamel})
+        {
+            using var context = new GidContext(config);
+            var e = context.{tablepascal}s
+                .Where(x => x.{primarypascal} == {primarycamel}){childlists}
+                .FirstOrDefault();
+            if(e != null)
+            {
+                return e;
+            }
+            throw new InvalidOperationException("{tablepascal} not found");
+        }

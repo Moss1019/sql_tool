@@ -1,9 +1,9 @@
         public {tablepascal} SelectById(Guid {primarycolumncamel})
         {
-            var result = Get<{tablepascal}>(collectionName).Where(e => e.Id == id);
-            if (result.Count() == 0)
+            var result = Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} == {primarycolumncamel}).FirstOrDefault();
+            if (result == null)
             {
                 throw new InvalidOperationException("{tablepascal} not found");
-            }
-            return result.First();
+            }{childlists}
+            return result;
         }

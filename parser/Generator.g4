@@ -2,7 +2,11 @@ grammar Generator;
 
 database: table+;
 
-table : NAME '{' column* LOOPED? JOINED?'}';
+table : NAME '{' column* looped? joined?'}';
+
+joined: 'joined(' NAME ')';
+
+looped: 'looped(' NAME ')';
 
 column : NAME DATA_TYPE option*;
 
@@ -13,10 +17,6 @@ option
   | 'unique'
   | 'foreign(' NAME ')'
   ;
-
-JOINED: 'joined';
-
-LOOPED: 'looped';
 
 DATA_TYPE
   : 'int'

@@ -10,12 +10,10 @@ namespace {rootname}.Services
     public class {tablepascal}Service : I{tablepascal}Service
     {
         private I{tablepascal}Repository repo;
-        private I{secondarytablepascal}Repository {secondarytablecamel}Repo;
 
-        public {tablepascal}Service(I{tablepascal}Repository repo, I{secondarytablepascal}Repository {secondarytablecamel}Repo)
+        public {tablepascal}Service(I{tablepascal}Repository repo)
         {
             this.repo = repo;
-            this.{secondarytablecamel}Repo = {secondarytablecamel}Repo;
         }
 
         public bool Delete(Guid {primarycolumncamel}, Guid {secondarycolumncamel})

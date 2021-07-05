@@ -1,0 +1,6 @@
+        public IEnumerable<{tablepascal}> SelectAll()
+        {
+            using var context = new GidContext(config);
+            return context.{tablepascal}s{childlists}
+                .ToList();
+        }

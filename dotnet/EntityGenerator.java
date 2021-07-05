@@ -34,7 +34,7 @@ public class EntityGenerator extends Generator {
     int i = 0;
     for(Column c: t.getColumns()) {
       b
-      .append("\t\t\t\t")
+      .append("\t\t\t")
       .append(fieldTmpl
         .replace("{datatype}", DataTypeUtil.resolvePrimitive(c))
         .replace("{columnpascal}", c.getPascalName()));
@@ -50,34 +50,41 @@ public class EntityGenerator extends Generator {
       return "";
     }
     StringBuilder b = new StringBuilder();
+    b.append("\n\n");
     int i = 0;
     for(Table pt: t.getParentTables()) {
+      String parentHandle = pt.getPascalName();
+      if(t.isLooped() || t.isJoined()) {
+        if(i > 0) {
+          parentHandle = t.getLoopedJoinedPascal();
+        }
+      }
       b
-      .append("\t\t\t\t")
+      .append("\t\t\t")
       .append(virtualParentTmpl
-        .replace("{tablepascal}", pt.getPascalName()))
-      .append("\n");
+        .replace("{parenthandlepascal}", parentHandle)
+        .replace("{tablepascal}", pt.getPascalName()));
       if(++i < t.getParentTables().size()) {
-        b.append("\n");
+        b.append("\n\n");
       }
     }
     return b.toString();
   } 
 
   public String generateChildLists(Table t) {
-    if(db.getDatabaseType() != DatabaseType.Sql) {
-      return "";
-    }
     StringBuilder b = new StringBuilder();
+    b.append("\n\n");
     int i = 0;
     for(Table ct: t.getChildTables()) {
+      if(ct.isJoined() || ct.isLooped()) {
+        continue;
+      }
       b
-      .append("\t\t\t\t")
+      .append("\t\t\t")
       .append(childListTmpl
-        .replace("{tablepascal}", ct.getPascalName()))
-      .append("\n");
-      if(++i < t.getChildTables().size()) {
-        b.append("\n");
+        .replace("{tablepascal}", ct.getPascalName()));
+      if(++i < t.getChildTables().size() - 1) {
+        b.append("\n\n");
       }
     }
     return b.toString();

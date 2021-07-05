@@ -8,6 +8,7 @@ public class Table {
   private List<Column> columns;
   private boolean joined;
   private boolean looped;
+  private String loopedJoinedName;
   private Column primaryColumn;
   private Column secondaryColumn;
   private List<Column> uniqueColumns;
@@ -16,12 +17,15 @@ public class Table {
   private List<Table> childTables;
   private String pascalName;
   private String camelName;
+  private String loopedJoinedPascal;
+  private String loopedJoinedCamel;
   private boolean lists;
 
-  public Table(String name, boolean joined, boolean looped, List<Column> columns) {
+  public Table(String name, boolean joined, boolean looped, String loopedJoinedName, List<Column> columns) {
     this.name = name;
     this.joined = joined;
     this.looped = looped;
+    this.loopedJoinedName = loopedJoinedName;
     this.columns = columns;
     setupNames();
     setupColumns();
@@ -95,6 +99,18 @@ public class Table {
     return pascalName.toLowerCase();
   }
 
+  public String getLoopedJoinedPascal() {
+    return loopedJoinedPascal;
+  }
+
+  public String getLoopedJoinedCamel() {
+    return loopedJoinedCamel;
+  }
+  
+  public String getLoopedJoinedLower() {
+    return loopedJoinedCamel.toLowerCase();
+  }
+
   public boolean hasLists() {
     return lists;
   }
@@ -146,5 +162,27 @@ public class Table {
     }
     pascalName = p.toString();
     camelName = c.toString();
+    if(loopedJoinedName.length() > 0) {
+      StringBuilder lp = new StringBuilder();
+      StringBuilder lc = new StringBuilder();
+      String[] loopedJoinedParts = loopedJoinedName.split("_");
+      for(int i = 0; i < loopedJoinedParts.length; ++i) {
+        String part = loopedJoinedParts[i];
+        lp.append(part.toUpperCase().charAt(0));
+        lp.append(part.toLowerCase().substring(1));
+        if(i == 0) {
+          lc.append(part.toLowerCase().charAt(0));
+        } else {
+          lc.append(part.toUpperCase().charAt(0));
+        }
+        lc.append(part.toLowerCase().substring(1));
+      }
+      loopedJoinedPascal = lp.toString();
+      loopedJoinedCamel = lc.toString();
+      System.out.println(loopedJoinedPascal);
+    } else {
+      loopedJoinedPascal = "";
+      loopedJoinedCamel = "";
+    }
   } 
 }

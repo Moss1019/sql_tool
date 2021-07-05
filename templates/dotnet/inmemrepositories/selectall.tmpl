@@ -1,4 +1,8 @@
         public IEnumerable<{tablepascal}> SelectAll()
         {
-            return Get<{tablepascal}>(collectionName);
+            var results = Get<{tablepascal}>(collectionName);
+            foreach(var result in results) 
+            {{childlists}
+            }
+            return results;
         }

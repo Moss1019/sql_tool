@@ -4,7 +4,7 @@
             if(entityToRemove == null)
             {
                 return false;
-            }
+            }{deletechildren}
             Set(Get<{tablepascal}>(collectionName).Where(e => e.{primarycolumnpascal} != {primarycolumncamel}).ToList());
             return true;
         }

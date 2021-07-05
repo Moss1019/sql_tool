@@ -1,0 +1,53 @@
+using {rootname}.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace {rootname}.Repositories.EF
+{
+    public class {tablepascal}Repository : I{tablepascal}Repository
+    {
+        private IConfiguration config;
+
+        public {tablepascal}Repository(IConfiguration config)
+        {
+            this.config = config;
+        }
+
+        public bool Delete(Guid {primarycamel}, Guid {secondarycamel})
+        {
+            using var context = new {rootname}Context(config);
+            var e = context.{tablepascal}s
+                .Where(x => x.{primarypascal} == {primarycamel} && x.{secondarypascal} == {secondarycamel})
+                .FirstOrDefault();
+            if(e != null)
+            {
+                context.{tablepascal}s.Remove(e);
+                context.SaveChanges();
+            }
+            return true;
+        }
+
+        public {tablepascal} Insert({tablepascal} entity)
+        {
+            using var context = new {rootname}Context(config);
+            context.{tablepascal}s.Add(entity);
+            context.SaveChanges();
+            return entity;
+        }
+
+        public IEnumerable<{primarytablepascal}> Select{secondarytablepascal}s(Guid {primarycamel})
+        {
+            using var context = new {rootname}Context(config);
+            var result = context.{tablepascal}s
+                .Where(x => x.{primarypascal} == {primarycamel})
+                .Include(x => x.{secondarytablepascal})
+                .Select(x => x.{secondarytablepascal})
+                .ToList();
+            return result;
+        }
+    }
+}
