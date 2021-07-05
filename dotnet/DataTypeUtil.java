@@ -38,4 +38,38 @@ public class DataTypeUtil {
     }
     return "null!";
   }
+
+  public static String resolveSqlType(Column col) {
+    String d = col.getDataType();
+    if(d.equals(dInt)) {
+      return "integer";
+    }
+    if(d.equals(dString)) {
+      return "char(16)";
+    }
+    if(d.equals(dDate)) {
+      return "datetime2";
+    }
+    if(d.equals(dGuid)) {
+      return "uniqueidentifier";
+    }
+    return "integer";
+  }
+
+  public static String resovleSqlDefault(Column col) {
+    String d = col.getDataType();
+    if(d.equals(dInt)) {
+      return "0";
+    }
+    if(d.equals(dString)) {
+      return "''";
+    }
+    if(d.equals(dDate)) {
+      return "date()";
+    }
+    if(d.equals(dGuid)) {
+      return "newid()";
+    }
+    return "0";
+  }
 }

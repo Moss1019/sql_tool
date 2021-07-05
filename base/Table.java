@@ -99,6 +99,10 @@ public class Table {
     return pascalName.toLowerCase();
   }
 
+  public String getLoopedJoinedName() {
+    return loopedJoinedName;
+  }
+
   public String getLoopedJoinedPascal() {
     return loopedJoinedPascal;
   }
@@ -179,7 +183,6 @@ public class Table {
       }
       loopedJoinedPascal = lp.toString();
       loopedJoinedCamel = lc.toString();
-      System.out.println(loopedJoinedPascal);
     } else {
       loopedJoinedPascal = "";
       loopedJoinedCamel = "";

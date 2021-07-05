@@ -34,7 +34,7 @@ public class ConfigGenerator extends Generator {
 
   @Override
   protected void loadTemplates() {
-    inMemDiConfig = loadTemplate("inmemdiconfig");
+    inMemDiConfig = loadTemplate("diconfig");
     addScopedTmpl = loadTemplate("addscoped");
   }
 }

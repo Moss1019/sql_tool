@@ -74,6 +74,8 @@ public class Program {
         case Sql: {
           SqlRepositoryGenerator repositoryGenerator = new SqlRepositoryGenerator(db);
           writeFiles(repositoryGenerator.generate(), "Repositories");
+          SqlGenerator sqlGenerator = new SqlGenerator(db);
+          writeFiles(sqlGenerator.generate(), "");
           break;
         }
         default:

@@ -9,13 +9,22 @@ namespace {rootname}
     {
         public static void Add{rootname}Configuration(this IServiceCollection services)
         {
+            AddConfiguration(services);
             ConfigureRepositories(services);
             ConfigureServices(services);
         }
 
+        private static void AddConfiguration(IServiceCollection services)
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+            services.AddSingleton<IConfiguration>(config);
+        }
+
         private static void ConfigureRepositories(IServiceCollection services)
         { {repositories}
-            services.AddSingleton<DbContext>();
+            
         }
 
         public static void ConfigureServices(IServiceCollection services)
