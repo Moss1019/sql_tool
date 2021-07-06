@@ -58,7 +58,7 @@ public class SqlGenerator extends Generator {
       b.append(" primary key ");
     }
     if(c.isUnique()) {
-      b.append(" not null ");
+      b.append(" unique not null ");
     }
     return b.toString();
   }
