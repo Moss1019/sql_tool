@@ -21,13 +21,17 @@ public class SqlRepositoryGenerator extends Generator {
   private String updateTmpl;
   private String includeChildTmpl;
   private String joinedClassTmpl;
-  
+  private String contextTmpl;
+  private String contextCompositeTmpl;
+  private String contextSetTmpl;
+
   public SqlRepositoryGenerator(Database db) {
     super(db, "../templates/dotnet/entityframework");
   }
 
   public Map<String, String> generate() {
     Map<String, String> files = new HashMap<>();
+    files.put(db.getRootName() + "Context.cs", generateContext());
     for(Table t: db.getTables()) {
       files.put("I" + t.getPascalName() + "Repository.cs", generateInterface(t));
       files.put(t.getPascalName() + "Repository.cs", generateClass(t));
@@ -35,7 +39,30 @@ public class SqlRepositoryGenerator extends Generator {
     return files;
   }
 
-private String generateInterface(Table t) {
+  private String generateContext() {
+    StringBuilder b = new StringBuilder();
+    StringBuilder k = new StringBuilder();
+    for(Table t: db.getTables()) {
+      b
+      .append("\n\n\t\t")
+      .append(contextSetTmpl
+        .replace("{tablepascal}", t.getPascalName()));
+      if(t.isJoined() || t.isLooped()) {
+        k
+        .append("\n\t\t\t")
+        .append(contextCompositeTmpl
+          .replace("{tablepascal}", t.getPascalName())
+          .replace("{primarycolpascal}", t.getPrimaryColumn().getPascalName())
+          .replace("{secondarycolpascal}", t.getSecondaryColumn().getPascalName()));
+      }
+    }
+    return contextTmpl
+      .replace("{sets}", b.toString())
+      .replace("{composites}", k.toString())
+      .replace("{rootname}", db.getRootName());
+  }
+
+  private String generateInterface(Table t) {
     if(t.isLooped() || t.isJoined()) {
       return joinedInterfaceTmpl
         .replace("{rootname}", db.getRootName())
@@ -118,7 +145,8 @@ private String generateInterface(Table t) {
         .replace("{secondarycamel}", t.getSecondaryColumn().getCamelName())
         .replace("{primarypascal}", t.getPrimaryColumn().getPascalName())
         .replace("{secondarypascal}", t.getSecondaryColumn().getPascalName())
-        .replace("{secondarytablepascal}", t.getLoopedJoinedPascal());
+        .replace("{secondarytablepascal}", t.getLoopedJoinedPascal())
+        .replace("{primarytablepascal}", t.getPrimaryColumn().getForeignTable().getPascalName());
     } else {
       return classTmpl
         .replace("{delete}", generateDelete(t))
@@ -224,5 +252,8 @@ private String generateInterface(Table t) {
     updateTmpl = loadTemplate("update");
     includeChildTmpl = loadTemplate("includechild");
     joinedClassTmpl = loadTemplate("joinedclass");
+    contextTmpl = loadTemplate("context");
+    contextCompositeTmpl = loadTemplate("contextcomposite");
+    contextSetTmpl = loadTemplate("contextset");
   }
 }

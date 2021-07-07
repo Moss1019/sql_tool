@@ -1,6 +1,6 @@
         public bool Update({tablepascal} entity)
         {
-            using var context = new GidContext(config);
+            using var context = new {rootname}Context(config);
             var e = context.{tablepascal}s
                 .Where(x => x.{primarypascal} == entity.{primarypascal})
                 .FirstOrDefault();

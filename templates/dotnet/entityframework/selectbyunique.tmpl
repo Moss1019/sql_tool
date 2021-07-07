@@ -1,6 +1,6 @@
         public {tablepascal} SelectBy{columnpascal}(string {columncamel})
         {
-            using var context = new GidContext(config);
+            using var context = new {rootname}Context(config);
             var e = context.{tablepascal}s
                 .Where(x => x.{columnpascal} == {columncamel}){childlists}
                 .FirstOrDefault();

@@ -1,0 +1,27 @@
+using {rootname}.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
+namespace {rootname}.Repositories
+{
+    public class {rootname}Context: DbContext
+    {
+        private IConfiguration config;{sets}
+
+        public {rootname}Context(IConfiguration config)
+        {
+            this.config = config;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(config.GetConnectionString("{rootname}Db"));
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {{composites}
+            base.OnModelCreating(modelBuilder);
+        }
+    }
+}

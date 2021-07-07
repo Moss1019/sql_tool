@@ -1,6 +1,6 @@
         public {tablepascal} Insert({tablepascal} entity)
         {
-            using var context = new GidContext(config);
+            using var context = new {rootname}Context(config);
             context.{tablepascal}s.Add(entity);
             context.SaveChanges();
             return entity;

@@ -15,12 +15,12 @@ public class ConfigGenerator extends Generator {
     StringBuilder br = new StringBuilder();
     for(Table t: db.getTables()) {
       bs
-        .append("\n\t\t\t\t\t\t")
+        .append("\n\t\t\t")
         .append(addScopedTmpl
           .replace("{tablepascal}", t.getPascalName())
           .replace("{type}", "Service"));
       br
-        .append("\n\t\t\t\t\t\t")
+        .append("\n\t\t\t")
         .append(addScopedTmpl
           .replace("{tablepascal}", t.getPascalName())
           .replace("{type}", "Repository"));

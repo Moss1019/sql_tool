@@ -69,7 +69,6 @@ public class SqlGenerator extends Generator {
     for(Table pt: t.getParentTables()) {
       String foreignColumn = "";
       String tableName = "";
-      String onDelete = "";
       for(Column c: t.getColumns()) {
         if(!c.isForeign()) {
           continue;
@@ -79,7 +78,6 @@ public class SqlGenerator extends Generator {
             if(i++ == 0) {
               foreignColumn = c.getCamelName();
               tableName = t.getName();
-              onDelete = "on delete cascade";
             } else {
               foreignColumn = t.getSecondaryColumn().getCamelName();
               tableName = t.getLoopedJoinedName();
@@ -88,7 +86,6 @@ public class SqlGenerator extends Generator {
           } else {
             foreignColumn = c.getCamelName();
             tableName = t.getName();
-            onDelete = "on delete cascade";
             break;
           }
         }
@@ -99,8 +96,7 @@ public class SqlGenerator extends Generator {
         .replace("{parentname}", pt.getName())
         .replace("{tablename}", tableName)
         .replace("{parentprimarycamel}", pt.getPrimaryColumn().getCamelName())
-        .replace("{foreigncamel}", foreignColumn)
-        .replace("{ondelete}", onDelete));
+        .replace("{foreigncamel}", foreignColumn));
     }
     return b.toString();
   }
