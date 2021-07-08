@@ -26,7 +26,8 @@ public class EntityGenerator extends Generator {
       .replace("{tablepascal}", t.getPascalName())
       .replace("{fields}", generateFields(t))
       .replace("{parent}", generateVirtualParents(t))
-      .replace("{childlist}", generateChildLists(t));
+      .replace("{childlist}", generateChildLists(t))
+      .replace("{tableattrib}", getTableAttibute(t));
   }
 
   private String generateFields(Table t) {
@@ -34,10 +35,12 @@ public class EntityGenerator extends Generator {
     int i = 0;
     for(Column c: t.getColumns()) {
       b
-      .append("\t\t\t")
+      .append("\t\t")
       .append(fieldTmpl
+        .replace("{columnattrib}", getColumnAttribute(c))
         .replace("{datatype}", DataTypeUtil.resolvePrimitive(c))
-        .replace("{columnpascal}", c.getPascalName()));
+        .replace("{columnpascal}", c.getPascalName())
+        .replace("{datadefault}", DataTypeUtil.resolveDefault(c)));
       if(++i < t.getColumns().size() || t.hasLists()) {
         b.append("\n\n");
       }
@@ -60,7 +63,7 @@ public class EntityGenerator extends Generator {
         }
       }
       b
-      .append("\t\t\t")
+      .append("\t\t")
       .append(virtualParentTmpl
         .replace("{parenthandlepascal}", parentHandle)
         .replace("{tablepascal}", pt.getPascalName()));
@@ -71,7 +74,7 @@ public class EntityGenerator extends Generator {
     return b.toString();
   } 
 
-  public String generateChildLists(Table t) {
+  private String generateChildLists(Table t) {
     StringBuilder b = new StringBuilder();
     b.append("\n\n");
     int i = 0;
@@ -80,7 +83,7 @@ public class EntityGenerator extends Generator {
         continue;
       }
       b
-      .append("\t\t\t")
+      .append("\t\t")
       .append(childListTmpl
         .replace("{tablepascal}", ct.getPascalName()));
       if(++i < t.getChildTables().size() - 1) {
@@ -90,8 +93,22 @@ public class EntityGenerator extends Generator {
     return b.toString();
   }
 
+  private String getTableAttibute(Table t) {
+    if(db.getDatabaseType() == DatabaseType.Sql) {
+      return String.format("\n\t[Table(\"%s\")]", t.getPascalName());
+    }
+    return "";
+  }
+
+  private String getColumnAttribute(Column c) {
+    if(c.isPrimary()) {
+      return "[Key]\n\t\t";
+    }
+    return "";
+  }
+
   @Override
-  public void loadTemplates() {
+  protected void loadTemplates() {
     classTmpl = loadTemplate("class");
     fieldTmpl = loadTemplate("field");
     childListTmpl = loadTemplate("childlist");

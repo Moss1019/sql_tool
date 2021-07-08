@@ -65,7 +65,7 @@ public class DataTypeUtil {
       return "''";
     }
     if(d.equals(dDate)) {
-      return "date()";
+      return "getdate()";
     }
     if(d.equals(dGuid)) {
       return "newid()";

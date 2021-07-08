@@ -146,7 +146,7 @@ public class SqlRepositoryGenerator extends Generator {
         .replace("{primarypascal}", t.getPrimaryColumn().getPascalName())
         .replace("{secondarypascal}", t.getSecondaryColumn().getPascalName())
         .replace("{secondarytablepascal}", t.getLoopedJoinedPascal())
-        .replace("{primarytablepascal}", t.getPrimaryColumn().getForeignTable().getPascalName());
+        .replace("{resultpascal}", t.getSecondaryColumn().getForeignTable().getPascalName());
     } else {
       return classTmpl
         .replace("{delete}", generateDelete(t))

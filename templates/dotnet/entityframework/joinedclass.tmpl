@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace {rootname}.Repositories.EF
+namespace {rootname}.Repositories
 {
     public class {tablepascal}Repository : I{tablepascal}Repository
     {
@@ -39,7 +39,7 @@ namespace {rootname}.Repositories.EF
             return entity;
         }
 
-        public IEnumerable<{primarytablepascal}> Select{tablepascal}s(Guid {primarycamel})
+        public IEnumerable<{resultpascal}> Select{tablepascal}s(Guid {primarycamel})
         {
             using var context = new {rootname}Context(config);
             var result = context.{tablepascal}s
