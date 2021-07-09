@@ -1,0 +1,8 @@
+	@RequestMapping(value = "for{parentpascal}/{{parentprimarylower}}", method = RequestMethod.GET)
+	public ResponseEntity<?> getOf{parentpascal}(@PathVariable UUID {parentprimarylower}) { 
+		List<{tablepascal}View> result = service.selectOf{parentpascal}({parentprimarylower});
+		if (result.size() == 0) {
+			return ResponseEntity.status(404).body("No results");
+		}
+		return ResponseEntity.ok(result);
+	}

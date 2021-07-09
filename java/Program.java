@@ -50,40 +50,8 @@ public class Program {
         arguments.get("databasetype"), 
         (List<Table>)visitor.visit(tree));
       
-      EntityGenerator entityGenerator = new EntityGenerator(db);
-      writeFiles(entityGenerator.generate(), "Entities");
-
-      ViewGenerator viewGenerator = new ViewGenerator(db);
-      writeFiles(viewGenerator.generate(), "Views");
-
-      MapperGenerator mapperGenerator = new MapperGenerator(db);
-      writeFiles(mapperGenerator.generate(), "Mappers");
-
       ControllerGenerator controllerGenerator = new ControllerGenerator(db);
-      writeFiles(controllerGenerator.generate(), "Controllers");
-
-      ServiceGenerator serviceGenerator = new ServiceGenerator(db);
-      writeFiles(serviceGenerator.generate(), "Services");
-
-      switch (db.getDatabaseType()) {
-        case InMemory: {
-          InMemoryRepositoryGenerator repositoryGenerator = new InMemoryRepositoryGenerator(db);
-          writeFiles(repositoryGenerator.generate(), "Repositories");
-          break;
-        }
-        case Sql: {
-          SqlRepositoryGenerator repositoryGenerator = new SqlRepositoryGenerator(db);
-          writeFiles(repositoryGenerator.generate(), "Repositories");
-          SqlGenerator sqlGenerator = new SqlGenerator(db);
-          writeFiles(sqlGenerator.generate(), "");
-          break;
-        }
-        default:
-          System.out.println("Unknown database type");
-      }
-
-      ConfigGenerator configGenerator = new ConfigGenerator(db);
-      writeFiles(configGenerator.generate(), "");
+      writeFiles(controllerGenerator.generate(), "controller");
 
     } catch (Exception ex) {
       ex.printStackTrace();

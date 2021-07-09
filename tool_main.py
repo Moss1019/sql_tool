@@ -1,6 +1,6 @@
 
 from tool_manager import antlr_exists, download_antlr, run_antlr
-from tool_generators import generator_asp
+from tool_generators import generate_asp, generate_spring
 
 
 def show_menu():
@@ -41,9 +41,9 @@ while is_running:
   elif sm == 1:
     run_antlr(get_grammer_file_name())
   elif sm == 2:
-    print('coming soon')
+    generate_spring()
   elif sm == 3:
-    generator_asp()
+    generate_asp()
   elif sm == 4:
     print('planned feature')
   elif sm == 5:

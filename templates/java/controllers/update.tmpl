@@ -1,0 +1,8 @@
+	@RequestMapping(value = "", method = RequestMethod.PUT)
+	public ResponseEntity<?> update(@RequestBody {tablepascal}View updated{tablepascal}) { 
+		boolean result = service.update(updated{tablepascal});
+		if (!result) {
+			return ResponseEntity.status(400).body("Could not update {tablepascal}");
+		}
+		return ResponseEntity.ok(result);
+	}

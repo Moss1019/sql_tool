@@ -1,0 +1,8 @@
+	@RequestMapping(value = "{value}", method = RequestMethod.GET)
+	public ResponseEntity<?> getByPk(@PathVariable UUID value) {
+		{tablepascal}View result = service.selectByPk(value);
+		if (result == null) {
+			return ResponseEntity.status(404).body("Could not find {tablepascal} with id " + value);
+		}
+		return ResponseEntity.ok(result);
+	}

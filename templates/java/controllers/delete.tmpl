@@ -1,0 +1,8 @@
+	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> delete(@PathVariable UUID id) {
+		boolean result = service.delete(id);
+		if (!result) {
+			return ResponseEntity.status(400).body("Could not delete {tablepascal}");
+		}
+		return ResponseEntity.ok(result);
+	}

@@ -1,0 +1,8 @@
+	@RequestMapping(value = "by{columnpascal}/{{pascallower}}", method = RequestMethod.GET)
+	public ResponseEntity<?> selectBy{columnpascal}(@PathVariable String {pascallower}) {
+		{tablepascal}View result = service.selectBy{columnpascal}({pascallower});
+		if (result == null) {
+			return ResponseEntity.status(404).body("Could not find {tablelower} by " + {pascallower});
+		}
+		return ResponseEntity.ok(result);
+	}
