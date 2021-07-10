@@ -1,0 +1,4 @@
+	public boolean update(ItemView updatedItem) { 
+		boolean result = repo.update(ItemMapper.mapItemView(updatedItem));
+		return result;
+	}

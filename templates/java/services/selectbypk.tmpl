@@ -1,0 +1,9 @@
+	public ItemView selectByPk(UUID value) {
+		Item dbResult = repo.selectByPk(value);
+		if(dbResult == null) {
+			return null;
+		}
+		List<MilestoneView> milestoneViews = milestoneService.selectOfItem(dbResult.getItemId());
+		ItemView result = ItemMapper.mapItem(dbResult, milestoneViews);
+		return result;
+	}

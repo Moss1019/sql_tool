@@ -1,0 +1,11 @@
+	public List<ItemView> selectAll() {
+		List<Item> dbResult = repo.selectAll();
+		List<ItemView> result = dbResult
+			.stream()
+			.map(x -> {
+				List<MilestoneView> milestoneViews = milestoneService.selectOfItem(x.getItemId());
+				return ItemMapper.mapItem(x, milestoneViews);
+			})
+			.collect(Collectors.toList());
+		return result;
+	}

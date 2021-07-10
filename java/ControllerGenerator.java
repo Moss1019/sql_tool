@@ -10,6 +10,9 @@ public class ControllerGenerator extends Generator {
   private String selectByUniqueTmpl;
   private String updateTmpl;
   private String deleteTmpl;
+  private String joinedClassTmpl;
+  private String selectForParentJoinedTmpl;
+  private String deleteJoinedTmpl;
 
   public ControllerGenerator(Database db) {
     super(db, "../templates/java/controllers");
@@ -24,17 +27,38 @@ public class ControllerGenerator extends Generator {
   }
 
   private String generateController(Table t) {
-    return classTmpl
-      .replace("{insert}", generateInsert(t))
-      .replace("{selectall}", generateSelectAll(t))
-      .replace("{selectbyid}", generateSelectById(t))
-      .replace("{selectforparent}", generateSelectForParent(t))
-      .replace("{selectbyunique}", generateSelectByUnique(t))
-      .replace("{update}", generateUpdate(t))
-      .replace("{delete}", generateDelete(t))
-      .replace("{tablepascal}", t.getPascalName())
-      .replace("{tablelower}", t.getLowerName())
-      .replace("{rootname}", db.getRootName());
+    if(t.isJoined() || t.isLooped()) {
+      return joinedClassTmpl
+        .replace("{insert}", generateInsert(t))
+        .replace("{selectforparent}", generateSelectForParentJoined(t))
+        .replace("{delete}", generateDeleteJoined(t))
+        .replace("{tablepascal}", t.getPascalName())
+        .replace("{rootname}", db.getRootName());
+    } else {
+      return classTmpl
+        .replace("{insert}", generateInsert(t))
+        .replace("{selectall}", generateSelectAll(t))
+        .replace("{selectbyid}", generateSelectById(t))
+        .replace("{selectforparent}", generateSelectForParent(t))
+        .replace("{selectbyunique}", generateSelectByUnique(t))
+        .replace("{update}", generateUpdate(t))
+        .replace("{delete}", generateDelete(t))
+        .replace("{tablepascal}", t.getPascalName())
+        .replace("{tablelower}", t.getLowerName())
+        .replace("{rootname}", db.getRootName());
+    }
+  }
+
+  private String generateSelectForParentJoined(Table t) {
+    return selectForParentJoinedTmpl
+      .replace("{parentpascal}", t.getPrimaryColumn().getForeignTable().getPascalName())
+      .replace("{parentprimarylower}", t.getPrimaryColumn().getLowerName());
+  }
+
+  private String generateDeleteJoined(Table t) {
+    return deleteJoinedTmpl
+      .replace("{primarylower}", t.getPrimaryColumn().getLowerName())
+      .replace("{secondarylower}", t.getSecondaryColumn().getLowerName());
   }
 
   private String generateInsert(Table t) {
@@ -97,5 +121,8 @@ public class ControllerGenerator extends Generator {
     selectByUniqueTmpl = loadTemplate("selectbyunique");
     updateTmpl = loadTemplate("update");
     deleteTmpl = loadTemplate("delete");
+    joinedClassTmpl = loadTemplate("joiningclass");
+    selectForParentJoinedTmpl = loadTemplate("joiningselectforparent");
+    deleteJoinedTmpl = loadTemplate("joiningdelete");
   }
 }

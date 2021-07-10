@@ -1,0 +1,32 @@
+package {rootname}.service;
+
+import org.springframework.stereotype.Service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import {rootname}.entity.*;
+import {rootname}.view.*;
+import {rootname}.mapper.*;
+import {rootname}.repository.*;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+public class ItemService {
+	@Autowired
+	private ItemRepository repo;
+
+{insert}
+
+{delete}
+
+{selectall}
+
+{selectbyunique}
+
+{selectforparent}
+
+{update}
+}

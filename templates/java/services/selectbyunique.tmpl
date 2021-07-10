@@ -1,0 +1,9 @@
+	public UserView selectByUserName(String value) {
+		User dbResult = repo.selectByUserName(value);
+		if(dbResult == null) {
+			return null;
+		}
+		List<ItemView> itemViews = itemService.selectOfUser(dbResult.getUserId());
+		UserView result = UserMapper.mapUser(dbResult, itemViews);
+		return result;
+	}

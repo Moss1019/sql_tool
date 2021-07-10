@@ -1,0 +1,5 @@
+	public ItemView insert(ItemView newItem) {
+		Item dbResult = repo.insert(ItemMapper.mapItemView(newItem));
+		ItemView result = ItemMapper.mapItem(dbResult);
+		return result;
+	}

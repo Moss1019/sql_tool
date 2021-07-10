@@ -1,0 +1,9 @@
+	public boolean delete(UUID id) {
+    Item object = repo.selectByPk(id);
+    if(object != null) {
+      for(MilestoneView x: milestoneService.selectOfItem(object.getItemId())) {
+        milestoneService.delete(x.getMilestoneId());
+      }
+    }
+		return repo.delete(id);
+	}
